@@ -1,0 +1,8 @@
+input/*
+!input/.gitkeep
+preview/
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+scripts/ascii/_work/
