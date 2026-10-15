@@ -241,6 +241,7 @@ def about(mode: str) -> str:
     tf, bf, mf = typo.font(typo.DISPLAY), typo.font(typo.BODY), typo.font(typo.MONO_B)
     body, css = "", ("@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}.cb{animation:bob 5s ease-in-out infinite}"
                      "@keyframes run{to{stroke-dashoffset:-400}}.run{stroke-dasharray:90 310;animation:run 6s linear infinite}"
+                     "@keyframes shn{0%{transform:translateX(0)}45%,100%{transform:translateX(280px)}}.shn{animation:shn 6s ease-in-out infinite}"
                      "@keyframes ic1{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}.ic1{animation:ic1 2.2s ease-in-out infinite}"
                      "@keyframes ic2{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.12)}}.ic2{transform-box:fill-box;transform-origin:center;animation:ic2 1.8s ease-in-out infinite}"
                      "@keyframes ic3{to{transform:rotate(360deg)}}.ic3{transform-box:fill-box;transform-origin:center;animation:ic3 6s linear infinite}"
@@ -254,6 +255,7 @@ def about(mode: str) -> str:
         dd = "".join(f'<path d="{bf.path(l, 13.5, x + 20, 122 + k * 21)[0]}" fill="{c["muted"]}"/>' for k, l in enumerate(lines))
         body += (f'<g class="cb" style="animation-delay:-{i * 1.1:.1f}s"><rect x="{x + .5}" y="14.5" width="190" height="178" rx="22" fill="{c["card"]}" stroke="{c["line"]}"/>'
                  f'<rect class="run" x="{x + .5}" y="14.5" width="190" height="178" rx="22" fill="none" stroke="{col}" stroke-width="2.4" pathLength="400" style="animation-delay:-{i * 1.5}s"/>'
+                 f'<clipPath id="ac{i}"><rect x="{x}" y="14" width="191" height="179" rx="22"/></clipPath><g clip-path="url(#ac{i})"><rect class="shn" x="{x - 60}" y="14" width="34" height="180" fill="{col}" opacity=".10" transform="skewX(-20)" style="animation-delay:-{i * 1.4:.1f}s"/></g>'
                  f'{_about_icon(i, x + 150, 28, col)}<path d="{ld}" fill="{col}"/><path d="{td}" fill="{c["ink"]}"/>{dd}</g>')
     ff = typo.font(typo.HEAD)
     fd, _ = ff.path("Fun fact:", 15, 0, 0)

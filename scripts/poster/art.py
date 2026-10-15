@@ -129,7 +129,10 @@ def header(mode: str) -> str:
               f'<g clip-path="url(#nm)"><rect class="shm" x="-260" y="60" width="200" height="190" fill="url(#shg)" opacity=".75" transform="skewX(-18)"/></g>'
               f'<path class="ul" d="{ul}" fill="none" stroke="url(#gn)" stroke-width="4" stroke-linecap="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="0"/></g>'
             + roles + wbody)
-    css = acss + pcss + tcss + gcss + wcss + css_name + rcss + kcss
+    shoot = "".join(f'<g transform="translate({90 + k * 330} {30 + (k % 2) * 36})"><line class="sl" x1="0" y1="0" x2="-80" y2="-27" stroke="url(#st)" stroke-width="2.2" stroke-linecap="round" style="animation-delay:-{k * 2.1:.1f}s"/></g>' for k in range(3))
+    body = body.replace(wbody, shoot + wbody)
+    defs += f'<linearGradient id="st" x1="0" x2="1"><stop offset="0" stop-color="{c["accent"]}"/><stop offset="1" stop-color="{c["accent"]}" stop-opacity="0"/></linearGradient>'
+    css = acss + pcss + tcss + gcss + wcss + css_name + rcss + kcss + "@keyframes ssh{0%{transform:translate(0,0);opacity:0}6%{opacity:1}30%,100%{transform:translate(230px,78px);opacity:0}}.sl{animation:ssh 7.2s ease-in infinite}"
     return doc(W, H, body, css, defs, "Rajdip Dhar: hand-drawn signature, rotating roles, animated aurora banner")
 
 

@@ -33,7 +33,9 @@ def toolbox(mode: str) -> str:
     mf, nf, pf = typo.font(typo.MONO_B), typo.font(typo.MEDIUM), typo.font(typo.HEAD)
     css = ("@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}.tl{animation:bob 4.6s ease-in-out infinite}"
            "@keyframes run{to{stroke-dashoffset:-400}}.run{stroke-dasharray:90 310;animation:run 5s linear infinite}"
-           "@keyframes pu{0%,100%{opacity:1}50%{opacity:.3}}.pu{animation:pu 1.6s ease-in-out infinite}" + _tw())
+           "@keyframes pu{0%,100%{opacity:1}50%{opacity:.3}}.pu{animation:pu 1.6s ease-in-out infinite}"
+           "@keyframes shn{0%{transform:translateX(0)}40%,100%{transform:translateX(220px)}}.shn{animation:shn 5s ease-in-out infinite}"
+           "@keyframes gw{0%,100%{opacity:.12;transform:scale(1)}50%{opacity:.3;transform:scale(1.18)}}.gw{transform-box:fill-box;transform-origin:center;animation:gw 3s ease-in-out infinite}" + _tw())
     body, y, k = "", 0, 0
     for label, items, learning in ROWS:
         d, w = mf.path(label, 13, 0, 0, 4)
@@ -50,7 +52,9 @@ def toolbox(mode: str) -> str:
             body += (f'<g class="tl" style="animation-delay:-{(k * .7) % 4.6:.1f}s">'
                      f'<rect x="{x + .5:.1f}" y="{y + .5}" width="{TW - 1}" height="{TH - 1}" rx="22" fill="{c["card"]}" stroke="{c["line"] if not learning else c["pink"]}" stroke-opacity="{1 if not learning else .8}"{dash}/>'
                      f'<rect class="run" x="{x + .5:.1f}" y="{y + .5}" width="{TW - 1}" height="{TH - 1}" rx="22" fill="none" stroke="{col}" stroke-width="2.2" pathLength="400" style="animation-delay:-{(k * 1.3) % 5:.1f}s"/>'
-                     f'<circle cx="{x + TW / 2:.1f}" cy="{y + 52}" r="30" fill="{col}" opacity=".14"/>'
+                     f'<clipPath id="tc{k}"><rect x="{x:.1f}" y="{y}" width="{TW}" height="{TH}" rx="22"/></clipPath>'
+                     f'<g clip-path="url(#tc{k})"><rect class="shn" x="{x - 70:.1f}" y="{y}" width="40" height="{TH}" fill="#fff" opacity=".09" transform="skewX(-20)" style="animation-delay:-{(k * .45) % 5:.2f}s"/></g>'
+                     f'<circle class="gw" cx="{x + TW / 2:.1f}" cy="{y + 52}" r="30" fill="{col}" opacity=".14" style="animation-delay:-{(k * .5) % 3:.1f}s"/>'
                      f'{icon(key, x + TW / 2 - 21, y + 31, 42, col)}'
                      f'<path d="{nd}" transform="translate({x + (TW - nw) / 2:.1f} {y + 107})" fill="{c["ink"]}"/>'
                      + (f'<circle class="pu" cx="{x + TW - 16}" cy="{y + 16}" r="4" fill="{c["pink"]}"/>' if learning else "") + '</g>')
@@ -104,6 +108,7 @@ def project_card(p: dict, mode: str, idx: int) -> str:
     css = ("@keyframes run{to{stroke-dashoffset:-1000}}.run{stroke-dasharray:160 840;animation:run 7s linear infinite}"
            "@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}.cb{animation:bob 6s ease-in-out infinite}"
            "@keyframes arr{0%,100%{transform:translate(0,0)}50%{transform:translate(4px,-4px)}}.arr{animation:arr 2s ease-in-out infinite}"
+           "@keyframes ptl{0%{transform:translateY(0);opacity:0}15%{opacity:.8}100%{transform:translateY(-150px);opacity:0}}.ptl{animation:ptl 5s linear infinite}"
            "@keyframes sheen{0%{transform:translateX(0)}45%,100%{transform:translateX(620px)}}.sheen{animation:sheen 6s ease-in-out infinite}"
            "@keyframes spin{to{transform:rotate(360deg)}}.wm{transform-box:fill-box;transform-origin:center;animation:spin 40s linear infinite}" + _tw())
     arrow = (f'<g class="arr"><circle cx="{W - 44}" cy="{H - 41}" r="20" fill="url(#g1)"/>'
@@ -113,6 +118,7 @@ def project_card(p: dict, mode: str, idx: int) -> str:
             f'<g clip-path="url(#cc)"><circle cx="{W - 30}" cy="40" r="120" fill="{col}" opacity=".10"/>'
             f'<g class="wm">{icon(p["icon"], W - 130, -10, 130, col, "opacity=\".13\"")}</g></g>'
             f'<rect class="run" x="1" y="1" width="{W - 2}" height="{H - 2}" rx="26" fill="none" stroke="url(#g1)" stroke-width="3" pathLength="1000" style="animation-delay:-{idx * 1.7:.1f}s"/>'
+            f'<g clip-path="url(#cc)">{"".join(f"<circle class=" + chr(34) + "ptl" + chr(34) + f" cx=" + chr(34) + f"{40 + j * 58}" + chr(34) + f" cy=" + chr(34) + f"{H - 10}" + chr(34) + f" r=" + chr(34) + f"{1.6 + (j % 3) * .6}" + chr(34) + f" fill=" + chr(34) + f"{col}" + chr(34) + " style=" + chr(34) + f"animation-delay:-{(j * 1.1 + idx) % 6:.1f}s;animation-duration:{4 + j % 3}s" + chr(34) + "/>" for j in range(6))}</g>'
             f'<g clip-path="url(#cc)"><rect class="sheen" x="-120" y="0" width="70" height="{H}" fill="#fff" opacity=".10" transform="skewX(-20)" style="animation-delay:-{idx * 1.6:.1f}s"/></g>'
             f'<path d="{kd}" fill="{c["accent"]}"/><path d="{td}" fill="url(#g1)"/>{dd}{chips}{arrow}'
             f'{star4(W - 90, 150, 6, c["accent"], "tw")}{star4(W - 40, 120, 4, c["pink"], "tw", "style=" + chr(34) + "animation-delay:-1.3s" + chr(34))}</g>')
