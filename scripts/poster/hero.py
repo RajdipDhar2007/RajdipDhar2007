@@ -40,14 +40,16 @@ def section_title(num: str, text: str, mode: str) -> str:
     css += f"@keyframes dot{{0%{{transform:translateX(0)}}100%{{transform:translateX({tw - 6:.0f}px)}}}}.dot{{animation:dot 3.2s ease-in-out infinite alternate}}"
     css += kf("shm", T, [(0, "transform:translateX(0)"), (2.2, "transform:translateX(0)"), (3.6, f"transform:translateX({tw + 240:.0f}px)"), (5.6, "transform:translateX(0)"), (7.0, f"transform:translateX({tw + 240:.0f}px)"), (T, f"transform:translateX({tw + 240:.0f}px)")]) + f".shm{{animation:shm {T}s linear infinite}}"
     css += kf("orb", T, [(0, "opacity:0"), (.2, "opacity:0"), (1.0, "opacity:1"), (T - .7, "opacity:1"), (T - .25, "opacity:0"), (T, "opacity:0")]) + f".orb{{animation:orb {T}s ease-out infinite}}"
-    css += _tw()
+    css += _tw() + "@keyframes bst{0%,15%{opacity:0;transform:translate(0,0)}18%{opacity:1}35%,100%{opacity:0;transform:translate(var(--dx),var(--dy))}}.bst{animation:bst 9s ease-out infinite}"
+    import math as _m
+    burst = "".join(f'<circle class="bst" cx="{x0 + tw / 2:.0f}" cy="81" r="2.6" fill="{[c["accent"], c["second"], c["pink"]][j % 3]}" style="--dx:{58 * _m.cos(j * _m.pi / 5.5 - _m.pi):.0f}px;--dy:{-42 * abs(_m.sin(j * _m.pi / 5.5)):.0f}px"/>' for j in range(12))
     defs = (_grad(c, "g1", 0, 1) + f'<clipPath id="tc"><path d="{full}"/></clipPath>'
             '<linearGradient id="sg"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>')
     dly = lambda v: f'style="animation-delay:-{v}s"'  # noqa: E731
     body = (f'<g class="orb">{star4(x0 - 34, 46, 9, c["accent"], "tw")}{star4(x0 + tw + 34, 46, 9, c["second"], "tw", dly(1.2))}'
             f'{star4(x0 - 14, 20, 5, c["pink"], "tw", dly(.6))}{star4(x0 + tw + 14, 20, 5, c["accent"], "tw", dly(1.8))}</g>'
             f'{letters}<g clip-path="url(#tc)"><rect class="shm" x="{x0 - 200:.0f}" y="10" width="110" height="70" fill="url(#sg)" opacity=".8" transform="skewX(-18)"/></g>'
-            f'<g class="ln"><rect x="{x0:.0f}" y="80" width="{tw:.0f}" height="3" rx="1.5" fill="url(#g1)" opacity=".85"/>'
+            f'{burst}<g class="ln"><rect x="{x0:.0f}" y="80" width="{tw:.0f}" height="3" rx="1.5" fill="url(#g1)" opacity=".85"/>'
             f'<circle class="dot" cx="{x0 + 3:.0f}" cy="81.5" r="5" fill="{c["ink"]}"/></g>')
     return doc(W, H, body, css, defs, f"{text.title()} section title")
 
@@ -263,9 +265,20 @@ def about(mode: str) -> str:
     fact = "this README is generated code. The portrait is made of text and every banner is hand-built SVG."
     lines = bf.wrap(fact, 15, 650)
     fy = 250
-    ftxt = "".join(f'<path d="{bf.path(l, 15, 112, fy + k * 22)[0]}" fill="{c["ink"]}"/>' for k, l in enumerate(lines))
+    ftxt, tT, tcss, t0 = "", 11.0, "", 0.6
+    for k, l in enumerate(lines):
+        dur = max(len(l) * 0.045, .5)
+        tcss += kf(f"ty{k}", tT, [(0, "opacity:0;clip-path:inset(0 100% 0 0)"), (t0 - .01, "opacity:0;clip-path:inset(0 100% 0 0)"), (t0, "opacity:1;clip-path:inset(0 100% 0 0)"),
+                                  (t0 + dur, "opacity:1;clip-path:inset(0 0 0 0)"), (tT - .8, "opacity:1;clip-path:inset(0 0 0 0)"), (tT - .4, "opacity:0"), (tT, "opacity:0")]) + f".ty{k}{{animation:ty{k} {tT}s steps({max(len(l), 1)},end) infinite}}"
+        ftxt += f'<g class="ty{k}"><path d="{bf.path(l, 15, 112, fy + k * 22)[0]}" fill="{c["ink"]}"/></g>'
+        t0 += dur + .1
+    tcss += "@keyframes cb{0%,49%{opacity:1}50%,100%{opacity:0}}.cb2{animation:cb 1s steps(1) infinite}"
+    tcss += kf("cbw", tT, [(0, "opacity:0"), (t0, "opacity:0"), (t0 + .05, "opacity:1"), (tT - .8, "opacity:1"), (tT - .4, "opacity:0"), (tT, "opacity:0")]) + f".cbw{{animation:cbw {tT}s linear infinite}}"
+    ftxt += f'<g class="cbw"><rect class="cb2" x="{112 + bf.width(lines[-1], 15) + 4:.0f}" y="{fy + (len(lines) - 1) * 22 - 14}" width="8" height="17" fill="{c["accent"]}"/></g>'
+    abody_extra_css = tcss
     body += (f'<g class="cb" style="animation-delay:-2s"><rect x=".5" y="214.5" width="829" height="74" rx="20" fill="{c["card"]}" stroke="{c["line"]}"/>'
              f'<path d="{ff.path("Fun fact:", 15, 28, fy)[0]}" fill="{c["accent"]}"/>{ftxt}</g>')
+    css += abody_extra_css
     return doc(W, H, body, css, "", "About: B.Tech CSE at HITK, full-stack, Android, game dev and Web3, exploring AI and automation, looking for internships", pad_y=8)
 
 
@@ -304,10 +317,21 @@ def greeting_svg(mode: str, text: str, stamp: str, night: bool) -> str:
         icon_svg = f'<g class="spin">{rays}</g><circle cx="42" cy="42" r="12" fill="{c["pink"]}"/>'
     css = ("@keyframes spin{to{transform:rotate(360deg)}}.spin{transform-origin:42px 42px;animation:spin 14s linear infinite}"
            "@keyframes run{to{stroke-dashoffset:-400}}.run{stroke-dasharray:80 320;animation:run 6s linear infinite}" + _tw())
-    body = (f'<rect x=".5" y=".5" width="{W - 1}" height="{H - 1}" rx="26" fill="{c["card"]}" stroke="{c["line"]}"/>'
+    import random as _r
+    rr = _r.Random(3)
+    if night:
+        scene = "".join(f'<circle class="tws" cx="{rr.randint(520, 800)}" cy="{rr.randint(10, 72)}" r="{rr.choice([1, 1.4, 2])}" fill="{c["ink"]}" style="animation-delay:-{rr.uniform(0, 3):.1f}s"/>' for _ in range(26))
+        scene += f'<line class="gsl" x1="560" y1="14" x2="500" y2="-6" stroke="{c["accent"]}" stroke-width="2" stroke-linecap="round"/>'
+    else:
+        scene = "".join(f'<g class="cld" style="animation-delay:-{k * 5}s;animation-duration:{18 + k * 4}s"><ellipse cx="540" cy="{20 + k * 20}" rx="30" ry="9" fill="{c["accent"]}" opacity=".18"/><ellipse cx="560" cy="{14 + k * 20}" rx="20" ry="8" fill="{c["accent"]}" opacity=".18"/></g>' for k in range(3))
+    css_scene = ("@keyframes tws{0%,100%{opacity:.15}50%{opacity:.9}}.tws{animation:tws 3s ease-in-out infinite}"
+                 "@keyframes gsl{0%{transform:translate(0,0);opacity:0}10%{opacity:1}35%,100%{transform:translate(220px,70px);opacity:0}}.gsl{animation:gsl 7s ease-in infinite}"
+                 "@keyframes cld{from{transform:translateX(0)}to{transform:translateX(300px)}}.cld{animation:cld 20s linear infinite}")
+    body = (f'<clipPath id="gc"><rect x="1" y="1" width="{W - 2}" height="{H - 2}" rx="26"/></clipPath><g clip-path="url(#gc)">{scene}</g>'
+            f'<rect x=".5" y=".5" width="{W - 1}" height="{H - 1}" rx="26" fill="none" stroke="{c["line"]}"/>'
             f'<rect class="run" x=".5" y=".5" width="{W - 1}" height="{H - 1}" rx="26" fill="none" stroke="url(#g1)" stroke-width="2.4" pathLength="400"/>'
             f'{icon_svg}<path d="{d}" fill="{c["ink"]}"/><path d="{sd}" fill="{c["muted"]}"/>')
-    return doc(W, H, body, css, _grad(c, "g1"), text)
+    return doc(W, H, body, css + css_scene, _grad(c, "g1"), text)
 
 
 TITLES = [("01", "ABOUT ME", "about"), ("02", "TOOLBOX", "toolbox"), ("03", "FEATURED WORK", "work"), ("04", "BY THE NUMBERS", "stats"),

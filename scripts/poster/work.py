@@ -3,6 +3,9 @@ from __future__ import annotations
 from .common import PAL, MODES, OUT, doc, kf, lin_grad, typo, write, icon, icon_hex
 from .hero import star4, _tw, _grad
 
+Q = chr(34)
+A = chr(39)
+
 
 def _lum(hexcol: str) -> float:
     r, g, b = (int(hexcol[i:i + 2], 16) / 255 for i in (1, 3, 5))
@@ -35,6 +38,7 @@ def toolbox(mode: str) -> str:
            "@keyframes run{to{stroke-dashoffset:-400}}.run{stroke-dasharray:90 310;animation:run 5s linear infinite}"
            "@keyframes pu{0%,100%{opacity:1}50%{opacity:.3}}.pu{animation:pu 1.6s ease-in-out infinite}"
            "@keyframes shn{0%{transform:translateX(0)}40%,100%{transform:translateX(220px)}}.shn{animation:shn 5s ease-in-out infinite}"
+           "@keyframes orb{from{offset-distance:0%}to{offset-distance:100%}}.orb{animation:orb 4s linear infinite;filter:drop-shadow(0 0 3px currentColor)}"
            "@keyframes gw{0%,100%{opacity:.12;transform:scale(1)}50%{opacity:.3;transform:scale(1.18)}}.gw{transform-box:fill-box;transform-origin:center;animation:gw 3s ease-in-out infinite}" + _tw())
     body, y, k = "", 0, 0
     for label, items, learning in ROWS:
@@ -57,7 +61,8 @@ def toolbox(mode: str) -> str:
                      f'<circle class="gw" cx="{x + TW / 2:.1f}" cy="{y + 52}" r="30" fill="{col}" opacity=".14" style="animation-delay:-{(k * .5) % 3:.1f}s"/>'
                      f'{icon(key, x + TW / 2 - 21, y + 31, 42, col)}'
                      f'<path d="{nd}" transform="translate({x + (TW - nw) / 2:.1f} {y + 107})" fill="{c["ink"]}"/>'
-                     + (f'<circle class="pu" cx="{x + TW - 16}" cy="{y + 16}" r="4" fill="{c["pink"]}"/>' if learning else "") + '</g>')
+                     + ((f'<circle class="pu" cx="{x + TW - 16}" cy="{y + 16}" r="4" fill="{c["pink"]}"/>'
+                         f'<circle class="orb" r="3.2" fill="{c["pink"]}" style="offset-path:path({A}M{x + 22:.1f} {y:.1f} H{x + TW - 22:.1f} A22 22 0 0 1 {x + TW:.1f} {y + 22:.1f} V{y + TH - 22:.1f} A22 22 0 0 1 {x + TW - 22:.1f} {y + TH:.1f} H{x + 22:.1f} A22 22 0 0 1 {x:.1f} {y + TH - 22:.1f} V{y + 22:.1f} A22 22 0 0 1 {x + 22:.1f} {y:.1f}Z{A});animation-delay:-{k * .9:.1f}s"/>') if learning else "") + '</g>')
             k += 1
         y += TH + 30
     # skill pills (badges)

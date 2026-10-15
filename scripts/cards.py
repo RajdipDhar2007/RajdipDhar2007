@@ -174,6 +174,7 @@ def dashboard_svg(mode: str, stats: dict, langs: list[tuple[str, int]], streak: 
            f"@keyframes pu{{0%,100%{{opacity:1;transform:scale(1)}}50%{{opacity:.45;transform:scale(1.35)}}}}.pu{{transform-box:fill-box;transform-origin:center;animation:pu 1.6s ease-in-out infinite}}"
            f"@keyframes a2{{0%,100%{{transform:translateX(0)}}50%{{transform:translateX(5px)}}}}.a2{{animation:a2 1.4s ease-in-out infinite}}"
            f"@keyframes orbit{{to{{transform:rotate(360deg)}}}}.orb1{{transform-origin:0 0;animation:orbit 4s linear infinite}}.orb2{{transform-origin:0 0;animation:orbit 6s linear infinite reverse}}"
+           f"@keyframes fl{{0%,100%{{transform:scale(1,1) rotate(-2deg)}}25%{{transform:scale(.92,1.1) rotate(2deg)}}50%{{transform:scale(1.05,.95) rotate(-1deg)}}75%{{transform:scale(.95,1.08) rotate(3deg)}}}}.flame{{transform-box:fill-box;transform-origin:bottom;animation:fl .9s ease-in-out infinite}}"
            f"@keyframes shn{{0%{{transform:translateX(0)}}50%,100%{{transform:translateX(900px)}}}}.shn{{animation:shn 7s ease-in-out infinite}}"
            f"@keyframes run{{to{{stroke-dashoffset:-400}}}}.run{{stroke-dasharray:80 320;animation:run 6s linear infinite}}" + _tw())
     body = ""
@@ -219,8 +220,10 @@ def dashboard_svg(mode: str, stats: dict, langs: list[tuple[str, int]], streak: 
     body += (f'<circle cx="{cx}" cy="{cy}" r="{r}" fill="none" stroke="{c["line"]}" stroke-width="10"/>'
              f'<circle class="rg" cx="{cx}" cy="{cy}" r="{r}" fill="none" stroke="url(#g1)" stroke-width="10" stroke-linecap="round" stroke-dasharray="{circ:.0f}" '
              f'style="--full:{circ:.0f};--off:{circ * (1 - frac):.0f}" transform="rotate(-90 {cx} {cy})"/>'
-             f'<path d="{big.path(str(streak["current"]), 46, cx - cw / 2, cy + 8)[0]}" fill="{c["ink"]}"/>'
-             f'<path d="{lab.path("days", 13, cx - lab.width("days", 13) / 2, cy + 32)[0]}" fill="{c["muted"]}"/>')
+f'<g transform="translate({cx} {cy - 22})"><g class="flame"><path d="M0 -22 C10 -10 14 -2 8 8 C5 13 -5 13 -8 8 C-14 -2 -8 -10 0 -22Z" fill="url(#g1)"/>'
+             f'<path d="M0 -6 C5 0 6 4 3 8 C1 10 -1 10 -3 8 C-6 4 -4 0 0 -6Z" fill="{c["page"]}" opacity=".55"/></g></g>'
+             f'<path d="{big.path(str(streak["current"]), 46, cx - cw / 2, cy + 22)[0]}" fill="{c["ink"]}"/>'
+             f'<path d="{lab.path("days", 13, cx - lab.width("days", 13) / 2, cy + 44)[0]}" fill="{c["muted"]}"/>')
     for i, (val, label, col) in enumerate([(streak["longest"], "longest streak", c["second"]), (streak["total"], "total contributions", c["accent"])]):
         y = 258 + i * 76
         vd, _ = big.path(str(val), 30, 0, 0)

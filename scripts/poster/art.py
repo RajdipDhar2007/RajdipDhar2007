@@ -193,7 +193,21 @@ def footer(mode: str) -> str:
           f'<path d="M-6 8 L-14 18 L-6 15Z M6 8 L14 18 L6 15Z" fill="{c["pink"]}"/><path class="fl" d="M-4 16 Q0 34 4 16Z" fill="{c["accent"]}"/></g></g>')
     rcss2 = ("@keyframes rkt{0%{transform:translate(-60px,250px);opacity:0}4%{opacity:1}50%{transform:translate(1060px,40px);opacity:1}51%,100%{transform:translate(1060px,40px);opacity:0}}"
              ".rkt{animation:rkt 16s linear infinite;opacity:0}@keyframes fl{0%,100%{transform:scaleY(1)}50%{transform:scaleY(1.7)}}.fl{transform-box:fill-box;transform-origin:top;animation:fl .25s ease-in-out infinite}")
-    body = bg + abody + pbody + stars + rk + letters + sub_el + heart.replace('translate(0 -4)', 'translate(0 8)') + made + wv
+    fr = rng(41)
+    mnt = ""
+    for layer, (col, op, hmax, dur) in enumerate([(c["second"], .22, 46, 90), (c["accent"], .30, 30, 60)]):
+        x, d = 0, "M0 300"
+        while x < 1000:
+            w = fr.randint(60, 140)
+            d += f" L{x + w / 2:.0f} {300 - fr.randint(hmax // 2, hmax)} L{x + w} 300"
+            x += w
+        d += " L1000 300Z"
+        mnt += f'<g class="mt{layer}" style="animation-duration:{dur}s"><path d="{d}" fill="{col}" opacity="{op}"/><path d="{d}" transform="translate(1000 0)" fill="{col}" opacity="{op}"/></g>'
+    flies = "".join(f'<circle class="ff" cx="{fr.randint(30, 970)}" cy="{fr.randint(190, 285)}" r="2.4" fill="{c["green"]}" style="animation-duration:{fr.randint(5, 9)}s;animation-delay:-{fr.uniform(0, 8):.1f}s"/>' for _ in range(12))
+    mcss = ("@keyframes mt{from{transform:translateX(0)}to{transform:translateX(-1000px)}}.mt0,.mt1{animation:mt 80s linear infinite}"
+            "@keyframes ff{0%{transform:translate(0,0);opacity:0}20%{opacity:1}50%{transform:translate(26px,-18px);opacity:.3}80%{opacity:1}100%{transform:translate(-14px,10px);opacity:0}}.ff{animation:ff 7s ease-in-out infinite}")
+    rcss2 += mcss
+    body = bg + abody + pbody + stars + mnt + flies + rk + letters + sub_el + heart.replace('translate(0 -4)', 'translate(0 8)') + made + wv
     return doc(1000, H, body, acss + pcss + scss + lcss + wcss + rcss2, defs, "Thanks for stopping by: animated footer")
 
 
