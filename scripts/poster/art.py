@@ -68,6 +68,20 @@ def header(mode: str) -> str:
     gcss = ("@keyframes fy{0%{transform:translateY(0);opacity:0}20%{opacity:.55}100%{transform:translateY(90px);opacity:.9}}"
             ".fy{animation:fy 3.6s cubic-bezier(.55,0,.95,.6) infinite}")
 
+    # drifting synthwave skyline sitting on the horizon (two copies = seamless loop)
+    sr = rng(23)
+    bx, blds, wins = 0, "", ""
+    while bx < 1000:
+        bw, bh = sr.randint(16, 40), sr.randint(6, 15)
+        blds += f'<rect x="{bx}" y="{hz - bh}" width="{bw}" height="{bh}" fill="{c["base"] if mode == "dark" else c["base2"]}" stroke="{c["accent"]}" stroke-opacity=".35"/>'
+        for _ in range(sr.randint(0, 3)):
+            wx, wy = bx + sr.randint(3, max(4, bw - 6)), hz - sr.randint(5, max(6, bh - 3))
+            wins += f'<rect class="wn" x="{wx}" y="{wy}" width="3" height="3" fill="{sr.choice([c["accent"], c["pink"], c["second"]])}" style="animation-delay:-{sr.uniform(0, 4):.1f}s"/>'
+        bx += bw + sr.randint(0, 6)
+    city = f'<g class="cty">{blds}{wins}<g transform="translate(1000 0)">{blds}{wins}</g></g>'
+    ccss = ("@keyframes cty{from{transform:translateX(0)}to{transform:translateX(-1000px)}}.cty{animation:cty 70s linear infinite}"
+            "@keyframes wn{0%,100%{opacity:.2}50%{opacity:1}}.wn{animation:wn 3s ease-in-out infinite}")
+
     # hand-drawn signature
     sf = typo.font(typo.SCRIPT)
     size = 136
@@ -124,7 +138,7 @@ def header(mode: str) -> str:
             + f'<clipPath id="nm"><path d="{full_d}"/></clipPath>')
     bg = (f'<defs><linearGradient id="bgg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="{c["base"]}"/><stop offset="1" stop-color="{c["base2"]}"/></linearGradient></defs>'
           f'<rect width="1000" height="{H}" fill="url(#bgg)"/>')
-    body = (bg + abody + f'<g clip-path="inset(0)">{vlines}{hlines}</g>'.replace('<g clip-path="inset(0)">', f'<g>') + pbody + tbody + hello + status + kicker
+    body = (bg + abody + f'<g clip-path="inset(0)">{vlines}{hlines}</g>'.replace('<g clip-path="inset(0)">', f'<g>') + city + pbody + tbody + hello + status + kicker
             + f'<g class="bob"><g class="nf"><path d="{full_d}" fill="url(#gn)"/></g>{draw}'
               f'<g clip-path="url(#nm)"><rect class="shm" x="-260" y="60" width="200" height="190" fill="url(#shg)" opacity=".75" transform="skewX(-18)"/></g>'
               f'<path class="ul" d="{ul}" fill="none" stroke="url(#gn)" stroke-width="4" stroke-linecap="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="0"/></g>'
@@ -132,7 +146,7 @@ def header(mode: str) -> str:
     shoot = "".join(f'<g transform="translate({90 + k * 330} {30 + (k % 2) * 36})"><line class="sl" x1="0" y1="0" x2="-80" y2="-27" stroke="url(#st)" stroke-width="2.2" stroke-linecap="round" style="animation-delay:-{k * 2.1:.1f}s"/></g>' for k in range(3))
     body = body.replace(wbody, shoot + wbody)
     defs += f'<linearGradient id="st" x1="0" x2="1"><stop offset="0" stop-color="{c["accent"]}"/><stop offset="1" stop-color="{c["accent"]}" stop-opacity="0"/></linearGradient>'
-    css = acss + pcss + tcss + gcss + wcss + css_name + rcss + kcss + "@keyframes ssh{0%{transform:translate(0,0);opacity:0}6%{opacity:1}30%,100%{transform:translate(230px,78px);opacity:0}}.sl{animation:ssh 7.2s ease-in infinite}"
+    css = acss + pcss + tcss + gcss + wcss + css_name + rcss + kcss + ccss + "@keyframes ssh{0%{transform:translate(0,0);opacity:0}6%{opacity:1}30%,100%{transform:translate(230px,78px);opacity:0}}.sl{animation:ssh 7.2s ease-in infinite}"
     return doc(W, H, body, css, defs, "Rajdip Dhar: hand-drawn signature, rotating roles, animated aurora banner")
 
 
@@ -175,8 +189,12 @@ def footer(mode: str) -> str:
     defs = adefs + lin_grad("gf", [(0, c["accent"]), (.5, c["second"]), (1, c["pink"])], 0, 0, 1, 0) + lin_grad("st", [(0, "#fff"), (1, "#fff")], 0, 0, 1, 0).replace('stop-color="#fff"/><stop offset="1" stop-color="#fff"', f'stop-color="{c["accent"]}"/><stop offset="1" stop-color="{c["accent"]}" stop-opacity="0"')
     bg = (f'<linearGradient id="bgf" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="{c["base2"]}"/><stop offset="1" stop-color="{c["base"]}"/></linearGradient>'
           f'<rect width="1000" height="{H}" fill="url(#bgf)"/>')
-    body = bg + abody + pbody + stars + letters + sub_el + heart.replace('translate(0 -4)', 'translate(0 8)') + made + wv
-    return doc(1000, H, body, acss + pcss + scss + lcss + wcss, defs, "Thanks for stopping by: animated footer")
+    rk = (f'<g class="rkt"><g transform="rotate(-18)"><path d="M0 -16 C10 -8 10 8 6 16 H-6 C-10 8 -10 -8 0 -16Z" fill="{c["ink"]}"/><circle cx="0" cy="-3" r="4" fill="{c["accent"]}"/>'
+          f'<path d="M-6 8 L-14 18 L-6 15Z M6 8 L14 18 L6 15Z" fill="{c["pink"]}"/><path class="fl" d="M-4 16 Q0 34 4 16Z" fill="{c["accent"]}"/></g></g>')
+    rcss2 = ("@keyframes rkt{0%{transform:translate(-60px,250px);opacity:0}4%{opacity:1}50%{transform:translate(1060px,40px);opacity:1}51%,100%{transform:translate(1060px,40px);opacity:0}}"
+             ".rkt{animation:rkt 16s linear infinite;opacity:0}@keyframes fl{0%,100%{transform:scaleY(1)}50%{transform:scaleY(1.7)}}.fl{transform-box:fill-box;transform-origin:top;animation:fl .25s ease-in-out infinite}")
+    body = bg + abody + pbody + stars + rk + letters + sub_el + heart.replace('translate(0 -4)', 'translate(0 8)') + made + wv
+    return doc(1000, H, body, acss + pcss + scss + lcss + wcss + rcss2, defs, "Thanks for stopping by: animated footer")
 
 
 def build():

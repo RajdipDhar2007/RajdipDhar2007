@@ -33,7 +33,8 @@ def section_title(num: str, text: str, mode: str) -> str:
         t0 = 0.15 + i * 0.05
         css += kf(f"l{i}", T, [(0, "opacity:0;transform:translateY(26px)"), (t0, "opacity:0;transform:translateY(26px)"), (t0 + .5, "opacity:1;transform:translateY(0)"),
                                (T - .7, "opacity:1;transform:translateY(0)"), (T - .25, "opacity:0;transform:translateY(-10px)"), (T, "opacity:0")]) + f".l{i}{{animation:l{i} {T}s cubic-bezier(.2,.9,.25,1.1) infinite}}"
-        letters += f'<path class="l{i}" d="{d}" fill="url(#g1)"/>'
+        letters += f'<g class="lw" style="animation-delay:-{i * .25:.2f}s"><path class="l{i}" d="{d}" fill="url(#g1)"/></g>'
+    css += "@keyframes lw{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}.lw{animation:lw 2.8s ease-in-out infinite}"
     full = " ".join(g[0] for g in gl)
     css += kf("ln", T, [(0, "transform:scaleX(0)"), (.5, "transform:scaleX(0)"), (1.6, "transform:scaleX(1)"), (T - .7, "transform:scaleX(1)"), (T - .25, "transform:scaleX(1);opacity:0"), (T, "transform:scaleX(0);opacity:0")]) + f".ln{{transform-box:fill-box;transform-origin:center;animation:ln {T}s cubic-bezier(.3,.8,.2,1) infinite}}"
     css += f"@keyframes dot{{0%{{transform:translateX(0)}}100%{{transform:translateX({tw - 6:.0f}px)}}}}.dot{{animation:dot 3.2s ease-in-out infinite alternate}}"
@@ -277,12 +278,13 @@ def contact_pill(label: str, sub: str, icon_name: str, mode: str) -> str:
     sd, _ = sf.path(sub, 11.5, 62, 50)
     css = (kf("sw", T, [(0, "transform:translateX(0)"), (2, "transform:translateX(0)"), (3.2, "transform:translateX(340px)"), (T, "transform:translateX(340px)")]) + f".sw{{animation:sw {T}s linear infinite}}"
            "@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}.bb{animation:bob 3.6s ease-in-out infinite}"
-           "@keyframes run{to{stroke-dashoffset:-300}}.run{stroke-dasharray:70 230;animation:run 3.5s linear infinite}")
+           "@keyframes run{to{stroke-dashoffset:-300}}.run{stroke-dasharray:70 230;animation:run 3.5s linear infinite}"
+           "@keyframes png{0%{r:20;opacity:.8}100%{r:34;opacity:0}}.png{animation:png 2.2s ease-out infinite}")
     body = (f'<clipPath id="bc"><rect x="1" y="1" width="{W - 2}" height="{H - 2}" rx="22"/></clipPath><g class="bb">'
             f'<rect x="1" y="1" width="{W - 2}" height="{H - 2}" rx="22" fill="{c["card"]}" stroke="{c["line"]}" stroke-width="1.5"/>'
             f'<rect class="run" x="1" y="1" width="{W - 2}" height="{H - 2}" rx="22" fill="none" stroke="url(#g1)" stroke-width="2.6" pathLength="300"/>'
             f'<g clip-path="url(#bc)"><rect class="sw" x="-90" y="0" width="50" height="{H}" fill="{c["accent"]}" opacity=".18" transform="skewX(-20)"/></g>'
-            f'<circle cx="34" cy="34" r="20" fill="url(#g1)" opacity=".18"/>{icon(icon_name, 22, 22, 24, c["accent"])}'
+            f'<circle cx="34" cy="34" r="20" fill="url(#g1)" opacity=".18"/><circle class="png" cx="34" cy="34" r="20" fill="none" stroke="{c["accent"]}" stroke-width="2"/>{icon(icon_name, 22, 22, 24, c["accent"])}'
             f'<path d="{ld}" fill="{c["ink"]}"/><path d="{sd}" fill="{c["muted"]}"/></g>')
     return doc(W, H, body, css, _grad(c, "g1"), f"{label}: {sub}", pad_y=8)
 
