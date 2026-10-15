@@ -47,7 +47,7 @@ jobs:
         uses: stats-organization/github-readme-stats-action@v2
         with:
           card: top-langs
-          options: username=${{ github.repository_owner }}&layout=compact&langs_count=6&hide=jupyter notebook&${{ env.DARK }}
+          options: username=${{ github.repository_owner }}&layout=compact&langs_count=6&hide=jupyter%20notebook&${{ env.DARK }}
           path: assets/cards/langs-dark.svg
           token: ${{ secrets.GH_STATS_PAT }}
 
@@ -55,7 +55,7 @@ jobs:
         uses: stats-organization/github-readme-stats-action@v2
         with:
           card: top-langs
-          options: username=${{ github.repository_owner }}&layout=compact&langs_count=6&hide=jupyter notebook&${{ env.LIGHT }}
+          options: username=${{ github.repository_owner }}&layout=compact&langs_count=6&hide=jupyter%20notebook&${{ env.LIGHT }}
           path: assets/cards/langs-light.svg
           token: ${{ secrets.GH_STATS_PAT }}
 
