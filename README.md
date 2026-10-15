@@ -15,16 +15,21 @@
 
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/sections/ticker-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/sections/ticker-light.svg"><img alt="Full-stack, Android, game dev, Web3, AI / LLM, automation" src="assets/sections/ticker-light.svg" width="100%" ></picture></p>
 
+<p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/sections/divider-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/sections/divider-light.svg"><img alt="" src="assets/sections/divider-light.svg" width="100%" ></picture></p>
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/titles/about-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/titles/about-light.svg"><img alt="About me" src="assets/titles/about-light.svg" width="100%" ></picture></p>
 
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/sections/about-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/sections/about-light.svg"><img alt="B.Tech CSE at HITK, full-stack, Android, game dev and Web3, exploring AI and automation, looking for internships" src="assets/sections/about-light.svg" width="100%" ></picture></p>
 <!-- TODO_RAJDIP: clubs, hackathons and achievements can become a new card or a short list here. -->
 
+<p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/sections/divider-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/sections/divider-light.svg"><img alt="" src="assets/sections/divider-light.svg" width="100%" ></picture></p>
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/titles/toolbox-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/titles/toolbox-light.svg"><img alt="Toolbox" src="assets/titles/toolbox-light.svg" width="100%" ></picture></p>
 
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/sections/toolbox-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/sections/toolbox-light.svg"><img alt="Toolbox: Python, TypeScript, JavaScript, Kotlin, C, HTML, React, Vite, Android Studio, OpenGL, Git, GitHub; learning Django, Solidity, Jupyter, ML, data science, LLM apps and automation" src="assets/sections/toolbox-light.svg" width="100%" ></picture></p>
 <!-- TODO_RAJDIP: review the toolbox tiles (poster.work.ROWS); they only list what the public repos show. -->
 
+<p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/sections/ticker2-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/sections/ticker2-light.svg"><img alt="Build, ship, learn, repeat" src="assets/sections/ticker2-light.svg" width="100%" ></picture></p>
+
+<p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/sections/divider-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/sections/divider-light.svg"><img alt="" src="assets/sections/divider-light.svg" width="100%" ></picture></p>
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/titles/work-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/titles/work-light.svg"><img alt="Featured work" src="assets/titles/work-light.svg" width="100%" ></picture></p>
 
 <table>
@@ -52,30 +57,22 @@
 
 <p align="center"><sub>More on my <a href="https://github.com/RajdipDhar2007?tab=repositories">repositories</a> page: TaskFlow, MathForge, Rack Up (Web3 game on Base Sepolia), Periodic Table and more.</sub></p>
 
+<p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/sections/divider-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/sections/divider-light.svg"><img alt="" src="assets/sections/divider-light.svg" width="100%" ></picture></p>
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/titles/stats-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/titles/stats-light.svg"><img alt="By the numbers" src="assets/titles/stats-light.svg" width="100%" ></picture></p>
 
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/stats/dashboard-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/stats/dashboard-light.svg"><img alt="GitHub stats: commits, pull requests, stars, followers, top languages and contribution streak" src="assets/stats/dashboard-light.svg" width="100%" ></picture></p>
 
+<p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/sections/divider-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/sections/divider-light.svg"><img alt="" src="assets/sections/divider-light.svg" width="100%" ></picture></p>
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/titles/city-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/titles/city-light.svg"><img alt="Contribution city" src="assets/titles/city-light.svg" width="100%" ></picture></p>
 
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/3d/contribution-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/3d/contribution-light.svg"><img alt="3D contribution chart for the last 36 weeks" src="assets/3d/contribution-light.svg" width="100%" ></picture></p>
-<p align="center"><sub>3D chart by <a href="https://github.com/CatsJuice/ssr-contributions-img">ssr-contributions-img</a>, refreshed daily by GitHub Actions</sub></p>
 
+<p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/sections/divider-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/sections/divider-light.svg"><img alt="" src="assets/sections/divider-light.svg" width="100%" ></picture></p>
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/titles/activity-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/titles/activity-light.svg"><img alt="Live activity" src="assets/titles/activity-light.svg" width="100%" ></picture></p>
 
-<p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/live/greeting-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/live/greeting-light.svg"><img alt="Time-of-day greeting from Kolkata" src="assets/live/greeting-light.svg" width="100%" ></picture></p>
+<p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/live/greeting-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/live/greeting-light.svg"><img alt="Time-of-day greeting" src="assets/live/greeting-light.svg" width="100%" ></picture></p>
 
-<details>
-<summary><b>Recent GitHub activity</b></summary>
-
-<!--START_SECTION:activity-->
-1. 🚀 Published release [TaskFlow v1.0.0](https://github.com/RajdipDhar2007/TaskFlow/releases/tag/v1.0.0) in [RajdipDhar2007/TaskFlow](https://github.com/RajdipDhar2007/TaskFlow)
-2. 🚀 Published release [AttendTrack v1.0](https://github.com/RajdipDhar2007/AttendTrack/releases/tag/v1.0) in [RajdipDhar2007/AttendTrack](https://github.com/RajdipDhar2007/AttendTrack)
-3. 🚀 Published release [UltimateCraft v5.1.0 — the Alive update](https://github.com/RajdipDhar2007/UltimateCraft/releases/tag/v5.1.0) in [RajdipDhar2007/UltimateCraft](https://github.com/RajdipDhar2007/UltimateCraft)
-<!--END_SECTION:activity-->
-
-</details>
-
+<p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/sections/divider-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/sections/divider-light.svg"><img alt="" src="assets/sections/divider-light.svg" width="100%" ></picture></p>
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/titles/connect-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/titles/connect-light.svg"><img alt="Let's connect" src="assets/titles/connect-light.svg" width="100%" ></picture></p>
 
 <p align="center">

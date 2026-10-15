@@ -111,11 +111,14 @@ def dashboard_svg(mode: str, stats: dict, langs: list[tuple[str, int]], streak: 
     css = (f"@keyframes bob{{0%,100%{{transform:translateY(0)}}50%{{transform:translateY(-4px)}}}}.bb{{animation:bob 5s ease-in-out infinite}}"
            f"@keyframes grow{{0%{{transform:scaleX(0)}}12%,86%{{transform:scaleX(1)}}100%{{transform:scaleX(0)}}}}.gr{{transform-box:fill-box;transform-origin:left;animation:grow {T}s cubic-bezier(.3,.8,.2,1) infinite}}"
            f"@keyframes ring{{0%{{stroke-dashoffset:var(--full)}}15%,86%{{stroke-dashoffset:var(--off)}}100%{{stroke-dashoffset:var(--full)}}}}.rg{{animation:ring {T}s cubic-bezier(.3,.8,.2,1) infinite}}"
+           f"@keyframes shn{{0%{{transform:translateX(0)}}50%,100%{{transform:translateX(900px)}}}}.shn{{animation:shn 7s ease-in-out infinite}}"
            f"@keyframes run{{to{{stroke-dashoffset:-400}}}}.run{{stroke-dasharray:80 320;animation:run 6s linear infinite}}" + _tw())
     body = ""
 
     def panel(x, y, w, h, i):
-        return (f'<rect x="{x + .5}" y="{y + .5}" width="{w - 1}" height="{h - 1}" rx="24" fill="{c["card"]}" stroke="{c["line"]}"/>'
+        return (f'<clipPath id="pc{i}"><rect x="{x}" y="{y}" width="{w}" height="{h}" rx="24"/></clipPath>'
+                f'<rect x="{x + .5}" y="{y + .5}" width="{w - 1}" height="{h - 1}" rx="24" fill="{c["card"]}" stroke="{c["line"]}"/>'
+                f'<g clip-path="url(#pc{i})"><rect class="shn" x="{x - 90}" y="{y}" width="60" height="{h}" fill="{c["accent"]}" opacity=".05" transform="skewX(-20)" style="animation-delay:-{i * 1.1:.1f}s"/></g>'
                 f'<rect class="run" x="{x + .5}" y="{y + .5}" width="{w - 1}" height="{h - 1}" rx="24" fill="none" stroke="url(#g1)" stroke-width="2.2" pathLength="400" style="animation-delay:-{i * 1.4:.1f}s"/>')
 
     tiles = [("commits", "commits this year", c["accent"], lambda x, y: icon("git", x, y, 26, c["accent"])),
@@ -126,7 +129,7 @@ def dashboard_svg(mode: str, stats: dict, langs: list[tuple[str, int]], streak: 
         x = i * 213
         nd, nw = big.path(str(stats[key]), 44, 0, 0)
         ld, _ = lab.path(label, 13.5, x + 24, 108)
-        body += (f'<g class="bb" style="animation-delay:-{i * .9:.1f}s">{panel(x, 8, 190, 120, i)}<circle cx="{x + 150}" cy="48" r="26" fill="{col}" opacity=".12"/>'
+        body += (f'<g class="bb" style="animation-delay:-{i * .9:.1f}s">{panel(x, 8, 190, 120, i)}'
                  f'{ic(x + 24, 34)}<path d="{nd}" transform="translate({x + 24} 100)" fill="{col}" opacity="0"/>'
                  f'</g>')
         # number is placed below the icon; label under it

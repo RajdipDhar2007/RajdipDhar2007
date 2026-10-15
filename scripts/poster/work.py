@@ -104,6 +104,7 @@ def project_card(p: dict, mode: str, idx: int) -> str:
     css = ("@keyframes run{to{stroke-dashoffset:-1000}}.run{stroke-dasharray:160 840;animation:run 7s linear infinite}"
            "@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}.cb{animation:bob 6s ease-in-out infinite}"
            "@keyframes arr{0%,100%{transform:translate(0,0)}50%{transform:translate(4px,-4px)}}.arr{animation:arr 2s ease-in-out infinite}"
+           "@keyframes sheen{0%{transform:translateX(0)}45%,100%{transform:translateX(620px)}}.sheen{animation:sheen 6s ease-in-out infinite}"
            "@keyframes spin{to{transform:rotate(360deg)}}.wm{transform-box:fill-box;transform-origin:center;animation:spin 40s linear infinite}" + _tw())
     arrow = (f'<g class="arr"><circle cx="{W - 44}" cy="{H - 41}" r="20" fill="url(#g1)"/>'
              f'<path d="M{W - 52} {H - 33} L{W - 36} {H - 49} M{W - 48} {H - 49} H{W - 36} V{H - 37}" fill="none" stroke="{"#0D1117" if mode == "dark" else "#fff"}" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></g>')
@@ -112,6 +113,7 @@ def project_card(p: dict, mode: str, idx: int) -> str:
             f'<g clip-path="url(#cc)"><circle cx="{W - 30}" cy="40" r="120" fill="{col}" opacity=".10"/>'
             f'<g class="wm">{icon(p["icon"], W - 130, -10, 130, col, "opacity=\".13\"")}</g></g>'
             f'<rect class="run" x="1" y="1" width="{W - 2}" height="{H - 2}" rx="26" fill="none" stroke="url(#g1)" stroke-width="3" pathLength="1000" style="animation-delay:-{idx * 1.7:.1f}s"/>'
+            f'<g clip-path="url(#cc)"><rect class="sheen" x="-120" y="0" width="70" height="{H}" fill="#fff" opacity=".10" transform="skewX(-20)" style="animation-delay:-{idx * 1.6:.1f}s"/></g>'
             f'<path d="{kd}" fill="{c["accent"]}"/><path d="{td}" fill="url(#g1)"/>{dd}{chips}{arrow}'
             f'{star4(W - 90, 150, 6, c["accent"], "tw")}{star4(W - 40, 120, 4, c["pink"], "tw", "style=" + chr(34) + "animation-delay:-1.3s" + chr(34))}</g>')
     return doc(W, H, body, css, _grad(c, "g1"), f"{p['name']}: {p['desc']}", pad_y=8)

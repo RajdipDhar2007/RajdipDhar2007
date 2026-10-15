@@ -20,38 +20,60 @@ def _grad(c, gid="g1", x1=0, x2=1):
 
 # ------------------------------------------------------------------ section titles
 def section_title(num: str, text: str, mode: str) -> str:
+    """`num` is kept for call compatibility; titles no longer show numbers or a kicker."""
     c = PAL[mode]
-    W, H, T = 830, 118, 9.0
+    W, H, T = 830, 100, 9.0
     f = typo.font(typo.DISPLAY)
     size = 46
     tw = f.width(text, size, 1)
     x0 = (W - tw) / 2
-    gl = f.glyphs(text, size, x0, 84, 1)
+    gl = f.glyphs(text, size, x0, 62, 1)
     css, letters = "", ""
     for i, (d, _, _) in enumerate(gl):
         t0 = 0.15 + i * 0.05
         css += kf(f"l{i}", T, [(0, "opacity:0;transform:translateY(26px)"), (t0, "opacity:0;transform:translateY(26px)"), (t0 + .5, "opacity:1;transform:translateY(0)"),
                                (T - .7, "opacity:1;transform:translateY(0)"), (T - .25, "opacity:0;transform:translateY(-10px)"), (T, "opacity:0")]) + f".l{i}{{animation:l{i} {T}s cubic-bezier(.2,.9,.25,1.1) infinite}}"
         letters += f'<path class="l{i}" d="{d}" fill="url(#g1)"/>'
-    mf = typo.font(typo.MONO_B)
-    kd, kw = mf.path(f"{num}  //  PORTFOLIO", 13, 0, 0, 3)
-    css += kf("k", T, [(0, "opacity:0"), (.1, "opacity:0"), (.8, "opacity:1"), (T - .7, "opacity:1"), (T - .25, "opacity:0"), (T, "opacity:0")]) + f".k{{animation:k {T}s linear infinite}}"
+    full = " ".join(g[0] for g in gl)
     css += kf("ln", T, [(0, "transform:scaleX(0)"), (.5, "transform:scaleX(0)"), (1.6, "transform:scaleX(1)"), (T - .7, "transform:scaleX(1)"), (T - .25, "transform:scaleX(1);opacity:0"), (T, "transform:scaleX(0);opacity:0")]) + f".ln{{transform-box:fill-box;transform-origin:center;animation:ln {T}s cubic-bezier(.3,.8,.2,1) infinite}}"
     css += f"@keyframes dot{{0%{{transform:translateX(0)}}100%{{transform:translateX({tw - 6:.0f}px)}}}}.dot{{animation:dot 3.2s ease-in-out infinite alternate}}"
+    css += kf("shm", T, [(0, "transform:translateX(0)"), (2.2, "transform:translateX(0)"), (3.6, f"transform:translateX({tw + 240:.0f}px)"), (5.6, "transform:translateX(0)"), (7.0, f"transform:translateX({tw + 240:.0f}px)"), (T, f"transform:translateX({tw + 240:.0f}px)")]) + f".shm{{animation:shm {T}s linear infinite}}"
+    css += kf("orb", T, [(0, "opacity:0"), (.2, "opacity:0"), (1.0, "opacity:1"), (T - .7, "opacity:1"), (T - .25, "opacity:0"), (T, "opacity:0")]) + f".orb{{animation:orb {T}s ease-out infinite}}"
     css += _tw()
-    body = (f'<path class="k" d="{kd}" transform="translate({(W - kw) / 2:.0f} 30)" fill="{c["accent"]}"/>'
-            f'{star4((W - kw) / 2 - 22, 25, 7, c["accent"], "tw")}{star4((W + kw) / 2 + 22, 25, 7, c["second"], "tw", "style=\"animation-delay:-1.2s\"")}'
-            f'{letters}<g class="ln"><rect x="{x0:.0f}" y="102" width="{tw:.0f}" height="3" rx="1.5" fill="url(#g1)" opacity=".85"/>'
-            f'<circle class="dot" cx="{x0 + 3:.0f}" cy="103.5" r="5" fill="{c["ink"]}"/></g>')
-    return doc(W, H, body, css, _grad(c, "g1", 0, 1), f"{text.title()} section title")
+    defs = (_grad(c, "g1", 0, 1) + f'<clipPath id="tc"><path d="{full}"/></clipPath>'
+            '<linearGradient id="sg"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>')
+    dly = lambda v: f'style="animation-delay:-{v}s"'  # noqa: E731
+    body = (f'<g class="orb">{star4(x0 - 34, 46, 9, c["accent"], "tw")}{star4(x0 + tw + 34, 46, 9, c["second"], "tw", dly(1.2))}'
+            f'{star4(x0 - 14, 20, 5, c["pink"], "tw", dly(.6))}{star4(x0 + tw + 14, 20, 5, c["accent"], "tw", dly(1.8))}</g>'
+            f'{letters}<g clip-path="url(#tc)"><rect class="shm" x="{x0 - 200:.0f}" y="10" width="110" height="70" fill="url(#sg)" opacity=".8" transform="skewX(-18)"/></g>'
+            f'<g class="ln"><rect x="{x0:.0f}" y="80" width="{tw:.0f}" height="3" rx="1.5" fill="url(#g1)" opacity=".85"/>'
+            f'<circle class="dot" cx="{x0 + 3:.0f}" cy="81.5" r="5" fill="{c["ink"]}"/></g>')
+    return doc(W, H, body, css, defs, f"{text.title()} section title")
+
+
+def divider(mode: str) -> str:
+    """Thin animated separator: two comets run along a gradient line past a spinning diamond."""
+    c = PAL[mode]
+    W, H = 830, 40
+    css = ("@keyframes cm{0%{transform:translateX(0);opacity:0}10%{opacity:1}90%{opacity:1}100%{transform:translateX(700px);opacity:0}}"
+           ".cm{animation:cm 4.5s ease-in-out infinite}.cm2{animation:cm 4.5s ease-in-out infinite;animation-delay:-2.25s}"
+           "@keyframes sp{to{transform:rotate(360deg)}}.sp{transform-box:fill-box;transform-origin:center;animation:sp 8s linear infinite}" + _tw())
+    body = (f'<line x1="40" y1="20" x2="790" y2="20" stroke="url(#g1)" stroke-opacity=".35" stroke-width="2" stroke-linecap="round"/>'
+            f'<g class="cm"><rect x="40" y="18.5" width="90" height="3" rx="1.5" fill="url(#cg)"/><circle cx="130" cy="20" r="4" fill="{c["accent"]}"/></g>'
+            f'<g class="cm2"><rect x="40" y="18.5" width="90" height="3" rx="1.5" fill="url(#cg)"/><circle cx="130" cy="20" r="4" fill="{c["pink"]}"/></g>'
+            f'<rect x="{W / 2 - 40}" y="6" width="80" height="28" fill="{c["page"]}"/>'
+            f'<g class="sp"><rect x="{W / 2 - 8}" y="12" width="16" height="16" rx="3" fill="none" stroke="url(#g1)" stroke-width="2.4" transform="rotate(45 {W / 2} 20)"/></g>'
+            f'{star4(W / 2 - 28, 20, 6, c["accent"], "tw")}{star4(W / 2 + 28, 20, 6, c["second"], "tw", "style=" + chr(34) + "animation-delay:-1.2s" + chr(34))}')
+    defs = _grad(c, "g1") + f'<linearGradient id="cg"><stop offset="0" stop-color="{c["accent"]}" stop-opacity="0"/><stop offset="1" stop-color="{c["accent"]}"/></linearGradient>'
+    return doc(W, H, body, css, defs, "divider")
 
 
 # ------------------------------------------------------------------ ticker
-def ticker(mode: str) -> str:
+def ticker(mode: str, words=None, reverse: bool = False) -> str:
     c = PAL[mode]
     W, H, DUR = 830, 56, 26
     f = typo.font(typo.HEAD)
-    words = ["FULL-STACK", "ANDROID", "GAME DEV", "WEB3", "AI / LLM", "AUTOMATION"]
+    words = words or ["FULL-STACK", "ANDROID", "GAME DEV", "WEB3", "AI / LLM", "AUTOMATION"]
     x, parts = 0.0, ""
     for i, w in enumerate(words):
         d, wd = f.path(w, 19, x, 36, 3)
@@ -61,7 +83,7 @@ def ticker(mode: str) -> str:
         x += 30
     seq = parts
     shift = x
-    css = f"@keyframes tk{{from{{transform:translateX(0)}}to{{transform:translateX(-{shift:.0f}px)}}}}.tk{{animation:tk {DUR}s linear infinite}}"
+    css = f"@keyframes tk{{from{{transform:translateX(0)}}to{{transform:translateX(-{shift:.0f}px)}}}}.tk{{animation:tk {DUR}s linear infinite{' reverse' if reverse else ''}}}"
     reps = int(W / shift) + 2
     track = "".join(f'<g transform="translate({k * shift:.0f} 0)">{seq}</g>' for k in range(reps + 1))
     defs = (lin_grad("fade", [(0, c["page"]), (.1, c["page"]), (.18, c["page"])], 0, 0, 1, 0)
@@ -198,6 +220,17 @@ def button(label: str, icon_name: str | None, mode: str, primary: bool) -> str:
 
 
 # ------------------------------------------------------------------ about cards
+def _about_icon(i: int, x: float, y: float, col: str) -> str:
+    """Tiny animated glyph per about card: cap bob, code brackets pulse, sparkle spin, radar ping."""
+    if i == 0:
+        return f'<g class="ic1"><path d="M{x} {y + 8} L{x + 11} {y + 2} L{x + 22} {y + 8} L{x + 11} {y + 14}Z M{x + 5} {y + 11} v6 q6 4 12 0 v-6" fill="none" stroke="{col}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></g>'
+    if i == 1:
+        return f'<g class="ic2"><path d="M{x + 7} {y + 2} L{x} {y + 10} L{x + 7} {y + 18} M{x + 15} {y + 2} L{x + 22} {y + 10} L{x + 15} {y + 18}" fill="none" stroke="{col}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></g>'
+    if i == 2:
+        return f'<g class="ic3">{star4(x + 11, y + 10, 11, col)}</g>'
+    return (f'<circle cx="{x + 11}" cy="{y + 10}" r="4" fill="{col}"/><circle class="ic4" cx="{x + 11}" cy="{y + 10}" r="4" fill="none" stroke="{col}" stroke-width="2"/>')
+
+
 def about(mode: str) -> str:
     c = PAL[mode]
     W, H, T = 830, 300, 10.0
@@ -207,16 +240,21 @@ def about(mode: str) -> str:
              ("LOOKING FOR", "Internships", "…and people to build cool things with", c["green"])]
     tf, bf, mf = typo.font(typo.DISPLAY), typo.font(typo.BODY), typo.font(typo.MONO_B)
     body, css = "", ("@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}.cb{animation:bob 5s ease-in-out infinite}"
-                     "@keyframes run{to{stroke-dashoffset:-400}}.run{stroke-dasharray:90 310;animation:run 6s linear infinite}")
+                     "@keyframes run{to{stroke-dashoffset:-400}}.run{stroke-dasharray:90 310;animation:run 6s linear infinite}"
+                     "@keyframes ic1{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}.ic1{animation:ic1 2.2s ease-in-out infinite}"
+                     "@keyframes ic2{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.12)}}.ic2{transform-box:fill-box;transform-origin:center;animation:ic2 1.8s ease-in-out infinite}"
+                     "@keyframes ic3{to{transform:rotate(360deg)}}.ic3{transform-box:fill-box;transform-origin:center;animation:ic3 6s linear infinite}"
+                     "@keyframes ic4{0%{r:4;opacity:.9}100%{r:13;opacity:0}}.ic4{animation:ic4 1.8s ease-out infinite}")
     for i, (lab, title, desc, col) in enumerate(cards):
         x = i * 213
         ld, _ = mf.path(lab, 11.5, x + 20, 50, 2)
-        td, _ = tf.path(title, 21, x + 20, 92)
+        tsz = min(21.0, 21.0 * 152 / tf.width(title, 21))  # shrink long titles so they never leave the card
+        td, _ = tf.path(title, tsz, x + 20, 92)
         lines = bf.wrap(desc, 13.5, 150)
         dd = "".join(f'<path d="{bf.path(l, 13.5, x + 20, 122 + k * 21)[0]}" fill="{c["muted"]}"/>' for k, l in enumerate(lines))
         body += (f'<g class="cb" style="animation-delay:-{i * 1.1:.1f}s"><rect x="{x + .5}" y="14.5" width="190" height="178" rx="22" fill="{c["card"]}" stroke="{c["line"]}"/>'
                  f'<rect class="run" x="{x + .5}" y="14.5" width="190" height="178" rx="22" fill="none" stroke="{col}" stroke-width="2.4" pathLength="400" style="animation-delay:-{i * 1.5}s"/>'
-                 f'<circle cx="{x + 168}" cy="40" r="5" fill="{col}" opacity=".9"/><path d="{ld}" fill="{col}"/><path d="{td}" fill="{c["ink"]}"/>{dd}</g>')
+                 f'{_about_icon(i, x + 150, 28, col)}<path d="{ld}" fill="{col}"/><path d="{td}" fill="{c["ink"]}"/>{dd}</g>')
     ff = typo.font(typo.HEAD)
     fd, _ = ff.path("Fun fact:", 15, 0, 0)
     fact = "this README is generated code. The portrait is made of text and every banner is hand-built SVG."
@@ -269,7 +307,7 @@ def greeting_svg(mode: str, text: str, stamp: str, night: bool) -> str:
 
 
 TITLES = [("01", "ABOUT ME", "about"), ("02", "TOOLBOX", "toolbox"), ("03", "FEATURED WORK", "work"), ("04", "BY THE NUMBERS", "stats"),
-          ("05", "CONTRIBUTION CITY", "city"), ("06", "LIVE ACTIVITY", "activity"), ("07", "LET'S CONNECT", "connect")]
+          ("05", "CONTRIBUTION CITY", "city"), ("06", "RIGHT NOW", "activity"), ("07", "LET'S CONNECT", "connect")]
 
 
 def build():
@@ -283,6 +321,8 @@ def build():
         write(OUT / "hero" / f"btn-email-{m}.svg", button("Email me", "gmail", m, True))
         write(OUT / "hero" / f"btn-work-{m}.svg", button("My work", "github", m, False))
         write(OUT / "sections" / f"ticker-{m}.svg", ticker(m))
+        write(OUT / "sections" / f"divider-{m}.svg", divider(m))
+        write(OUT / "sections" / f"ticker2-{m}.svg", ticker(m, ["BUILD", "SHIP", "LEARN", "REPEAT", "CREATE", "ITERATE"], True))
         write(OUT / "sections" / f"about-{m}.svg", about(m))
         write(OUT / "contact" / f"email-{m}.svg", contact_pill("Email", "rajdipdharofficial@gmail.com", "gmail", m))
         write(OUT / "contact" / f"github-{m}.svg", contact_pill("GitHub", "@RajdipDhar2007", "github", m))

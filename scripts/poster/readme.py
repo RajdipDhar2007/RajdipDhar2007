@@ -3,7 +3,6 @@
     python scripts/poster/readme.py
 """
 from __future__ import annotations
-import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -19,12 +18,8 @@ def pic(path: str, alt: str, width: str = "100%", extra: str = "", dark: bool = 
 
 
 def title(slug: str, alt: str) -> str:
-    return f'<p align="center">{pic("assets/titles/" + slug + "-{m}.svg", alt)}</p>\n'
-
-
-def keep(old: str, name: str) -> str:
-    m = re.search(rf"<!--START_SECTION:{name}-->(.*?)<!--END_SECTION:{name}-->", old, re.S)
-    return m.group(1) if m else "\n"
+    return (f'<p align="center">{pic("assets/sections/divider-{m}.svg", "")}</p>\n'
+            f'<p align="center">{pic("assets/titles/" + slug + "-{m}.svg", alt)}</p>\n')
 
 
 def card(key: str, name: str, extra: str) -> str:
@@ -34,7 +29,6 @@ def card(key: str, name: str, extra: str) -> str:
 
 
 def main() -> None:
-    old = README.read_text(encoding="utf-8") if README.exists() else ""
     owner = REPO.split("/")[0]
     out = f'''<div align="center">
 {pic("assets/banners/header-{m}.svg", "Rajdip Dhar: hand-drawn signature, animated aurora banner")}
@@ -61,6 +55,8 @@ def main() -> None:
 <p align="center">{pic("assets/sections/toolbox-{m}.svg", "Toolbox: Python, TypeScript, JavaScript, Kotlin, C, HTML, React, Vite, Android Studio, OpenGL, Git, GitHub; learning Django, Solidity, Jupyter, ML, data science, LLM apps and automation")}</p>
 <!-- TODO_RAJDIP: review the toolbox tiles (poster.work.ROWS); they only list what the public repos show. -->
 
+<p align="center">{pic("assets/sections/ticker2-{m}.svg", "Build, ship, learn, repeat")}</p>
+
 {title("work", "Featured work")}
 <table>
 <tr>
@@ -80,17 +76,9 @@ def main() -> None:
 
 {title("city", "Contribution city")}
 <p align="center">{pic("assets/3d/contribution-{m}.svg", "3D contribution chart for the last 36 weeks", "100%")}</p>
-<p align="center"><sub>3D chart by <a href="https://github.com/CatsJuice/ssr-contributions-img">ssr-contributions-img</a>, refreshed daily by GitHub Actions</sub></p>
 
 {title("activity", "Live activity")}
-<p align="center">{pic("assets/live/greeting-{m}.svg", "Time-of-day greeting from Kolkata")}</p>
-
-<details>
-<summary><b>Recent GitHub activity</b></summary>
-
-<!--START_SECTION:activity-->{keep(old, "activity")}<!--END_SECTION:activity-->
-
-</details>
+<p align="center">{pic("assets/live/greeting-{m}.svg", "Time-of-day greeting")}</p>
 
 {title("connect", "Let's connect")}
 <p align="center">

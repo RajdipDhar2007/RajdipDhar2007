@@ -108,13 +108,13 @@ def header(mode: str) -> str:
     rcss += ".r0{opacity:1}"
     # kicker + status chips
     mf = typo.font(typo.MONO_B)
-    kd, kw = mf.path("B.TECH CSE  /  HERITAGE INSTITUTE OF TECHNOLOGY  /  KOLKATA", 13, 0, 0, 2)
+    kd, kw = mf.path("B.TECH CSE  /  HERITAGE INSTITUTE OF TECHNOLOGY", 13, 0, 0, 2)
     kicker = f'<path class="kick" d="{kd}" transform="translate({500 - kw / 2:.0f} 74)" fill="{c["muted"]}"/>'
     kcss = kf("kick", T, [(0, "opacity:0"), (0.2, "opacity:0"), (1.2, "opacity:1"), (T - .7, "opacity:1"), (T - .4, "opacity:0"), (T, "opacity:0")]) + f".kick{{animation:kick {T}s linear infinite}}"
     hello_d, hw = mf.path("> hello, world", 13, 28, 36)
     hello = (f'<path d="{hello_d}" fill="{c["accent"]}"/><rect class="cur" x="{28 + hw + 5}" y="25" width="8" height="14" fill="{c["accent"]}"/>'
              "<style>@keyframes cu{0%,49%{opacity:1}50%,100%{opacity:0}}.cur{animation:cu 1s steps(1) infinite}</style>")
-    st_d, sw = mf.path("KOLKATA / IST", 13, 0, 0, 2)
+    st_d, sw = mf.path("BUILDING IN PUBLIC", 13, 0, 0, 2)
     status = (f'<g transform="translate({1000 - 28 - sw - 20:.0f} 36)"><circle class="pulse" cx="0" cy="-5" r="4" fill="{c["green"]}"/>'
               f'<path d="{st_d}" transform="translate(14 0)" fill="{c["muted"]}"/></g>'
               "<style>@keyframes pl{0%,100%{opacity:1;r:4}50%{opacity:.35;r:6}}.pulse{animation:pl 1.8s ease-in-out infinite}</style>")
@@ -165,7 +165,7 @@ def footer(mode: str) -> str:
     sd, sw = mf.path(sub, 14, 0, 0, 3)
     lcss += kf("sb", T, [(0, "opacity:0"), (1.6, "opacity:0"), (2.4, "opacity:1"), (T - .8, "opacity:1"), (T - .3, "opacity:0"), (T, "opacity:0")]) + f".sb{{animation:sb {T}s linear infinite}}"
     sub_el = f'<path class="sb" d="{sd}" transform="translate({500 - sw / 2:.0f} 196)" fill="{c["muted"]}"/>'
-    hd, hwid = mf.path("MADE IN KOLKATA WITH PYTHON, SVG & CURIOSITY", 11, 0, 0, 2)
+    hd, hwid = mf.path("MADE WITH PYTHON, SVG & CURIOSITY", 11, 0, 0, 2)
     made = f'<path d="{hd}" transform="translate({500 - hwid / 2:.0f} 262)" fill="{c["muted"]}" opacity=".8"/>'
     heart = (f'<path class="hb" d="M500 232 c-6-8 -18-3 -12 7 l12 12 l12-12 c6-10 -6-15 -12-7z" fill="{c["pink"]}" transform="translate(0 -4)"/>'
              "<style>@keyframes hb{0%,100%{transform:scale(1)}15%{transform:scale(1.25)}30%{transform:scale(1)}45%{transform:scale(1.18)}}.hb{transform-box:fill-box;transform-origin:center;animation:hb 1.6s ease-in-out infinite}</style>")
