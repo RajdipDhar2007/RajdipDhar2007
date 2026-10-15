@@ -207,6 +207,16 @@ def build(mode: str) -> str:
     live = f'<circle class="lv" cx="{W - 128}" cy="17" r="4" fill="{c["green"]}"/>' + ptxt("ASCII  LIVE", W - 116, 21, 10.5, fill=c["muted"], tracking=1.5)
     title = (f'<circle cx="18" cy="17" r="5" fill="{c["second"]}"/><circle cx="36" cy="17" r="5" fill="{c["accent"]}"/><circle cx="54" cy="17" r="5" fill="{c["green"]}"/>'
              f'{ptxt("rajdip@hitk ~/portrait", W / 2 - 80, 21, 11.5, fill=c["muted"])}{live}<line x1="0" x2="{W}" y1="34" y2="34" stroke="{c["line"]}"/>')
+    # radar in the empty top-right corner of the portrait
+    rx_, ry_, rr_ = W - 62, Y0 + 56, 30
+    css.raw("@keyframes sweep{to{transform:rotate(360deg)}}.sweep{animation:sweep 3s linear infinite}"
+            "@keyframes blip{0%,100%{opacity:0}40%{opacity:1}}.blip{animation:blip 3s linear infinite}"
+            "@keyframes runb{to{stroke-dashoffset:-1000}}.runb{stroke-dasharray:160 840;animation:runb 7s linear infinite}")
+    radar = (f'<g class="{css.window([(3.0, HIDE_AT)])}"><circle cx="{rx_}" cy="{ry_}" r="{rr_}" fill="none" stroke="{c["line"]}"/><circle cx="{rx_}" cy="{ry_}" r="{rr_ // 2}" fill="none" stroke="{c["line"]}"/>'
+             f'<path d="M{rx_ - rr_} {ry_} H{rx_ + rr_} M{rx_} {ry_ - rr_} V{ry_ + rr_}" stroke="{c["line"]}"/>'
+             f'<g class="sweep" style="transform-origin:{rx_}px {ry_}px"><path d="M{rx_} {ry_} L{rx_ + rr_} {ry_} A{rr_} {rr_} 0 0 0 {rx_ + rr_ * 0.866:.1f} {ry_ - rr_ * 0.5:.1f}Z" fill="url(#sw)" opacity=".8"/>'
+             f'<line x1="{rx_}" y1="{ry_}" x2="{rx_ + rr_}" y2="{ry_}" stroke="{c["accent"]}" stroke-width="1.5"/></g>'
+             f'<circle class="blip" cx="{rx_ + 12}" cy="{ry_ - 10}" r="2.4" fill="{c["second"]}"/><circle class="blip" cx="{rx_ - 14}" cy="{ry_ + 8}" r="2.4" fill="{c["green"]}" style="animation-delay:-1.2s"/></g>')
     stage = css.window([(0, HIDE_AT)])
     reduced = ("@media (prefers-reduced-motion: reduce){*{animation:none!important}"
                ".sc,.fx,.scan,.scan2,.rainw,.shw,.gl0,.gl1{display:none}.rw,.boot{opacity:1}}")
@@ -215,11 +225,13 @@ def build(mode: str) -> str:
     desc = f"Animated ASCII portrait of {NAME}: it renders, scans, glitches into focus, then idles with sweeping light."
     defs = (f'<linearGradient id="glow" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="{c["accent"]}" stop-opacity="0"/><stop offset="1" stop-color="{c["accent"]}" stop-opacity=".4"/></linearGradient>'
             f'<linearGradient id="sg" x1="0" x2="1"><stop offset="0" stop-color="{c["accent"]}" stop-opacity="0"/><stop offset=".7" stop-color="{c["accent"]}" stop-opacity=".34"/><stop offset="1" stop-color="{c["accent"]}" stop-opacity="0"/></linearGradient>'
+            f'<radialGradient id="sw" cx="0" cy="0" r="1" gradientUnits="objectBoundingBox"><stop offset="0" stop-color="{c["accent"]}" stop-opacity=".0"/><stop offset="1" stop-color="{c["accent"]}" stop-opacity=".45"/></radialGradient>'
             f'<linearGradient id="bg" x1="0" x2="1"><stop offset="0" stop-color="{c["accent"]}"/><stop offset="1" stop-color="{c["second"]}"/></linearGradient>')
     return (f'<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" viewBox="0 0 {W} {H}" width="{W}" height="{H}" role="img" aria-label="{esc(desc)}">'
             f'<title>{esc(desc)}</title><defs>{defs}<g id="fs">{"".join(static_rows)}</g></defs><style>{style}</style>'
-            f'<rect x=".5" y=".5" width="{W - 1}" height="{H - 1}" rx="14" fill="{card}" stroke="{c["line"]}"/>{title}'
-            f'<g class="{stage}">{boot}{brackets}{rain}{bands}<g fill="{c["text"]}"><g id="fig">{"".join(rows_svg)}</g></g>{fx}{status}{prompt2}'
+            f'<rect x=".5" y=".5" width="{W - 1}" height="{H - 1}" rx="14" fill="{card}" stroke="{c["line"]}"/>'
+            f'<rect class="runb" x=".5" y=".5" width="{W - 1}" height="{H - 1}" rx="14" fill="none" stroke="url(#bg)" stroke-width="2.4" pathLength="1000"/>{title}'
+            f'<g class="{stage}">{boot}{brackets}{radar}{rain}{bands}<g fill="{c["text"]}"><g id="fig">{"".join(rows_svg)}</g></g>{fx}{status}{prompt2}'
             f'<g class="shw {shim_cls}">{"".join(shim)}</g>{scan("scan")}{scan("scan2")}</g></svg>')
 
 

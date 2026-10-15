@@ -47,9 +47,13 @@ def section_title(num: str, text: str, mode: str) -> str:
     defs = (_grad(c, "g1", 0, 1) + f'<clipPath id="tc"><path d="{full}"/></clipPath>'
             '<linearGradient id="sg"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>')
     dly = lambda v: f'style="animation-delay:-{v}s"'  # noqa: E731
+    gl_a = kf("ga", T, [(0, "opacity:0"), (3.9, "opacity:0"), (3.91, "opacity:.9"), (4.03, "opacity:.9"), (4.04, "opacity:0"), (6.5, "opacity:0"), (6.51, "opacity:.9"), (6.62, "opacity:.9"), (6.63, "opacity:0"), (T, "opacity:0")])
+    gl_b = kf("gb", T, [(0, "opacity:0"), (3.93, "opacity:0"), (3.94, "opacity:.9"), (4.06, "opacity:.9"), (4.07, "opacity:0"), (6.53, "opacity:0"), (6.54, "opacity:.9"), (6.65, "opacity:.9"), (6.66, "opacity:0"), (T, "opacity:0")])
+    css += gl_a + gl_b + f".ga{{animation:ga {T}s linear infinite;opacity:0}}.gb{{animation:gb {T}s linear infinite;opacity:0}}"
+    glitch = (f'<path class="ga" d="{full}" fill="{c["accent"]}" transform="translate(-3 0)"/><path class="gb" d="{full}" fill="{c["pink"]}" transform="translate(3 1)"/>')
     body = (f'<g class="orb">{star4(x0 - 34, 46, 9, c["accent"], "tw")}{star4(x0 + tw + 34, 46, 9, c["second"], "tw", dly(1.2))}'
             f'{star4(x0 - 14, 20, 5, c["pink"], "tw", dly(.6))}{star4(x0 + tw + 14, 20, 5, c["accent"], "tw", dly(1.8))}</g>'
-            f'{letters}<g clip-path="url(#tc)"><rect class="shm" x="{x0 - 200:.0f}" y="10" width="110" height="70" fill="url(#sg)" opacity=".8" transform="skewX(-18)"/></g>'
+            f'{letters}{glitch}<g clip-path="url(#tc)"><rect class="shm" x="{x0 - 200:.0f}" y="10" width="110" height="70" fill="url(#sg)" opacity=".8" transform="skewX(-18)"/></g>'
             f'{burst}<g class="ln"><rect x="{x0:.0f}" y="80" width="{tw:.0f}" height="3" rx="1.5" fill="url(#g1)" opacity=".85"/>'
             f'<circle class="dot" cx="{x0 + 3:.0f}" cy="81.5" r="5" fill="{c["ink"]}"/></g>')
     return doc(W, H, body, css, defs, f"{text.title()} section title")
@@ -130,9 +134,10 @@ def hero_hello(mode: str) -> str:
     css += kf("shm", T, [(0, "transform:translateX(0)"), (3.5, "transform:translateX(0)"), (4.8, "transform:translateX(520px)"), (T, "transform:translateX(520px)")]) + f".shm{{animation:shm {T}s linear infinite}}"
     css += _tw()
     full = " ".join(g[0] for g in gl)
-    defs = (_grad(c, "g1") + f'<clipPath id="cl"><path d="{full}"/></clipPath>'
+    defs = (_grad(c, "g1") + '<filter id="bl2" x="-30%" y="-60%" width="160%" height="220%"><feGaussianBlur stdDeviation="26"/></filter>' + f'<clipPath id="cl"><path d="{full}"/></clipPath>'
             + '<linearGradient id="sg"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>')
-    body = (f'<path class="hi" d="{hi}" fill="{c["accent"]}"/>{letters}'
+    css += "@keyframes aura{0%,100%{opacity:.22;transform:scale(1)}50%{opacity:.5;transform:scale(1.2)}}.aura{transform-box:fill-box;transform-origin:center;animation:aura 4s ease-in-out infinite}"
+    body = (f'<ellipse class="aura" cx="150" cy="100" rx="150" ry="52" fill="url(#g1)" filter="url(#bl2)"/><path class="hi" d="{hi}" fill="{c["accent"]}"/>{letters}'
             f'<g clip-path="url(#cl)"><rect class="shm" x="-140" y="40" width="90" height="110" fill="url(#sg)" opacity=".7" transform="skewX(-18)"/></g>'
             f'<path d="M6 152 q50 12 110 0 t110 0 t110 0" fill="none" stroke="url(#g1)" stroke-width="4" stroke-linecap="round" opacity=".9"/>'
             f'{star4(330, 40, 9, c["accent"], "tw")}{star4(362, 74, 6, c["second"], "tw", "style=\"animation-delay:-.9s\"")}{star4(300, 22, 5, c["pink"], "tw", "style=\"animation-delay:-1.7s\"")}')

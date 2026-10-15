@@ -37,6 +37,7 @@ def toolbox(mode: str) -> str:
     css = ("@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}.tl{animation:bob 4.6s ease-in-out infinite}"
            "@keyframes run{to{stroke-dashoffset:-400}}.run{stroke-dasharray:90 310;animation:run 5s linear infinite}"
            "@keyframes pu{0%,100%{opacity:1}50%{opacity:.3}}.pu{animation:pu 1.6s ease-in-out infinite}"
+           "@keyframes flow{0%{stroke-dashoffset:100}100%{stroke-dashoffset:-100}}.flow{stroke-dasharray:22 78;animation:flow 1.6s linear infinite}"
            "@keyframes shn{0%{transform:translateX(0)}40%,100%{transform:translateX(220px)}}.shn{animation:shn 5s ease-in-out infinite}"
            "@keyframes orb{from{offset-distance:0%}to{offset-distance:100%}}.orb{animation:orb 4s linear infinite;filter:drop-shadow(0 0 3px currentColor)}"
            "@keyframes gw{0%,100%{opacity:.12;transform:scale(1)}50%{opacity:.3;transform:scale(1.18)}}.gw{transform-box:fill-box;transform-origin:center;animation:gw 3s ease-in-out infinite}" + _tw())
@@ -45,6 +46,9 @@ def toolbox(mode: str) -> str:
         d, w = mf.path(label, 13, 0, 0, 4)
         body += f'<path d="{d}" transform="translate({(W - w) / 2:.0f} {y + 18})" fill="{c["accent"] if not learning else c["pink"]}"/>'
         body += star4((W - w) / 2 - 20, y + 13, 6, c["second"], "tw") + star4((W + w) / 2 + 20, y + 13, 6, c["accent"], "tw", 'style="animation-delay:-1.2s"')
+        if y > 0:  # flowing energy line linking the rows
+            body += (f'<line x1="{W / 2}" y1="{y - 26}" x2="{W / 2}" y2="{y - 2}" stroke="url(#g1)" stroke-opacity=".3" stroke-width="2" stroke-linecap="round"/>'
+                     f'<line class="flow" x1="{W / 2}" y1="{y - 26}" x2="{W / 2}" y2="{y - 2}" stroke="url(#g1)" stroke-width="3.2" stroke-linecap="round" pathLength="100"/>')
         y += 34
         total = len(items) * TW + (len(items) - 1) * GAP
         x0 = (W - total) / 2
