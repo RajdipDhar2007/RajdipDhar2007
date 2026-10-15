@@ -1,4 +1,4 @@
-name: Stats cards
+name: Stats dashboard
 
 on:
   schedule:
@@ -12,64 +12,30 @@ concurrency:
   group: readme-writer
   cancel-in-progress: false
 
-env:
-  DARK: bg_color=0D1117&title_color=22D3EE&text_color=E6EDF3&icon_color=A78BFA&hide_border=true
-  LIGHT: bg_color=FFFFFF&title_color=0969DA&text_color=1F2328&icon_color=8250DF&hide_border=true
-
 jobs:
-  cards:
+  stats:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-
       - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
+      - run: pip install fonttools
 
-      # GH_STATS_PAT: fine-grained, read-only (metadata, contents) + account profile.
-      - name: Stats (dark)
-        uses: stats-organization/github-readme-stats-action@v2
-        with:
-          card: stats
-          options: username=${{ github.repository_owner }}&show_icons=true&hide_rank=true&hide=issues,contribs&include_all_commits=true&${{ env.DARK }}
-          path: assets/cards/stats-dark.svg
-          token: ${{ secrets.GH_STATS_PAT }}
-
-      - name: Stats (light)
-        uses: stats-organization/github-readme-stats-action@v2
-        with:
-          card: stats
-          options: username=${{ github.repository_owner }}&show_icons=true&hide_rank=true&hide=issues,contribs&include_all_commits=true&${{ env.LIGHT }}
-          path: assets/cards/stats-light.svg
-          token: ${{ secrets.GH_STATS_PAT }}
-
-      - name: Top languages (dark)
-        uses: stats-organization/github-readme-stats-action@v2
-        with:
-          card: top-langs
-          options: username=${{ github.repository_owner }}&layout=compact&langs_count=6&hide=jupyter%20notebook&${{ env.DARK }}
-          path: assets/cards/langs-dark.svg
-          token: ${{ secrets.GH_STATS_PAT }}
-
-      - name: Top languages (light)
-        uses: stats-organization/github-readme-stats-action@v2
-        with:
-          card: top-langs
-          options: username=${{ github.repository_owner }}&layout=compact&langs_count=6&hide=jupyter%20notebook&${{ env.LIGHT }}
-          path: assets/cards/langs-light.svg
-          token: ${{ secrets.GH_STATS_PAT }}
-
-      - name: Streak card
+      # The default GITHUB_TOKEN reads public data. Optionally add a PAT secret named GH_STATS_PAT
+      # (read-only) to include private contributions.
+      - name: Render dashboard
         env:
-          GITHUB_TOKEN: ${{ secrets.GH_STATS_PAT }}
-        run: python scripts/cards.py streak
+          GITHUB_TOKEN: ${{ secrets.GH_STATS_PAT || secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY_OWNER: ${{ github.repository_owner }}
+        run: python scripts/cards.py
 
       - name: Commit
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add assets/cards/ profile/
+          git add assets/stats/
           if git diff --cached --quiet; then echo "nothing to commit"; exit 0; fi
-          git commit -m "chore: refresh stats cards [skip ci]"
+          git commit -m "chore: refresh stats dashboard [skip ci]"
           git pull --rebase
           git push

@@ -16,7 +16,7 @@ def launch(p):
     raise RuntimeError("No Chromium/Chrome/Edge available for Playwright")
 
 
-def snapshots(svg: Path, times, out_files, scheme="dark", scale=1.0, reduced_motion=False, size=None):
+def snapshots(svg: Path, times, out_files, scheme="dark", scale=1.0, reduced_motion=False, size=None, bg=None):
     from playwright.sync_api import sync_playwright
     with sync_playwright() as p:
         browser = launch(p)
@@ -24,6 +24,8 @@ def snapshots(svg: Path, times, out_files, scheme="dark", scale=1.0, reduced_mot
                                   reduced_motion="reduce" if reduced_motion else "no-preference")
         page = ctx.new_page()
         page.goto(svg.resolve().as_uri())
+        if bg:
+            page.evaluate("(c)=>{document.documentElement.style.background=c}", bg)
         dims = page.evaluate("(()=>{const s=document.documentElement;const b=s.getBoundingClientRect();"
                              "return [s.viewBox.baseVal.width||b.width, s.viewBox.baseVal.height||b.height]})()")
         w, h = size or (int(dims[0]), int(dims[1]))
@@ -45,12 +47,13 @@ def main():
     ap.add_argument("--scheme", default="dark")
     ap.add_argument("--scale", type=float, default=1.0)
     ap.add_argument("--reduced", action="store_true")
+    ap.add_argument("--bg", default=None)
     a = ap.parse_args()
     out = Path(a.out)
     out.mkdir(parents=True, exist_ok=True)
     stem = Path(a.svg).stem
     files = [out / f"{stem}-{t:g}s.png" for t in a.times]
-    snapshots(Path(a.svg), a.times, files, a.scheme, a.scale, a.reduced)
+    snapshots(Path(a.svg), a.times, files, a.scheme, a.scale, a.reduced, bg=a.bg)
     print("\n".join(map(str, files)))
 
 

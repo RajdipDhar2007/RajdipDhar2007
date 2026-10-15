@@ -1,7 +1,7 @@
 name: Rebuild ASCII portrait
 
-# Manual only. Needs input/photo.jpg (+ input/wave.mp4) to be present in the checkout,
-# which they are not by default (input/ is gitignored). Normally you run the build locally:
+# Manual only. Needs input/photo.jpg in the checkout, which it is not by default (input/ is gitignored),
+# so normally you run the build locally:
 #   python scripts/ascii/build_svg.py
 on:
   workflow_dispatch:
@@ -21,8 +21,8 @@ jobs:
       - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
-      - run: sudo apt-get update && sudo apt-get install -y ffmpeg gifsicle
-      - run: pip install pillow numpy opencv-python-headless playwright && python -m playwright install --with-deps chromium
+      - run: sudo apt-get update && sudo apt-get install -y gifsicle
+      - run: pip install pillow numpy opencv-python-headless playwright fonttools && python -m playwright install --with-deps chromium
       - run: python scripts/ascii/build_svg.py
       - name: Commit
         run: |

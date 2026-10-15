@@ -1,10 +1,9 @@
 """Stage 2: background removal, contrast, aligned fixed crop.
 
 Sources, in order of preference
-  1. scripts/ascii/_work/frames/*.png   (from extract_frames.sh, input/wave.mp4)
-  2. input/photo.jpg | .jpeg | .png
-  3. assets/source/profile-vector.svg   (rasterised with headless Chrome, has alpha)
-  4. a generated placeholder silhouette
+  1. input/photo.jpg | .jpeg | .png
+  2. assets/source/profile-vector.svg   (rasterised with headless Chrome, has alpha)
+  3. a generated placeholder silhouette
 
 Output: scripts/ascii/_work/prepped/fNN.png - "LA" images (L = tone, A = subject mask),
 all with the SAME crop and the SAME exposure so only moving pixels differ between frames.
@@ -111,9 +110,6 @@ def tone(gray: np.ndarray, mask: np.ndarray, lo_hi=None):
 
 
 def load_sources() -> list[Image.Image]:
-    frames = sorted((WORK / "frames").glob("*.png"))
-    if frames:
-        return [remove_bg(Image.open(f)) for f in frames]
     for ext in ("jpg", "jpeg", "png"):
         p = ROOT / "input" / f"photo.{ext}"
         if p.exists():

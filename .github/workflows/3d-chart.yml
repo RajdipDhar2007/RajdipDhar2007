@@ -1,0 +1,43 @@
+name: 3D contribution chart
+
+on:
+  schedule:
+    - cron: "30 18 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: readme-writer
+  cancel-in-progress: false
+
+jobs:
+  chart:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Fetch light and dark charts
+        run: |
+          set -euo pipefail
+          mkdir -p assets/3d
+          base="https://contribution.oooo.so/_/${{ github.repository_owner }}?chart=3dbar&gap=2&scale=1.8&gradient=true&legend=true&legendPosition=bottomLeft&legendDirection=row&strokeWidth=2&flatten=0&animation=wave&animation_duration=2&animation_delay=0.03&animation_amplitude=40&animation_frequency=0.2&animation_wave_center=0_6&weeks=36&format=svg"
+          fetch() {
+            curl --fail --silent --show-error --location --retry 3 --retry-delay 10 --max-time 60 "$base&$2" -o "assets/3d/$1.tmp"
+            # anything but an SVG must fail the job so the last good chart stays live
+            head -c 512 "assets/3d/$1.tmp" | grep -q '<svg' || { echo "::error::$1 is not an SVG"; exit 1; }
+            mv "assets/3d/$1.tmp" "assets/3d/$1"
+          }
+          fetch contribution-dark.svg  "colors=1B2A41&colors=0E7490&colors=22D3EE&colors=A78BFA&colors=F472B6&strokeColor=0D1117&dark=true"
+          fetch contribution-light.svg "colors=E6ECF5&colors=9EC5FE&colors=4C9AFF&colors=8250DF&colors=D6336C&strokeColor=FFFFFF"
+
+      - name: Commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add assets/3d/
+          if git diff --cached --quiet; then echo "nothing to commit"; exit 0; fi
+          git commit -m "chore: refresh 3D contribution chart [skip ci]"
+          git pull --rebase
+          git push

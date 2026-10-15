@@ -14,34 +14,25 @@ python scripts/ascii/build_svg.py         # the whole pipeline, one command
 | File | What | Fallback when missing |
 |---|---|---|
 | `input/photo.jpg` (or `.png`) | head-and-shoulders photo, plain background is fine | `assets/source/profile-vector.svg`, then a generated silhouette |
-| `input/wave.mp4` | 3-5 s of you waving, camera still | a synthetic, accent-coloured waving hand (placeholder) |
 
-`input/` is gitignored, so your raw photo and video are never committed.
+`input/` is gitignored, so your raw photo is never committed.
 
 ## Stages
 
-1. `extract_frames.sh` - ffmpeg the wave at 10 fps (8 frames = one 0.8 s wave cycle).
-2. `prep.py` - background removal (existing alpha -> `rembg` if installed -> GrabCut), CLAHE contrast,
-   head-anchored fixed crop and one fixed exposure for every frame, so the head never jitters.
-3. `frames_to_ascii.py` - 96x58 glyph grid, ramp `` .`:-=+*cs#%@``, Sobel edge glyphs `/ \ | _`.
-   Only the arm/hand region may differ between frames; everything else is copied from the base frame.
-4. `build_svg.py` - one SVG per theme (static rows once, per-frame groups for the arm region), GIF
-   via Pillow (+ `gifsicle -O3 --lossy=20` when installed) and PNG snapshots in `preview/`.
+1. `prep.py` - background removal (existing alpha, then `rembg` if installed, then GrabCut), CLAHE contrast,
+   head-anchored square crop and fixed exposure.
+2. `frames_to_ascii.py` - 96x58 glyph grid, ramp `` .`:-=+*cs#%@``, Sobel edge glyphs `/ \ | _`, separate dark and light tone maps.
+3. `build_svg.py` - one SVG per theme, plus `portrait.gif` (Pillow, + `gifsicle -O3 --lossy=20` when installed)
+   and PNG snapshots in `preview/`.
 
 ## Timeline (12 s loop)
 
 | Time | Phase |
 |---|---|
-| 0.0-0.8 s | boot: types the command, progress bar fills |
+| 0.0-0.8 s | boot: the command is typed, progress bar fills |
 | 0.8-2.6 s | scan line sweeps down; each row resolves from 3 scrambled versions |
 | 2.6-3.0 s | cyan/violet glitch copies flash twice, then sharp; `identity verified` |
-| 3.0-5.4 s | the hand waves 3x (frame swap on the arm region only); greeting is typed |
-| 5.4-12 s | idle: blinking cursor, ~40 shimmering glyphs, faint scan every 4 s |
+| 3.0-11.6 s | idle: light sweeps across the glyphs, glitch bands, hex rain, ~48 shimmering glyphs, blinking cursor, faint scans |
 | 11.6-12 s | glitch-out, loop |
 
-`prefers-reduced-motion: reduce` freezes the final composed frame (hand raised, text typed).
-
-## Budgets
-
-SVG < 500 KB (the build fails otherwise), GIF < 2 MB. Knobs: `COLS, ROWS` in `frames_to_ascii.py`,
-`SCRAMBLE`, shimmer count and timeline constants in `build_svg.py`.
+`prefers-reduced-motion: reduce` freezes the final frame. SVG budget: < 500 KB (the build fails otherwise).
