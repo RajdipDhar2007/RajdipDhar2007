@@ -69,6 +69,9 @@
 <summary><b>Recent GitHub activity</b></summary>
 
 <!--START_SECTION:activity-->
+1. 🚀 Published release [TaskFlow v1.0.0](https://github.com/RajdipDhar2007/TaskFlow/releases/tag/v1.0.0) in [RajdipDhar2007/TaskFlow](https://github.com/RajdipDhar2007/TaskFlow)
+2. 🚀 Published release [AttendTrack v1.0](https://github.com/RajdipDhar2007/AttendTrack/releases/tag/v1.0) in [RajdipDhar2007/AttendTrack](https://github.com/RajdipDhar2007/AttendTrack)
+3. 🚀 Published release [UltimateCraft v5.1.0 — the Alive update](https://github.com/RajdipDhar2007/UltimateCraft/releases/tag/v5.1.0) in [RajdipDhar2007/UltimateCraft](https://github.com/RajdipDhar2007/UltimateCraft)
 <!--END_SECTION:activity-->
 
 </details>
