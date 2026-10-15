@@ -73,6 +73,11 @@
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/live/greeting-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/live/greeting-light.svg"><img alt="Time-of-day greeting" src="assets/live/greeting-light.svg" width="100%" ></picture></p>
 
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/sections/divider-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/sections/divider-light.svg"><img alt="" src="assets/sections/divider-light.svg" width="100%" ></picture></p>
+<p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/titles/play-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/titles/play-light.svg"><img alt="Play a game" src="assets/titles/play-light.svg" width="100%" ></picture></p>
+
+<p align="center"><a href="https://rajdipdhar2007.github.io/RajdipDhar2007/"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/sections/arcade-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/sections/arcade-light.svg"><img alt="Bug Hunter, a playable arcade shooter. Click to play." src="assets/sections/arcade-light.svg" width="100%" ></picture></a></p>
+
+<p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/sections/divider-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/sections/divider-light.svg"><img alt="" src="assets/sections/divider-light.svg" width="100%" ></picture></p>
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/titles/connect-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/titles/connect-light.svg"><img alt="Let's connect" src="assets/titles/connect-light.svg" width="100%" ></picture></p>
 
 <p align="center">

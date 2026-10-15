@@ -80,6 +80,9 @@ def main() -> None:
 {title("activity", "Live activity")}
 <p align="center">{pic("assets/live/greeting-{m}.svg", "Time-of-day greeting")}</p>
 
+{title("play", "Play a game")}
+<p align="center"><a href="https://rajdipdhar2007.github.io/RajdipDhar2007/">{pic("assets/sections/arcade-{m}.svg", "Bug Hunter, a playable arcade shooter. Click to play.")}</a></p>
+
 {title("connect", "Let's connect")}
 <p align="center">
 <a href="mailto:rajdipdharofficial@gmail.com">{pic("assets/contact/email-{m}.svg", "Email Rajdip", "250")}</a>

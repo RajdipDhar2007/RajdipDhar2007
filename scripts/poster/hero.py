@@ -300,6 +300,73 @@ def star_cta(mode: str) -> str:
     return doc(W, H, body, css, defs, "Enjoyed the tour? Star this repo", pad_y=8)
 
 
+
+GAME_URL = "https://rajdipdhar2007.github.io/RajdipDhar2007/"
+
+
+def arcade_card(mode: str) -> str:
+    """README teaser for the playable game: a looping mini playfield next to the pitch and a PLAY button."""
+    import random
+    c = PAL[mode]
+    W, H = 830, 330
+    sf, hf, bf, mf = typo.font(typo.SCRIPT), typo.font(typo.HEAD), typo.font(typo.BODY), typo.font(typo.MONO_B)
+    rr = random.Random(12)
+    fx, fy, fw, fh = 26, 26, 262, 278
+    # ---- mini playfield
+    stars = "".join(f'<circle class="st" cx="{fx + rr.randint(4, fw - 4)}" cy="{fy + rr.randint(0, fh)}" r="{rr.choice([.8, 1.1, 1.5])}" fill="{c["ink"]}" style="animation-duration:{rr.randint(3, 7)}s;animation-delay:-{rr.uniform(0, 6):.1f}s"/>' for _ in range(34))
+
+    def bug(x, col, dur, delay, amp):
+        return (f'<g class="bf" style="animation-duration:{dur}s;animation-delay:-{delay}s"><g class="sw" style="animation-duration:{dur / 2}s;--a:{amp}px"><g transform="translate({x} {fy - 20})">'
+                f'<ellipse cx="0" cy="2" rx="11" ry="13" fill="{c["card"]}" stroke="{col}" stroke-width="2"/>'
+                f'<path d="M-11 -4 l-7 -3 M-11 3 l-8 1 M-11 9 l-7 5 M11 -4 l7 -3 M11 3 l8 1 M11 9 l7 5 M-3 -13 l-4 -7 M3 -13 l4 -7" stroke="{col}" stroke-width="2" stroke-linecap="round"/>'
+                f'<circle cx="-4" cy="-4" r="2.4" fill="#fff"/><circle cx="4" cy="-4" r="2.4" fill="#fff"/></g></g></g>')
+    bugs = bug(fx + 60, c["green"], 7, 0, 22) + bug(fx + 130, c["pink"], 6, 2.3, 30) + bug(fx + 200, c["second"], 8, 4.6, 18) + bug(fx + 95, c["green"], 9, 6.1, 26)
+    bullets = "".join(f'<rect class="bl" x="{fx + fw / 2 - 2}" y="{fy + fh - 40}" width="4" height="14" rx="2" fill="{c["accent"]}" style="animation-delay:-{k * .22:.2f}s"/>' for k in range(5))
+    booms = "".join(f'<circle class="bm" cx="{fx + x}" cy="{fy + y}" r="6" fill="none" stroke="{col}" stroke-width="3" style="animation-delay:-{d}s"/>' for x, y, col, d in [(70, 90, c["green"], 0), (170, 130, c["pink"], 1.7), (120, 60, c["accent"], 3.1)])
+    ship = (f'<g transform="translate({fx + fw / 2} {fy + fh - 22})"><g class="sh"><path d="M0 -16 L11 12 L0 6 L-11 12Z" fill="url(#g1)"/>'
+            f'<path class="fl" d="M-3 9 Q0 24 3 9Z" fill="{c["pink"]}"/></g></g>')
+    hud = f'<path d="{mf.path("SCORE 004210", 10, fx + 12, fy + 20, 1)[0]}" fill="{c["accent"]}"/><path d="{mf.path("WAVE 3", 10, fx + fw - 62, fy + 20, 1)[0]}" fill="{c["muted"]}"/>'
+    # ---- right side copy
+    title, tw = sf.path("Bug Hunter", 64, 330, 98)
+    sub, _ = mf.path("A  PLAYABLE  ARCADE  SHOOTER", 12, 332, 126, 3)
+    pitch = bf.wrap("Squash bugs, dodge their fire and take on the SEGFAULT boss. Power-ups, combos and a rank for every score.", 15, 450)
+    pd = "".join(f'<path d="{bf.path(l, 15, 332, 160 + k * 23)[0]}" fill="{c["muted"]}"/>' for k, l in enumerate(pitch))
+    bx, by, bw, bh = 332, 244, 214, 52
+    play, _ = hf.path("PLAY NOW", 17, bx + 66, by + 33, 1)
+    tri = f"M{bx + 30} {by + 16} L{bx + 30} {by + 36} L{bx + 46} {by + 26}Z"
+    dark = "#0D1117" if mode == "dark" else "#fff"
+    url, _ = mf.path("rajdipdhar2007.github.io/RajdipDhar2007", 10.5, bx + bw + 14, by + 31, 0)
+    chips, x = "", 332
+    for k, lab in enumerate(["BOSS FIGHTS", "POWER-UPS", "COMBOS", "MOBILE READY"]):
+        cw = mf.width(lab, 10, 1) + 22
+        chips += f'<rect x="{x}" y="200" width="{cw:.0f}" height="24" rx="12" fill="none" stroke="{[c["accent"], c["second"], c["pink"], c["green"]][k]}" stroke-width="1.6"/><path d="{mf.path(lab, 10, x + 11, 216, 1)[0]}" fill="{c["ink"]}"/>'
+        x += cw + 8
+    css = ("@keyframes bf{from{transform:translateY(0)}to{transform:translateY(330px)}}.bf{animation:bf 7s linear infinite}"
+           "@keyframes sw{0%,100%{transform:translateX(calc(var(--a) * -1))}50%{transform:translateX(var(--a))}}.sw{animation:sw 3s ease-in-out infinite}"
+           "@keyframes sh{0%,100%{transform:translateX(-70px)}50%{transform:translateX(70px)}}.sh{animation:sh 4.4s ease-in-out infinite}"
+           "@keyframes bl{0%{transform:translateY(0);opacity:1}100%{transform:translateY(-230px);opacity:0}}.bl{animation:bl 1.1s linear infinite}"
+           "@keyframes bm{0%{r:4;opacity:1}100%{r:26;opacity:0}}.bm{animation:bm 3.4s ease-out infinite}"
+           "@keyframes st{0%{transform:translateY(0);opacity:.2}50%{opacity:1}100%{transform:translateY(40px);opacity:.2}}.st{animation:st 5s linear infinite}"
+           "@keyframes fl{0%,100%{transform:scaleY(1)}50%{transform:scaleY(1.7)}}.fl{transform-box:fill-box;transform-origin:top;animation:fl .25s ease-in-out infinite}"
+           "@keyframes run{to{stroke-dashoffset:-1000}}.run{stroke-dasharray:180 820;animation:run 6s linear infinite}"
+           "@keyframes pl{0%{transform:scale(1);opacity:.7}100%{transform:scale(1.2,1.6);opacity:0}}.pl{transform-box:fill-box;transform-origin:center;animation:pl 1.8s ease-out infinite}"
+           "@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}.bob{animation:bob 2.6s ease-in-out infinite}"
+           "@keyframes shn{0%{transform:translateX(0)}45%,100%{transform:translateX(300px)}}.shn{animation:shn 3.2s ease-in-out infinite}"
+           "@keyframes tri{0%,100%{transform:translateX(0)}50%{transform:translateX(4px)}}.tri{animation:tri 1s ease-in-out infinite}" + _tw())
+    body = (f'<clipPath id="pf"><rect x="{fx}" y="{fy}" width="{fw}" height="{fh}" rx="18"/></clipPath><clipPath id="pc"><rect x="1" y="1" width="{W - 2}" height="{H - 2}" rx="30"/></clipPath>'
+            f'<rect x=".5" y=".5" width="{W - 1}" height="{H - 1}" rx="30" fill="{c["card"]}" stroke="{c["line"]}"/>'
+            f'<rect class="run" x=".5" y=".5" width="{W - 1}" height="{H - 1}" rx="30" fill="none" stroke="url(#g1)" stroke-width="3" pathLength="1000"/>'
+            f'<rect x="{fx}" y="{fy}" width="{fw}" height="{fh}" rx="18" fill="url(#pbg)" stroke="{c["accent"]}" stroke-opacity=".5"/>'
+            f'<g clip-path="url(#pf)">{stars}{bugs}{booms}{bullets}{ship}{hud}</g>'
+            f'<path d="{title}" fill="url(#g1)"/><path d="{sub}" fill="{c["accent"]}"/>{pd}{chips}'
+            f'<rect class="pl" x="{bx}" y="{by}" width="{bw}" height="{bh}" rx="26" fill="none" stroke="url(#g1)" stroke-width="2.5"/>'
+            f'<g class="bob"><clipPath id="bcl"><rect x="{bx}" y="{by}" width="{bw}" height="{bh}" rx="26"/></clipPath><rect x="{bx}" y="{by}" width="{bw}" height="{bh}" rx="26" fill="url(#g1)"/>'
+            f'<g clip-path="url(#bcl)"><rect class="shn" x="{bx - 90}" y="{by}" width="46" height="{bh}" fill="#fff" opacity=".4" transform="skewX(-20)"/></g>'
+            f'<path class="tri" d="{tri}" fill="{dark}"/><path d="{play}" fill="{dark}"/></g>'
+            f'<path d="{url}" fill="{c["muted"]}"/>{star4(790, 40, 9, c["accent"], "tw")}{star4(760, 70, 5, c["pink"], "tw", "style=" + chr(34) + "animation-delay:-1s" + chr(34))}')
+    defs = _grad(c, "g1") + f'<linearGradient id="pbg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="{c["base"]}"/><stop offset="1" stop-color="{c["base2"]}"/></linearGradient>'
+    return doc(W, H, body, css, defs, "Bug Hunter, a playable arcade shooter. Click to play.", pad_y=8)
+
 # ------------------------------------------------------------------ about cards
 def _about_icon(i: int, x: float, y: float, col: str) -> str:
     """Tiny animated glyph per about card: cap bob, code brackets pulse, sparkle spin, radar ping."""
@@ -413,7 +480,7 @@ def greeting_svg(mode: str, text: str, stamp: str, night: bool) -> str:
 
 
 TITLES = [("01", "ABOUT ME", "about"), ("02", "TOOLBOX", "toolbox"), ("03", "FEATURED WORK", "work"), ("04", "BY THE NUMBERS", "stats"),
-          ("05", "CONTRIBUTION CITY", "city"), ("06", "RIGHT NOW", "activity"), ("07", "LET'S CONNECT", "connect")]
+          ("05", "CONTRIBUTION CITY", "city"), ("08", "PLAY A GAME", "play"), ("06", "RIGHT NOW", "activity"), ("07", "LET'S CONNECT", "connect")]
 
 
 def build():
@@ -426,6 +493,7 @@ def build():
         write(OUT / "hero" / f"welcome-{m}.svg", hero_welcome(m))
         write(OUT / "hero" / f"btn-follow-{m}.svg", button("Follow me", "follow", m, True))
         write(OUT / "sections" / f"star-{m}.svg", star_cta(m))
+        write(OUT / "sections" / f"arcade-{m}.svg", arcade_card(m))
         write(OUT / "hero" / f"btn-work-{m}.svg", button("My work", "github", m, False))
         write(OUT / "sections" / f"ticker-{m}.svg", ticker(m))
         write(OUT / "sections" / f"divider-{m}.svg", divider(m))

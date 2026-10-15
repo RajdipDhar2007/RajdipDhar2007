@@ -37,6 +37,7 @@ def test_generated_svgs_are_valid(mode):
     _ok(hero.contact_pill("Email", "x@y.z", "gmail", mode))
     _ok(hero.button("Follow me", "follow", mode, True))
     _ok(hero.star_cta(mode))
+    _ok(hero.arcade_card(mode))
     _ok(work.toolbox(mode))
     for i, p in enumerate(work.PROJECTS):
         _ok(work.project_card(p, mode, i))
@@ -70,6 +71,14 @@ def test_readme_references_existing_files():
     for ref in re.findall(r'(?:src|srcset|href)="(?!https?:|mailto:|#)([^"]+)"', text):
         assert (ROOT / ref).exists(), f"README references missing file {ref}"
     assert text.count("<picture>") >= 20
+
+
+def test_game_page_is_self_contained():
+    html = (ROOT / "docs" / "index.html").read_text(encoding="utf-8")
+    assert "<canvas" in html and "requestAnimationFrame" in html
+    assert not re.search(r'(?:src|href)="https?://(?!github\.com/RajdipDhar2007)', html), "game must not load third-party resources"
+    for f in re.findall(r"url\((fonts/[^)]+)\)", html):
+        assert (ROOT / "docs" / f).exists(), f
 
 
 def test_readme_has_no_code_poster_leftovers():
