@@ -35,7 +35,8 @@ def test_generated_svgs_are_valid(mode):
     _ok(hero.about(mode))
     _ok(hero.section_title("01", "ABOUT ME", mode))
     _ok(hero.contact_pill("Email", "x@y.z", "gmail", mode))
-    _ok(hero.button("Email me", "gmail", mode, True))
+    _ok(hero.button("Follow me", "follow", mode, True))
+    _ok(hero.star_cta(mode))
     _ok(work.toolbox(mode))
     for i, p in enumerate(work.PROJECTS):
         _ok(work.project_card(p, mode, i))

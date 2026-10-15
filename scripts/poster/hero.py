@@ -1,5 +1,6 @@
 """Hero column, section titles, ticker, about cards, contact pills, live greeting."""
 from __future__ import annotations
+A = chr(39)
 from .common import PAL, MODES, OUT, doc, kf, lin_grad, typo, write, icon, esc
 
 # ------------------------------------------------------------------ small pieces
@@ -208,18 +209,95 @@ def button(label: str, icon_name: str | None, mode: str, primary: bool) -> str:
     W, H, T = 190, 52, 5.0
     f = typo.font(typo.HEAD)
     d, w = f.path(label, 16, 0, 0)
-    ix = 22 if icon_name else 0
-    total = w + (28 if icon_name else 0)
+    pad = 40 if icon_name == "follow" else 28
+    total = w + (pad if icon_name else 0)
     x0 = (W - total) / 2
     fg = "#0D1117" if (primary and mode == "dark") else ("#FFFFFF" if primary else c["ink"])
     fill = 'url(#g1)' if primary else c["card"]
-    ic = icon(icon_name, x0, 15, 22, fg) if icon_name else ""
+    if icon_name == "follow":
+        ic = (f'<circle cx="{x0 + 8}" cy="21" r="5.5" fill="{fg}"/><path d="M{x0 - 2} 38 q0 -10 10 -10 t10 10z" fill="{fg}"/>'
+              f'<g class="plus"><path d="M{x0 + 20} 18 h10 M{x0 + 25} 13 v10" stroke="{fg}" stroke-width="2.6" stroke-linecap="round"/></g>')
+    else:
+        ic = icon(icon_name, x0, 15, 22, fg) if icon_name else ""
     css = (kf("sw", T, [(0, "transform:translateX(0)"), (1.6, "transform:translateX(0)"), (2.6, "transform:translateX(280px)"), (T, "transform:translateX(280px)")]) + f".sw{{animation:sw {T}s linear infinite}}"
-           "@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}.bb{animation:bob 3.2s ease-in-out infinite}")
-    body = (f'<g class="bb"><rect x="1" y="1" width="{W - 2}" height="{H - 2}" rx="26" fill="{fill}" stroke="url(#g1)" stroke-width="2"/>'
+           "@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}.bb{animation:bob 3.2s ease-in-out infinite}"
+           "@keyframes plus{0%,100%{transform:scale(1) rotate(0)}50%{transform:scale(1.35) rotate(90deg)}}.plus{transform-box:fill-box;transform-origin:center;animation:plus 2s ease-in-out infinite}"
+           "@keyframes bpl{0%{transform:scale(1);opacity:.7}100%{transform:scale(1.18,1.5);opacity:0}}.bpl{transform-box:fill-box;transform-origin:center;animation:bpl 2.2s ease-out infinite}")
+    body = (f'<rect class="bpl" x="1" y="1" width="{W - 2}" height="{H - 2}" rx="26" fill="none" stroke="url(#g1)" stroke-width="2"/>'
+            f'<g class="bb"><rect x="1" y="1" width="{W - 2}" height="{H - 2}" rx="26" fill="{fill}" stroke="url(#g1)" stroke-width="2"/>'
             f'<clipPath id="bc"><rect x="1" y="1" width="{W - 2}" height="{H - 2}" rx="26"/></clipPath><g clip-path="url(#bc)"><rect class="sw" x="-100" y="0" width="60" height="{H}" fill="#fff" opacity=".35" transform="skewX(-20)"/></g>'
-            f'{ic}<path d="{d}" transform="translate({x0 + (28 if icon_name else 0):.1f} 32)" fill="{fg}"/></g>')
+            f'{ic}<path d="{d}" transform="translate({x0 + (pad if icon_name else 0):.1f} 32)" fill="{fg}"/></g>')
     return doc(W, H, body, css, _grad(c, "g1"), label, pad_y=8)
+
+
+
+def star_cta(mode: str) -> str:
+    """Closing call-to-action: a big glowing star, a hand-lettered ask and a shimmering button."""
+    import math
+    c = PAL[mode]
+    W, H, T = 830, 290, 10.0
+    sf, bf, hf = typo.font(typo.SCRIPT), typo.font(typo.BODY), typo.font(typo.HEAD)
+    # five-point star (outer r, inner r) centred at (150, 145)
+    cx, cy, ro, ri = 150, 150, 74, 32
+    pts = " ".join(f"{cx + (ro if i % 2 == 0 else ri) * math.cos(-math.pi / 2 + i * math.pi / 5):.1f},{cy + (ro if i % 2 == 0 else ri) * math.sin(-math.pi / 2 + i * math.pi / 5):.1f}" for i in range(10))
+    # title with a draw-on look
+    gl = sf.glyphs("Enjoyed the tour?", 52, 300, 108)
+    full = "".join(g[0] for g in gl)
+    css = ""
+    draw = ""
+    for i, (d, _, _) in enumerate(gl):
+        t0 = .2 + i * .08
+        css += kf(f"d{i}", T, [(0, "stroke-dashoffset:1;opacity:1"), (t0, "stroke-dashoffset:1;opacity:1"), (t0 + .7, "stroke-dashoffset:0;opacity:1"), (T - .7, "stroke-dashoffset:0;opacity:1"), (T - .3, "opacity:0;stroke-dashoffset:0"), (T, "opacity:0;stroke-dashoffset:1")]) + f".d{i}{{animation:d{i} {T}s ease-in-out infinite}}"
+        draw += f'<path class="d{i}" d="{d}" pathLength="1" fill="none" stroke="url(#g1)" stroke-width="1.6" stroke-dasharray="1" stroke-dashoffset="1"/>'
+    css += kf("tf", T, [(0, "opacity:0"), (1.4, "opacity:0"), (2.4, "opacity:1"), (T - .7, "opacity:1"), (T - .3, "opacity:0"), (T, "opacity:0")]) + f".tf{{animation:tf {T}s linear infinite}}"
+    lines = bf.wrap("If this profile made you smile, drop a star on this repo. It tells me the work is worth sharing and keeps me building.", 15, 460)
+    sub = "".join(f'<path d="{bf.path(l, 15, 300, 150 + k * 23)[0]}" fill="{c["muted"]}"/>' for k, l in enumerate(lines))
+    css += kf("sb", T, [(0, "opacity:0;transform:translateY(8px)"), (2.0, "opacity:0;transform:translateY(8px)"), (2.8, "opacity:1;transform:none"), (T - .7, "opacity:1;transform:none"), (T - .3, "opacity:0"), (T, "opacity:0")]) + f".sb{{animation:sb {T}s ease-out infinite}}"
+    # button
+    bw, bh, bx, by = 236, 54, 300, 214
+    lab, lw = hf.path("Star this repo", 18, 0, 0)
+    bx_text = bx + 62
+    bsx, bsy = bx + 38, by + bh / 2
+    bpts = " ".join(f"{bsx + (11 if k % 2 == 0 else 4.6) * math.cos(-math.pi / 2 + k * math.pi / 5):.1f},{bsy + (11 if k % 2 == 0 else 4.6) * math.sin(-math.pi / 2 + k * math.pi / 5):.1f}" for k in range(10))
+    # falling mini stars
+    rr = __import__("random").Random(9)
+    rain = ""
+    for j in range(14):
+        x = rr.randint(20, 810)
+        r = rr.choice([4, 5, 6, 8])
+        k = r * 0.28
+        d = f"M{x} {-r} Q{x + k} {-k} {x + r} 0 Q{x + k} {k} {x} {r} Q{x - k} {k} {x - r} 0 Q{x - k} {-k} {x} {-r}Z"
+        rain += f'<path class="fall" d="{d}" fill="{[c["accent"], c["second"], c["pink"]][j % 3]}" style="animation-delay:-{rr.uniform(0, 9):.1f}s;animation-duration:{rr.randint(6, 11)}s"/>'
+    # orbiting sparkles around the big star
+    orbit = f"M{cx - 100} {cy} a100 100 0 1 0 200 0 a100 100 0 1 0 -200 0"
+    sparks = "".join(f'<path class="orb" d="M0 -7 Q2 -2 7 0 Q2 2 0 7 Q-2 2 -7 0 Q-2 -2 0 -7Z" fill="{col}" style="offset-path:path({A}{orbit}{A});animation-delay:-{k * 1.3:.1f}s"/>' for k, col in enumerate([c["accent"], c["pink"], c["second"], c["accent"]]))
+    css += ("@keyframes fall{0%{transform:translateY(-10px) rotate(0);opacity:0}10%{opacity:.8}100%{transform:translateY(300px) rotate(180deg);opacity:0}}.fall{animation:fall 8s linear infinite}"
+            "@keyframes orb{from{offset-distance:0%}to{offset-distance:100%}}.orb{animation:orb 6s linear infinite}"
+            "@keyframes bst{0%,100%{transform:scale(1) rotate(0)}50%{transform:scale(1.12) rotate(8deg)}}.bst{transform-box:fill-box;transform-origin:center;animation:bst 2.6s ease-in-out infinite}"
+            "@keyframes glow{0%,100%{opacity:.25;transform:scale(1)}50%{opacity:.6;transform:scale(1.2)}}.glow{transform-box:fill-box;transform-origin:center;animation:glow 2.6s ease-in-out infinite}"
+            "@keyframes run{to{stroke-dashoffset:-1000}}.run{stroke-dasharray:180 820;animation:run 6s linear infinite}"
+            "@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}.bob{animation:bob 3s ease-in-out infinite}"
+            "@keyframes shn{0%{transform:translateX(0)}45%,100%{transform:translateX(320px)}}.shn{animation:shn 3.4s ease-in-out infinite}"
+            "@keyframes arr{0%,100%{transform:translateX(0)}50%{transform:translateX(5px)}}.arr{animation:arr 1.2s ease-in-out infinite}"
+            "@keyframes ring{0%{r:44;opacity:.7}100%{r:112;opacity:0}}.ring{animation:ring 2.8s ease-out infinite}" + _tw())
+    body = (f'<clipPath id="pc"><rect x="1" y="1" width="{W - 2}" height="{H - 2}" rx="30"/></clipPath>'
+            f'<rect x=".5" y=".5" width="{W - 1}" height="{H - 1}" rx="30" fill="{c["card"]}" stroke="{c["line"]}"/>'
+            f'<g clip-path="url(#pc)"><circle cx="{cx}" cy="{cy}" r="120" fill="url(#rg)" class="glow"/>{rain}</g>'
+            f'<rect class="run" x=".5" y=".5" width="{W - 1}" height="{H - 1}" rx="30" fill="none" stroke="url(#g1)" stroke-width="3" pathLength="1000"/>'
+            f'<circle class="ring" cx="{cx}" cy="{cy}" r="44" fill="none" stroke="{c["accent"]}" stroke-width="2"/>'
+            f'<circle class="ring" cx="{cx}" cy="{cy}" r="44" fill="none" stroke="{c["pink"]}" stroke-width="2" style="animation-delay:-1.4s"/>'
+            f'<ellipse cx="{cx}" cy="{cy}" rx="100" ry="100" fill="none" stroke="{c["line"]}" stroke-dasharray="3 6"/>{sparks}'
+            f'<g class="bst"><polygon points="{pts}" fill="url(#g1)" stroke="url(#g1)" stroke-width="8" stroke-linejoin="round"/>'
+            f'<polygon points="{pts}" fill="none" stroke="#fff" stroke-opacity=".5" stroke-width="2" stroke-linejoin="round" transform="translate({cx} {cy}) scale(.55) translate({-cx} {-cy})"/></g>'
+            f'<g class="tf" fill="url(#g1)"><path d="{full}"/></g>{draw}<g class="sb">{sub}</g>'
+            f'<g class="bob"><clipPath id="bcl"><rect x="{bx}" y="{by}" width="{bw}" height="{bh}" rx="27"/></clipPath>'
+            f'<rect x="{bx}" y="{by}" width="{bw}" height="{bh}" rx="27" fill="url(#g1)"/>'
+            f'<g clip-path="url(#bcl)"><rect class="shn" x="{bx - 90}" y="{by}" width="50" height="{bh}" fill="#fff" opacity=".4" transform="skewX(-20)"/></g>'
+            f'<polygon points="{bpts}" fill="{"#0D1117" if mode == "dark" else "#fff"}"/>'
+            f'<path d="{hf.path("Star this repo", 18, bx_text, by + 34)[0]}" fill="{"#0D1117" if mode == "dark" else "#fff"}"/>'
+            f'<g class="arr"><path d="M{bx + bw - 40} {by + 27} h18 m-7 -7 l7 7 l-7 7" fill="none" stroke="{"#0D1117" if mode == "dark" else "#fff"}" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></g></g>')
+    defs = _grad(c, "g1") + f'<radialGradient id="rg"><stop offset="0" stop-color="{c["accent"]}" stop-opacity=".55"/><stop offset="1" stop-color="{c["accent"]}" stop-opacity="0"/></radialGradient>'
+    return doc(W, H, body, css, defs, "Enjoyed the tour? Star this repo", pad_y=8)
 
 
 # ------------------------------------------------------------------ about cards
@@ -346,7 +424,8 @@ def build():
         write(OUT / "hero" / f"roles-{m}.svg", hero_roles(m))
         write(OUT / "hero" / f"chips-{m}.svg", hero_chips(m))
         write(OUT / "hero" / f"welcome-{m}.svg", hero_welcome(m))
-        write(OUT / "hero" / f"btn-email-{m}.svg", button("Email me", "gmail", m, True))
+        write(OUT / "hero" / f"btn-follow-{m}.svg", button("Follow me", "follow", m, True))
+        write(OUT / "sections" / f"star-{m}.svg", star_cta(m))
         write(OUT / "hero" / f"btn-work-{m}.svg", button("My work", "github", m, False))
         write(OUT / "sections" / f"ticker-{m}.svg", ticker(m))
         write(OUT / "sections" / f"divider-{m}.svg", divider(m))

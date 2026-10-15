@@ -3,6 +3,7 @@ from __future__ import annotations
 from .common import PAL, MODES, OUT, doc, kf, lin_grad, pct, rng, typo, write, esc
 
 W = 1000
+A = chr(39)
 ROLES = ["Full-stack developer", "Android developer", "Game developer from scratch", "Web3 explorer", "AI & automation tinkerer"]
 TOKENS = ["{ }", "</>", "0x", "=>", "[ ]", "01", "#", "::", "fn()", "&&", "//", "++"]
 
@@ -82,6 +83,12 @@ def header(mode: str) -> str:
     ccss = ("@keyframes cty{from{transform:translateX(0)}to{transform:translateX(-1000px)}}.cty{animation:cty 70s linear infinite}"
             "@keyframes wn{0%,100%{opacity:.2}50%{opacity:1}}.wn{animation:wn 3s ease-in-out infinite}")
 
+    # three glowing dots circling the signature on an elliptical orbit
+    orb_path = "M60 190 a440 78 0 1 0 880 0 a440 78 0 1 0 -880 0"
+    orbit = (f'<path d="{orb_path}" fill="none" stroke="{c["accent"]}" stroke-opacity=".22" stroke-dasharray="2 7"/>'
+             + "".join(f'<circle class="odot" r="{r}" fill="{col}" style="offset-path:path({A}{orb_path}{A});animation-delay:-{k * 6:.1f}s"/>' for k, (r, col) in enumerate([(4, c["accent"]), (3, c["pink"]), (3.5, c["second"])])))
+    ocss = "@keyframes odot{from{offset-distance:0%}to{offset-distance:100%}}.odot{animation:odot 18s linear infinite;filter:drop-shadow(0 0 4px currentColor)}"
+
     # hand-drawn signature
     sf = typo.font(typo.SCRIPT)
     size = 136
@@ -138,7 +145,7 @@ def header(mode: str) -> str:
             + f'<clipPath id="nm"><path d="{full_d}"/></clipPath>')
     bg = (f'<defs><linearGradient id="bgg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="{c["base"]}"/><stop offset="1" stop-color="{c["base2"]}"/></linearGradient></defs>'
           f'<rect width="1000" height="{H}" fill="url(#bgg)"/>')
-    body = (bg + abody + f'<g clip-path="inset(0)">{vlines}{hlines}</g>'.replace('<g clip-path="inset(0)">', f'<g>') + city + pbody + tbody + hello + status + kicker
+    body = (bg + abody + f'<g clip-path="inset(0)">{vlines}{hlines}</g>'.replace('<g clip-path="inset(0)">', f'<g>') + city + orbit + pbody + tbody + hello + status + kicker
             + f'<g class="bob"><g class="nf"><path d="{full_d}" fill="url(#gn)"/></g>{draw}'
               f'<g clip-path="url(#nm)"><rect class="shm" x="-260" y="60" width="200" height="190" fill="url(#shg)" opacity=".75" transform="skewX(-18)"/></g>'
               f'<path class="ul" d="{ul}" fill="none" stroke="url(#gn)" stroke-width="4" stroke-linecap="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="0"/></g>'
@@ -146,7 +153,7 @@ def header(mode: str) -> str:
     shoot = "".join(f'<g transform="translate({90 + k * 330} {30 + (k % 2) * 36})"><line class="sl" x1="0" y1="0" x2="-80" y2="-27" stroke="url(#st)" stroke-width="2.2" stroke-linecap="round" style="animation-delay:-{k * 2.1:.1f}s"/></g>' for k in range(3))
     body = body.replace(wbody, shoot + wbody)
     defs += f'<linearGradient id="st" x1="0" x2="1"><stop offset="0" stop-color="{c["accent"]}"/><stop offset="1" stop-color="{c["accent"]}" stop-opacity="0"/></linearGradient>'
-    css = acss + pcss + tcss + gcss + wcss + css_name + rcss + kcss + ccss + "@keyframes ssh{0%{transform:translate(0,0);opacity:0}6%{opacity:1}30%,100%{transform:translate(230px,78px);opacity:0}}.sl{animation:ssh 7.2s ease-in infinite}"
+    css = acss + pcss + tcss + gcss + wcss + css_name + rcss + kcss + ccss + ocss + "@keyframes ssh{0%{transform:translate(0,0);opacity:0}6%{opacity:1}30%,100%{transform:translate(230px,78px);opacity:0}}.sl{animation:ssh 7.2s ease-in infinite}"
     return doc(W, H, body, css, defs, "Rajdip Dhar: hand-drawn signature, rotating roles, animated aurora banner")
 
 

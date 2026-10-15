@@ -9,7 +9,7 @@
 <picture><source media="(prefers-color-scheme: dark)" srcset="assets/hero/chips-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/hero/chips-light.svg"><img alt="B.Tech CSE at HITK, Kolkata IST, batch 2026 to 2030, open to internships" src="assets/hero/chips-light.svg" width="360" ></picture>
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="assets/hero/welcome-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/hero/welcome-light.svg"><img alt="Welcome to my space" src="assets/hero/welcome-light.svg" width="360" ></picture><br>
-<a href="mailto:rajdipdharofficial@gmail.com"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/hero/btn-email-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/hero/btn-email-light.svg"><img alt="Email me" src="assets/hero/btn-email-light.svg" width="172" ></picture></a><a href="https://github.com/RajdipDhar2007?tab=repositories"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/hero/btn-work-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/hero/btn-work-light.svg"><img alt="See my work" src="assets/hero/btn-work-light.svg" width="172" ></picture></a>
+<a href="https://github.com/RajdipDhar2007"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/hero/btn-follow-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/hero/btn-follow-light.svg"><img alt="Follow me on GitHub" src="assets/hero/btn-follow-light.svg" width="172" ></picture></a><a href="https://github.com/RajdipDhar2007?tab=repositories"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/hero/btn-work-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/hero/btn-work-light.svg"><img alt="See my work" src="assets/hero/btn-work-light.svg" width="172" ></picture></a>
 
 <br clear="left">
 
@@ -81,6 +81,8 @@
 <!-- TODO_RAJDIP: add LinkedIn, portfolio, LeetCode / Codeforces and X pills (see contact_pill() in scripts/poster/hero.py) -->
 </p>
 <p align="center"><sub>Fastest reply: email &middot; open to internships and collaborations</sub></p>
+
+<p align="center"><a href="https://github.com/RajdipDhar2007/RajdipDhar2007"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/sections/star-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/sections/star-light.svg"><img alt="Enjoyed the tour? Star this repo" src="assets/sections/star-light.svg" width="100%" ></picture></a></p>
 
 <div align="center">
 <picture><source media="(prefers-color-scheme: dark)" srcset="assets/banners/footer-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/banners/footer-light.svg"><img alt="Thanks for stopping by" src="assets/banners/footer-light.svg" width="100%" ></picture>

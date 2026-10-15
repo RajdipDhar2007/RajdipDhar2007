@@ -41,7 +41,7 @@ def main() -> None:
 {pic("assets/hero/chips-{m}.svg", "B.Tech CSE at HITK, Kolkata IST, batch 2026 to 2030, open to internships", "360")}
 
 {pic("assets/hero/welcome-{m}.svg", "Welcome to my space", "360")}<br>
-<a href="mailto:rajdipdharofficial@gmail.com">{pic("assets/hero/btn-email-{m}.svg", "Email me", "172")}</a><a href="https://github.com/{owner}?tab=repositories">{pic("assets/hero/btn-work-{m}.svg", "See my work", "172")}</a>
+<a href="https://github.com/{owner}">{pic("assets/hero/btn-follow-{m}.svg", "Follow me on GitHub", "172")}</a><a href="https://github.com/{owner}?tab=repositories">{pic("assets/hero/btn-work-{m}.svg", "See my work", "172")}</a>
 
 <br clear="left">
 
@@ -87,6 +87,8 @@ def main() -> None:
 <!-- TODO_RAJDIP: add LinkedIn, portfolio, LeetCode / Codeforces and X pills (see contact_pill() in scripts/poster/hero.py) -->
 </p>
 <p align="center"><sub>Fastest reply: email &middot; open to internships and collaborations</sub></p>
+
+<p align="center"><a href="https://github.com/{REPO}">{pic("assets/sections/star-{m}.svg", "Enjoyed the tour? Star this repo")}</a></p>
 
 <div align="center">
 {pic("assets/banners/footer-{m}.svg", "Thanks for stopping by")}
