@@ -72,6 +72,20 @@ def divider(mode: str) -> str:
     return doc(W, H, body, css, defs, "divider")
 
 
+
+def divider2(mode: str) -> str:
+    """Heartbeat-style separator: an ECG line with a travelling pulse and a beating dot."""
+    c = PAL[mode]
+    W, H = 830, 40
+    d = "M40 20 H300 l12 0 l8 -14 l10 28 l10 -22 l8 8 H500 l10 0 l7 -10 l8 20 l8 -14 l6 4 H790"
+    css = ("@keyframes ecg{0%{stroke-dashoffset:100}100%{stroke-dashoffset:-100}}.ecg{stroke-dasharray:18 82;animation:ecg 3.2s linear infinite}"
+           "@keyframes bt{0%,100%{transform:scale(1)}15%{transform:scale(1.5)}30%{transform:scale(1)}}.bt{transform-box:fill-box;transform-origin:center;animation:bt 1.4s ease-in-out infinite}" + _tw())
+    body = (f'<path d="{d}" fill="none" stroke="url(#g1)" stroke-opacity=".3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>'
+            f'<path class="ecg" d="{d}" fill="none" stroke="url(#g1)" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" pathLength="100"/>'
+            f'<circle class="bt" cx="{W / 2}" cy="20" r="5" fill="{c["pink"]}"/>{star4(60, 20, 6, c["accent"], "tw")}{star4(770, 20, 6, c["second"], "tw", "style=" + chr(34) + "animation-delay:-1.2s" + chr(34))}')
+    return doc(W, H, body, css, _grad(c, "g1"), "divider")
+
+
 # ------------------------------------------------------------------ ticker
 def ticker(mode: str, words=None, reverse: bool = False) -> str:
     c = PAL[mode]
@@ -335,13 +349,21 @@ def arcade_card(mode: str) -> str:
     play, _ = hf.path("PLAY NOW", 17, bx + 66, by + 33, 1)
     tri = f"M{bx + 30} {by + 16} L{bx + 30} {by + 36} L{bx + 46} {by + 26}Z"
     dark = "#0D1117" if mode == "dark" else "#fff"
-    url, _ = mf.path("rajdipdhar2007.github.io/RajdipDhar2007", 10.5, bx + bw + 14, by + 31, 0)
+    url, _ = mf.path("INSERT COIN", 12, bx + bw + 22, by + 31, 3)
     chips, x = "", 332
     for k, lab in enumerate(["BOSS FIGHTS", "POWER-UPS", "COMBOS", "MOBILE READY"]):
         cw = mf.width(lab, 10, 1) + 22
         chips += f'<rect x="{x}" y="200" width="{cw:.0f}" height="24" rx="12" fill="none" stroke="{[c["accent"], c["second"], c["pink"], c["green"]][k]}" stroke-width="1.6"/><path d="{mf.path(lab, 10, x + 11, 216, 1)[0]}" fill="{c["ink"]}"/>'
         x += cw + 8
-    css = ("@keyframes bf{from{transform:translateY(0)}to{transform:translateY(330px)}}.bf{animation:bf 7s linear infinite}"
+    scan = "".join(f'<rect x="{fx}" y="{fy + k * 6}" width="{fw}" height="1" fill="#000" opacity=".16"/>' for k in range(fh // 6))
+    pw = (f'<g class="pwr"><circle cx="{fx + 150}" cy="{fy - 12}" r="10" fill="{c["card"]}" stroke="{c["green"]}" stroke-width="2"/>'
+          f'<path d="{mf.path("H", 11, fx + 145, fy - 8)[0]}" fill="{c["green"]}"/></g>'
+          f'<path class="pop" d="{mf.path("+100", 11, fx + 60, fy + 120, 1)[0]}" fill="{c["gold"] if "gold" in c else c["pink"]}"/>')
+    css = ("@keyframes pwr{from{transform:translate(0,0)}to{transform:translate(-40px,300px)}}.pwr{animation:pwr 9s linear infinite;animation-delay:-3s}"
+           "@keyframes pop{0%,100%{opacity:0;transform:translateY(0)}10%{opacity:1}40%{opacity:0;transform:translateY(-22px)}}.pop{animation:pop 3.4s ease-out infinite}"
+           "@keyframes coin{0%,49%{opacity:1}50%,100%{opacity:.15}}.coin{animation:coin 1s steps(1) infinite}"
+           "@keyframes crt{from{transform:translateY(0)}to{transform:translateY(6px)}}.crt{animation:crt .5s linear infinite}"
+           "@keyframes bf{from{transform:translateY(0)}to{transform:translateY(330px)}}.bf{animation:bf 7s linear infinite}"
            "@keyframes sw{0%,100%{transform:translateX(calc(var(--a) * -1))}50%{transform:translateX(var(--a))}}.sw{animation:sw 3s ease-in-out infinite}"
            "@keyframes sh{0%,100%{transform:translateX(-70px)}50%{transform:translateX(70px)}}.sh{animation:sh 4.4s ease-in-out infinite}"
            "@keyframes bl{0%{transform:translateY(0);opacity:1}100%{transform:translateY(-230px);opacity:0}}.bl{animation:bl 1.1s linear infinite}"
@@ -357,13 +379,13 @@ def arcade_card(mode: str) -> str:
             f'<rect x=".5" y=".5" width="{W - 1}" height="{H - 1}" rx="30" fill="{c["card"]}" stroke="{c["line"]}"/>'
             f'<rect class="run" x=".5" y=".5" width="{W - 1}" height="{H - 1}" rx="30" fill="none" stroke="url(#g1)" stroke-width="3" pathLength="1000"/>'
             f'<rect x="{fx}" y="{fy}" width="{fw}" height="{fh}" rx="18" fill="url(#pbg)" stroke="{c["accent"]}" stroke-opacity=".5"/>'
-            f'<g clip-path="url(#pf)">{stars}{bugs}{booms}{bullets}{ship}{hud}</g>'
+            f'<g clip-path="url(#pf)">{stars}{bugs}{booms}{bullets}{ship}{pw}<g class="crt">{scan}</g>{hud}</g>'
             f'<path d="{title}" fill="url(#g1)"/><path d="{sub}" fill="{c["accent"]}"/>{pd}{chips}'
             f'<rect class="pl" x="{bx}" y="{by}" width="{bw}" height="{bh}" rx="26" fill="none" stroke="url(#g1)" stroke-width="2.5"/>'
             f'<g class="bob"><clipPath id="bcl"><rect x="{bx}" y="{by}" width="{bw}" height="{bh}" rx="26"/></clipPath><rect x="{bx}" y="{by}" width="{bw}" height="{bh}" rx="26" fill="url(#g1)"/>'
             f'<g clip-path="url(#bcl)"><rect class="shn" x="{bx - 90}" y="{by}" width="46" height="{bh}" fill="#fff" opacity=".4" transform="skewX(-20)"/></g>'
             f'<path class="tri" d="{tri}" fill="{dark}"/><path d="{play}" fill="{dark}"/></g>'
-            f'<path d="{url}" fill="{c["muted"]}"/>{star4(790, 40, 9, c["accent"], "tw")}{star4(760, 70, 5, c["pink"], "tw", "style=" + chr(34) + "animation-delay:-1s" + chr(34))}')
+            f'<path class="coin" d="{url}" fill="{c["accent"]}"/>{star4(790, 40, 9, c["accent"], "tw")}{star4(760, 70, 5, c["pink"], "tw", "style=" + chr(34) + "animation-delay:-1s" + chr(34))}')
     defs = _grad(c, "g1") + f'<linearGradient id="pbg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="{c["base"]}"/><stop offset="1" stop-color="{c["base2"]}"/></linearGradient>'
     return doc(W, H, body, css, defs, "Bug Hunter, a playable arcade shooter. Click to play.", pad_y=8)
 
@@ -497,6 +519,7 @@ def build():
         write(OUT / "hero" / f"btn-work-{m}.svg", button("My work", "github", m, False))
         write(OUT / "sections" / f"ticker-{m}.svg", ticker(m))
         write(OUT / "sections" / f"divider-{m}.svg", divider(m))
+        write(OUT / "sections" / f"divider2-{m}.svg", divider2(m))
         write(OUT / "sections" / f"ticker2-{m}.svg", ticker(m, ["BUILD", "SHIP", "LEARN", "REPEAT", "CREATE", "ITERATE"], True))
         write(OUT / "sections" / f"about-{m}.svg", about(m))
         write(OUT / "contact" / f"email-{m}.svg", contact_pill("Email", "rajdipdharofficial@gmail.com", "gmail", m))

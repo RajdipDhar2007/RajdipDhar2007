@@ -69,6 +69,10 @@ def header(mode: str) -> str:
     gcss = ("@keyframes fy{0%{transform:translateY(0);opacity:0}20%{opacity:.55}100%{transform:translateY(90px);opacity:.9}}"
             ".fy{animation:fy 3.6s cubic-bezier(.55,0,.95,.6) infinite}")
 
+    # slow rotating light rays behind the signature
+    rays = "".join(f'<path d="M500 190 L{500 + 700 * __import__("math").cos(a):.0f} {190 + 700 * __import__("math").sin(a):.0f} L{500 + 700 * __import__("math").cos(a + .12):.0f} {190 + 700 * __import__("math").sin(a + .12):.0f}Z" fill="url(#ry)"/>' for a in [k * 0.7854 for k in range(8)])
+    rays = f'<g class="rays" style="transform-origin:500px 190px">{rays}</g>'
+    rcss0 = "@keyframes rays{to{transform:rotate(360deg)}}.rays{animation:rays 90s linear infinite;opacity:.55}"
     # drifting synthwave skyline sitting on the horizon (two copies = seamless loop)
     sr = rng(23)
     bx, blds, wins = 0, "", ""
@@ -140,12 +144,13 @@ def header(mode: str) -> str:
               f'<path d="{st_d}" transform="translate(14 0)" fill="{c["muted"]}"/></g>'
               "<style>@keyframes pl{0%,100%{opacity:1;r:4}50%{opacity:.35;r:6}}.pulse{animation:pl 1.8s ease-in-out infinite}</style>")
 
+    adefs += f'<radialGradient id="ry" cx="500" cy="190" r="700" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="{c["accent"]}" stop-opacity=".30"/><stop offset="1" stop-color="{c["accent"]}" stop-opacity="0"/></radialGradient>'
     defs = (adefs + lin_grad("gn", [(0, c["accent"]), (.55, c["second"]), (1, c["pink"])], 0, 0, 1, 0, 'gradientUnits="userSpaceOnUse" x1="%d" x2="%d"' % (x0, x0 + nw)).replace('x1="0" y1="0" x2="1" y2="0" ', "")
             + lin_grad("gr", [(0, c["accent"]), (1, c["second"])]) + lin_grad("shg", [(0, "#fff"), (.5, "#fff"), (1, "#fff")]).replace('<stop offset="0" stop-color="#fff"/>', '<stop offset="0" stop-color="#fff" stop-opacity="0"/>').replace('<stop offset="1" stop-color="#fff"/>', '<stop offset="1" stop-color="#fff" stop-opacity="0"/>')
             + f'<clipPath id="nm"><path d="{full_d}"/></clipPath>')
     bg = (f'<defs><linearGradient id="bgg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="{c["base"]}"/><stop offset="1" stop-color="{c["base2"]}"/></linearGradient></defs>'
           f'<rect width="1000" height="{H}" fill="url(#bgg)"/>')
-    body = (bg + abody + f'<g clip-path="inset(0)">{vlines}{hlines}</g>'.replace('<g clip-path="inset(0)">', f'<g>') + city + orbit + pbody + tbody + hello + status + kicker
+    body = (bg + abody + f'<g clip-path="inset(0)">{vlines}{hlines}</g>'.replace('<g clip-path="inset(0)">', f'<g>') + rays + city + orbit + pbody + tbody + hello + status + kicker
             + f'<g class="bob"><g class="nf"><path d="{full_d}" fill="url(#gn)"/></g>{draw}'
               f'<g clip-path="url(#nm)"><rect class="shm" x="-260" y="60" width="200" height="190" fill="url(#shg)" opacity=".75" transform="skewX(-18)"/></g>'
               f'<path class="ul" d="{ul}" fill="none" stroke="url(#gn)" stroke-width="4" stroke-linecap="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="0"/></g>'
@@ -153,7 +158,7 @@ def header(mode: str) -> str:
     shoot = "".join(f'<g transform="translate({90 + k * 330} {30 + (k % 2) * 36})"><line class="sl" x1="0" y1="0" x2="-80" y2="-27" stroke="url(#st)" stroke-width="2.2" stroke-linecap="round" style="animation-delay:-{k * 2.1:.1f}s"/></g>' for k in range(3))
     body = body.replace(wbody, shoot + wbody)
     defs += f'<linearGradient id="st" x1="0" x2="1"><stop offset="0" stop-color="{c["accent"]}"/><stop offset="1" stop-color="{c["accent"]}" stop-opacity="0"/></linearGradient>'
-    css = acss + pcss + tcss + gcss + wcss + css_name + rcss + kcss + ccss + ocss + "@keyframes ssh{0%{transform:translate(0,0);opacity:0}6%{opacity:1}30%,100%{transform:translate(230px,78px);opacity:0}}.sl{animation:ssh 7.2s ease-in infinite}"
+    css = acss + pcss + tcss + gcss + wcss + css_name + rcss + kcss + ccss + ocss + rcss0 + "@keyframes ssh{0%{transform:translate(0,0);opacity:0}6%{opacity:1}30%,100%{transform:translate(230px,78px);opacity:0}}.sl{animation:ssh 7.2s ease-in infinite}"
     return doc(W, H, body, css, defs, "Rajdip Dhar: hand-drawn signature, rotating roles, animated aurora banner")
 
 
@@ -214,7 +219,11 @@ def footer(mode: str) -> str:
     mcss = ("@keyframes mt{from{transform:translateX(0)}to{transform:translateX(-1000px)}}.mt0,.mt1{animation:mt 80s linear infinite}"
             "@keyframes ff{0%{transform:translate(0,0);opacity:0}20%{opacity:1}50%{transform:translate(26px,-18px);opacity:.3}80%{opacity:1}100%{transform:translate(-14px,10px);opacity:0}}.ff{animation:ff 7s ease-in-out infinite}")
     rcss2 += mcss
-    body = bg + abody + pbody + stars + mnt + flies + rk + letters + sub_el + heart.replace('translate(0 -4)', 'translate(0 8)') + made + wv
+    cp = [(90, 60), (190, 110), (300, 70), (410, 120), (560, 60), (690, 105), (800, 65), (910, 115)]
+    lines = f'<polyline points="{" ".join(f"{x},{y}" for x, y in cp)}" fill="none" stroke="{c["accent"]}" stroke-opacity=".35" stroke-dasharray="4 6" class="cl"/>'
+    dots = "".join(f'<circle class="cd" cx="{x}" cy="{y}" r="3" fill="{c["ink"]}" style="animation-delay:-{k * .5:.1f}s"/>' for k, (x, y) in enumerate(cp))
+    rcss2 += "@keyframes cl{to{stroke-dashoffset:-100}}.cl{animation:cl 6s linear infinite}@keyframes cd{0%,100%{opacity:.25;r:2}50%{opacity:1;r:4.5}}.cd{animation:cd 2.4s ease-in-out infinite}"
+    body = bg + abody + pbody + lines + dots + stars + mnt + flies + rk + letters + sub_el + heart.replace('translate(0 -4)', 'translate(0 8)') + made + wv
     return doc(1000, H, body, acss + pcss + scss + lcss + wcss + rcss2, defs, "Thanks for stopping by: animated footer")
 
 

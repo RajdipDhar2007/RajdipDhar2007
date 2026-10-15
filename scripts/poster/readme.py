@@ -17,8 +17,13 @@ def pic(path: str, alt: str, width: str = "100%", extra: str = "", dark: bool = 
             f'<img alt="{alt}" src="{path.format(m="light")}" width="{width}" {extra}></picture>')
 
 
+_n = [0]
+
+
 def title(slug: str, alt: str) -> str:
-    return (f'<p align="center">{pic("assets/sections/divider-{m}.svg", "")}</p>\n'
+    _n[0] += 1
+    div = "divider" if _n[0] % 2 else "divider2"
+    return (f'<p align="center">{pic("assets/sections/" + div + "-{m}.svg", "")}</p>\n'
             f'<p align="center">{pic("assets/titles/" + slug + "-{m}.svg", alt)}</p>\n')
 
 

@@ -21,7 +21,7 @@
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/sections/about-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/sections/about-light.svg"><img alt="B.Tech CSE at HITK, full-stack, Android, game dev and Web3, exploring AI and automation, looking for internships" src="assets/sections/about-light.svg" width="100%" ></picture></p>
 <!-- TODO_RAJDIP: clubs, hackathons and achievements can become a new card or a short list here. -->
 
-<p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/sections/divider-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/sections/divider-light.svg"><img alt="" src="assets/sections/divider-light.svg" width="100%" ></picture></p>
+<p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/sections/divider2-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/sections/divider2-light.svg"><img alt="" src="assets/sections/divider2-light.svg" width="100%" ></picture></p>
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/titles/toolbox-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/titles/toolbox-light.svg"><img alt="Toolbox" src="assets/titles/toolbox-light.svg" width="100%" ></picture></p>
 
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/sections/toolbox-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/sections/toolbox-light.svg"><img alt="Toolbox: Python, TypeScript, JavaScript, Kotlin, C, HTML, React, Vite, Android Studio, OpenGL, Git, GitHub; learning Django, Solidity, Jupyter, ML, data science, LLM apps and automation" src="assets/sections/toolbox-light.svg" width="100%" ></picture></p>
@@ -57,7 +57,7 @@
 
 <p align="center"><sub>More on my <a href="https://github.com/RajdipDhar2007?tab=repositories">repositories</a> page: TaskFlow, MathForge, Rack Up (Web3 game on Base Sepolia), Periodic Table and more.</sub></p>
 
-<p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/sections/divider-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/sections/divider-light.svg"><img alt="" src="assets/sections/divider-light.svg" width="100%" ></picture></p>
+<p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/sections/divider2-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/sections/divider2-light.svg"><img alt="" src="assets/sections/divider2-light.svg" width="100%" ></picture></p>
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/titles/stats-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/titles/stats-light.svg"><img alt="By the numbers" src="assets/titles/stats-light.svg" width="100%" ></picture></p>
 
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/stats/dashboard-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/stats/dashboard-light.svg"><img alt="GitHub stats: commits, pull requests, stars, followers, top languages and contribution streak" src="assets/stats/dashboard-light.svg" width="100%" ></picture></p>
@@ -67,7 +67,7 @@
 
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/3d/contribution-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/3d/contribution-light.svg"><img alt="3D contribution chart for the last 36 weeks" src="assets/3d/contribution-light.svg" width="100%" ></picture></p>
 
-<p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/sections/divider-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/sections/divider-light.svg"><img alt="" src="assets/sections/divider-light.svg" width="100%" ></picture></p>
+<p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/sections/divider2-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/sections/divider2-light.svg"><img alt="" src="assets/sections/divider2-light.svg" width="100%" ></picture></p>
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/titles/activity-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/titles/activity-light.svg"><img alt="Live activity" src="assets/titles/activity-light.svg" width="100%" ></picture></p>
 
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/live/greeting-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/live/greeting-light.svg"><img alt="Time-of-day greeting" src="assets/live/greeting-light.svg" width="100%" ></picture></p>
@@ -77,7 +77,7 @@
 
 <p align="center"><a href="https://rajdipdhar2007.github.io/RajdipDhar2007/"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/sections/arcade-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/sections/arcade-light.svg"><img alt="Bug Hunter, a playable arcade shooter. Click to play." src="assets/sections/arcade-light.svg" width="100%" ></picture></a></p>
 
-<p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/sections/divider-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/sections/divider-light.svg"><img alt="" src="assets/sections/divider-light.svg" width="100%" ></picture></p>
+<p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/sections/divider2-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/sections/divider2-light.svg"><img alt="" src="assets/sections/divider2-light.svg" width="100%" ></picture></p>
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/titles/connect-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/titles/connect-light.svg"><img alt="Let's connect" src="assets/titles/connect-light.svg" width="100%" ></picture></p>
 
 <p align="center">

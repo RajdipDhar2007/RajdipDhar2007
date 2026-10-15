@@ -175,6 +175,7 @@ def dashboard_svg(mode: str, stats: dict, langs: list[tuple[str, int]], streak: 
            f"@keyframes a2{{0%,100%{{transform:translateX(0)}}50%{{transform:translateX(5px)}}}}.a2{{animation:a2 1.4s ease-in-out infinite}}"
            f"@keyframes orbit{{to{{transform:rotate(360deg)}}}}.orb1{{transform-origin:0 0;animation:orbit 4s linear infinite}}.orb2{{transform-origin:0 0;animation:orbit 6s linear infinite reverse}}"
            f"@keyframes fl{{0%,100%{{transform:scale(1,1) rotate(-2deg)}}25%{{transform:scale(.92,1.1) rotate(2deg)}}50%{{transform:scale(1.05,.95) rotate(-1deg)}}75%{{transform:scale(.95,1.08) rotate(3deg)}}}}.flame{{transform-box:fill-box;transform-origin:bottom;animation:fl .9s ease-in-out infinite}}"
+           f"@keyframes bshine{{0%,25%{{transform:translateX(0)}}70%,100%{{transform:translateX(420px)}}}}.bshine{{animation:bshine 4s ease-in-out infinite}}"
            f"@keyframes shn{{0%{{transform:translateX(0)}}50%,100%{{transform:translateX(900px)}}}}.shn{{animation:shn 7s ease-in-out infinite}}"
            f"@keyframes run{{to{{stroke-dashoffset:-400}}}}.run{{stroke-dasharray:80 320;animation:run 6s linear infinite}}" + _tw())
     body = ""
@@ -208,7 +209,9 @@ def dashboard_svg(mode: str, stats: dict, langs: list[tuple[str, int]], streak: 
         pd, pw = lab.path(f"{pctv:.1f}%", 13, 0, y)
         body += (f'<path d="{nd}" fill="{c["ink"]}"/><path d="{pd}" transform="translate({377 - pw:.0f} 0)" fill="{c["muted"]}"/>'
                  f'<rect x="28" y="{y + 9}" width="349" height="8" rx="4" fill="{c["line"]}"/>'
-                 f'<rect class="gr" x="28" y="{y + 9}" width="{max(349 * v / total, 6):.1f}" height="8" rx="4" fill="{pal[i]}" style="animation-delay:{i * .12:.2f}s"/>')
+                 f'<rect class="gr" x="28" y="{y + 9}" width="{max(349 * v / total, 6):.1f}" height="8" rx="4" fill="{pal[i]}" style="animation-delay:{i * .12:.2f}s"/>'
+                 f'<clipPath id="bc{i}"><rect x="28" y="{y + 9}" width="{max(349 * v / total, 6):.1f}" height="8" rx="4"/></clipPath>'
+                 f'<g clip-path="url(#bc{i})"><rect class="bshine" x="0" y="{y + 9}" width="26" height="8" fill="#fff" opacity=".55" transform="skewX(-25)" style="animation-delay:{i * .5:.1f}s"/></g>')
     body += "</g>"
     # streak panel
     cx, cy, r = 425 + 112, 300, 62
