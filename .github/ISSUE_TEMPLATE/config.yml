@@ -1,0 +1,5 @@
+blank_issues_enabled: true   # the README game and poll links open pre-filled blank issues
+contact_links:
+  - name: Back to the profile
+    url: https://github.com/RajdipDhar2007
+    about: The tic-tac-toe board, poll and guestbook live on my profile README.

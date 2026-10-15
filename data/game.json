@@ -1,0 +1,22 @@
+{
+  "board": [
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    ""
+  ],
+  "status": "playing",
+  "player": null,
+  "history": [],
+  "totals": {
+    "human": 0,
+    "bot": 0,
+    "draw": 0
+  },
+  "rate": {}
+}

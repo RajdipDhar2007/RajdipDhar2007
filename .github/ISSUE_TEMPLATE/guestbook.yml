@@ -1,0 +1,26 @@
+name: Sign the guestbook
+description: Leave a short message on my profile README. It appears there within about a minute.
+title: "guestbook | new entry"
+labels: ["guestbook"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for stopping by! Plain text only: HTML, links and special characters are stripped.
+        Please keep it friendly. Entries are added automatically and this issue is closed once it is processed.
+  - type: input
+    id: name
+    attributes:
+      label: Name
+      description: Up to 30 characters (a first name or a handle is fine).
+      placeholder: Ada
+    validations:
+      required: true
+  - type: textarea
+    id: message
+    attributes:
+      label: Message
+      description: Up to 140 characters.
+      placeholder: Love the waving portrait!
+    validations:
+      required: true
