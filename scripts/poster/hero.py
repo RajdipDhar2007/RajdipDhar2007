@@ -308,9 +308,18 @@ def star_cta(mode: str) -> str:
               f'<g clip-path="url(#bcl)"><rect class="shn" x="{bx - 90}" y="{by}" width="50" height="{bh}" fill="#fff" opacity=".45" transform="skewX(-20)"/></g>'
               f'{mini}<path d="{lab}" transform="translate({bx + 72 + 1} {by + 38.5})" fill="#fff" opacity=".4"/><path d="{lab}" transform="translate({bx + 72} {by + 37})" fill="{dark}"/>{chev}</g>')
     note, nw = sf.path("go on, tap it", 19, 0, 0)
-    doodle = (f'<path class="dd" d="M{bx + bw + 20} {by + 40} q16 8 30 -6 q10 -10 4 -20" fill="none" stroke="{c["pink"]}" stroke-width="2.4" stroke-linecap="round" pathLength="100"/>'
-              f'<path class="dd" d="M{bx + bw + 46} {by + 20} l8 -2 l-1 9" fill="none" stroke="{c["pink"]}" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" pathLength="100"/>'
-              f'<path d="{note}" transform="translate({bx + bw + 62} {by + 46})" fill="{c["muted"]}" class="nt"/>')
+    # hand-drawn arrow: a curve that ends right at the button, with its head turned along the curve's end tangent
+    ax1, ay1 = bx + bw + 92, by + 20                      # start: above the note
+    ax2, ay2 = bx + bw + 14, by + 22                      # end: touching the button's right edge
+    c1, c2 = (ax1 + 6, ay1 - 30), (ax2 + 38, ay2 - 34)
+    tdx, tdy = ax2 - c2[0], ay2 - c2[1]
+    tn = math.hypot(tdx, tdy)
+    ux, uy = tdx / tn, tdy / tn
+    head = " ".join(f"{ax2 - 11 * (ux * math.cos(a_) - uy * math.sin(a_)) * 1:.1f} {ay2 - 11 * (ux * math.sin(a_) + uy * math.cos(a_)):.1f}" for a_ in (0.5, -0.5))
+    h1, h2 = head.split(" ", 2)[:2], head.split(" ")[2:]
+    doodle = (f'<path class="dd" d="M{ax1} {ay1} C{c1[0]} {c1[1]} {c2[0]} {c2[1]} {ax2} {ay2}" fill="none" stroke="{c["pink"]}" stroke-width="2.6" stroke-linecap="round" pathLength="100"/>'
+              f'<path class="dd" d="M{h1[0]} {h1[1]} L{ax2} {ay2} L{h2[0]} {h2[1]}" fill="none" stroke="{c["pink"]}" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" pathLength="100"/>'
+              f'<path d="{note}" transform="translate({bx + bw + 44} {by + 50})" fill="{c["muted"]}" class="nt"/>')
     # ---- falling mini stars, orbiting sparkles
     rr = __import__("random").Random(9)
     rain = ""
@@ -370,33 +379,55 @@ def arcade_card(mode: str) -> str:
     # ---- mini playfield
     stars = "".join(f'<circle class="st" cx="{fx + rr.randint(4, fw - 4)}" cy="{fy + rr.randint(0, fh)}" r="{rr.choice([.8, 1.1, 1.5])}" fill="{c["ink"]}" style="animation-duration:{rr.randint(3, 7)}s;animation-delay:-{rr.uniform(0, 6):.1f}s"/>' for _ in range(34))
 
-    # ---- a scripted fight: every bug is shot down by a real bullet, at the moment that bullet reaches it
+    # ---- a scripted fight that follows the real game's rules: bullets kill bugs, kills drop pickups (H shield, R rapid fire),
+    #      the rocket catches them and the effect shows on the rocket (shield ring, doubled fire rate, HUD chips, combo, score)
     import math as _m
     T, SHIP_T, VB, V = 13.2, 4.4, 209.0, 48.0                 # loop, ship sweep, bullet speed, bug speed (px/s)
     cxf, Y0, YTOP = fx + fw / 2, fy + fh - 52, fy - 14
+    SHIP_Y = fy + fh - 22
 
     def shipx(t):
         return cxf - 70 * _m.cos(2 * _m.pi * t / SHIP_T)
 
     def P(t):
         return f"{max(0.0, min(100.0, t / T * 100)):.3f}%"
-    fires = [n * .22 for n in range(60)]
     plan = [(5, 80, c["green"]), (14, 125, c["pink"]), (24, 95, c["second"]), (33, 140, c["green"]), (43, 85, c["pink"]), (52, 118, c["second"])]
-    fight = []
-    for n, yh, col in plan:
-        bxp = shipx(fires[n])
-        s0 = fires[n] + (Y0 - (yh + 10)) / VB - (yh - YTOP) / V
-        best = None
-        for m_, tf in enumerate(fires):                       # the first bullet that really meets this bug
-            if abs(shipx(tf) - bxp) > 13:
-                continue
-            t = (Y0 - YTOP - 10 + VB * tf + V * s0) / (VB + V)
-            if t >= max(tf, s0) and t < T and (best is None or t < best[0]):
-                best = (t, m_)
-        tc, m_ = best
-        fight.append(dict(x=bxp, s=s0, tc=tc, yc=YTOP + V * (tc - s0), m=m_, col=col))
-    hit = {f_["m"]: f_["tc"] for f_ in fight}
-    fcss, bugs, booms = "", "", ""
+    DROPS = {1: "H", 3: "R"}                                  # which kills drop a pickup
+
+    def fight_for(fires):
+        out = []
+        for n, yh, col in plan:
+            bxp = shipx(n * .22)
+            s0 = n * .22 + (Y0 - (yh + 10)) / VB - (yh - YTOP) / V
+            best = None
+            for m_, tf in enumerate(fires):                   # the first bullet that really meets this bug
+                if abs(shipx(tf) - bxp) > 13:
+                    continue
+                t = (Y0 - YTOP - 10 + VB * tf + V * s0) / (VB + V)
+                if t >= max(tf, s0) and t < T and (best is None or t < best[0]):
+                    best = (t, m_)
+            tc, m_ = best
+            out.append(dict(x=bxp, s=s0, tc=tc, yc=YTOP + V * (tc - s0), m=m_, col=col))
+        return out
+
+    def arrival(xb, tc, yc):
+        """First time after the drop starts falling when the ship is under x = xb (pickups fall at 55 to 110 px/s)."""
+        u = max(-1.0, min(1.0, -(xb - cxf) / 70))
+        base = _m.acos(u) * SHIP_T / (2 * _m.pi)
+        need = (SHIP_Y - 6 - yc) / 110
+        for t in sorted(t for k in range(0, 5) for t in (base + SHIP_T * k, -base + SHIP_T * k)):
+            if t >= tc + need:
+                return t
+
+    fires = [n * .22 for n in range(60)]
+    fight = fight_for(fires)
+    arr = {i: arrival(fight[i]["x"], fight[i]["tc"], fight[i]["yc"]) for i in DROPS}
+    t_rapid = arr[[i for i, k in DROPS.items() if k == "R"][0]]
+    fires = sorted(fires + [n * .22 + .11 for n in range(60) if n * .22 + .11 >= t_rapid and n * .22 + .11 < T - .3])   # rapid fire = twice the shots
+    fight = fight_for(fires)
+    arr = {i: arrival(fight[i]["x"], fight[i]["tc"], fight[i]["yc"]) for i in DROPS}
+    WIN = {"H": 4.4, "R": 3.4}
+    fcss, bugs, booms, pickups, ship_fx, hud_fx = "", "", "", "", "", ""
     for i, f_ in enumerate(fight):
         x_, y_, s0, tc, col = f_["x"], f_["yc"], f_["s"], f_["tc"], f_["col"]
         fcss += (f"@keyframes bg{i}{{0%,{P(s0)}{{opacity:0;transform:translate({x_:.1f}px,{YTOP}px)}}{P(s0 + .03)}{{opacity:1;transform:translate({x_:.1f}px,{YTOP}px)}}"
@@ -410,7 +441,32 @@ def arcade_card(mode: str) -> str:
         shards = "".join(f'<circle class="sd{i}" cx="{x_:.1f}" cy="{y_:.1f}" r="2.4" fill="{[col, c["accent"], "#fff"][k % 3]}" style="--dx:{22 * _m.cos(k * _m.pi / 3):.0f}px;--dy:{22 * _m.sin(k * _m.pi / 3):.0f}px"/>' for k in range(6))
         booms += (f'<circle class="bm{i}" cx="{x_:.1f}" cy="{y_:.1f}" r="3" fill="none" stroke="{col}" stroke-width="3"/>{shards}'
                   f'<path class="pt{i}" d="{mf.path("+100", 11, x_ - 14, y_ - 10, 1)[0]}" fill="{c["pink"]}"/>')
+        if i in DROPS:                                                # the kill drops a pickup that the rocket catches
+            kind, ta = DROPS[i], arr[i]
+            pc = c["green"] if kind == "H" else c["accent"]
+            fcss += (f"@keyframes pk{i}{{0%,{P(tc + .05)}{{opacity:0;transform:translate({x_:.1f}px,{y_:.1f}px)}}{P(tc + .12)}{{opacity:1;transform:translate({x_:.1f}px,{y_:.1f}px)}}"
+                     f"{P(ta)}{{opacity:1;transform:translate({x_:.1f}px,{SHIP_Y - 6}px)}}{P(ta + .03)},100%{{opacity:0;transform:translate({x_:.1f}px,{SHIP_Y - 6}px)}}}}.pk{i}{{opacity:0;animation:pk{i} {T}s linear infinite}}")
+            pickups += (f'<g class="pk{i}"><circle class="pwh" r="14" fill="{pc}"/><circle class="pwsp" r="13" fill="none" stroke="{pc}" stroke-width="2" stroke-dasharray="4 5" stroke-linecap="round"/>'
+                        f'<circle r="10" fill="{c["card"]}" stroke="{pc}" stroke-width="2"/><path d="{mf.path(kind, 11, -3.6, 4)[0]}" fill="{pc}"/></g>')
+            word = "SHIELD" if kind == "H" else "RAPID FIRE"
+            wd, ww = mf.path(word, 9, 0, 0, 1)
+            tx = max(fx + 8, min(fx + fw - 8 - ww, x_ - ww / 2))
+            fcss += (f"@keyframes ft{i}{{0%,{P(ta)}{{opacity:0;transform:translateY(0)}}{P(ta + .05)}{{opacity:1;transform:translateY(0)}}{P(ta + 1.1)},100%{{opacity:0;transform:translateY(-30px)}}}}.ft{i}{{opacity:0;animation:ft{i} {T}s ease-out infinite}}"
+                     f"@keyframes cb{i}{{0%,{P(ta)}{{r:6;opacity:0}}{P(ta + .03)}{{r:6;opacity:1}}{P(ta + .5)},100%{{r:38;opacity:0}}}}.cb{i}{{opacity:0;animation:cb{i} {T}s ease-out infinite}}"
+                     f"@keyframes fx{kind}{{0%,{P(ta)}{{opacity:0}}{P(ta + .08)}{{opacity:1}}{P(min(ta + WIN[kind], T - .05) - .15)}{{opacity:1}}{P(min(ta + WIN[kind], T - .05))},100%{{opacity:0}}}}.fx{kind}{{opacity:0;animation:fx{kind} {T}s linear infinite}}"
+                     f"@keyframes tm{kind}{{0%,{P(ta)}{{opacity:0;transform:scaleX(1)}}{P(ta + .05)}{{opacity:1;transform:scaleX(1)}}{P(min(ta + WIN[kind], T - .05))}{{opacity:1;transform:scaleX(0)}}{P(min(ta + WIN[kind], T - .05) + .01)},100%{{opacity:0;transform:scaleX(0)}}}}.tm{kind}{{opacity:0;transform-box:fill-box;transform-origin:left;animation:tm{kind} {T}s linear infinite}}")
+            booms += f'<g class="ft{i}"><path d="{wd}" transform="translate({tx:.1f} {SHIP_Y - 26})" fill="{pc}"/></g>'
+            ship_fx += f'<circle class="cb{i}" cx="0" cy="0" r="6" fill="none" stroke="{pc}" stroke-width="3"/>'
+            if kind == "H":
+                ship_fx += f'<g class="fxH"><circle class="shr" r="27" fill="{c["green"]}" fill-opacity=".12" stroke="{c["green"]}" stroke-width="2.4"/></g>'
+            else:
+                ship_fx += (f'<g class="fxR"><circle class="pwsp" r="21" fill="none" stroke="{c["accent"]}" stroke-width="2" stroke-dasharray="3 5" stroke-linecap="round"/>'
+                            f'<path class="fl" d="M-6 9 Q-9 30 -3 9Z M6 9 Q9 30 3 9Z" fill="{c["accent"]}"/></g>')
+            cxh = fx + 12 + (0 if kind == "H" else 40)
+            hud_fx += (f'<g class="fx{kind}"><rect x="{cxh}" y="{fy + 30}" width="34" height="16" rx="8" fill="none" stroke="{pc}" stroke-width="1.6"/>'
+                       f'<path d="{mf.path(kind, 9, cxh + 5, fy + 42, 0)[0]}" fill="{pc}"/><rect class="tm{kind}" x="{cxh + 16}" y="{fy + 36}" width="14" height="4" rx="2" fill="{pc}"/></g>')
     bullets = ""
+    hit = {f_["m"]: f_["tc"] for f_ in fight}
     for m_, tf in enumerate(fires):
         if m_ in hit:
             dt_ = hit[m_] - tf
@@ -421,18 +477,27 @@ def arcade_card(mode: str) -> str:
             cls = "bl"
         bullets += f'<rect class="{cls}" x="{shipx(tf) - 2:.1f}" y="{Y0}" width="4" height="14" rx="2" fill="{c["accent"]}" style="animation-delay:{tf:.2f}s"/>'
     fcss += (f"@keyframes bl{{0%{{opacity:0;transform:translateY(0)}}.01%{{opacity:1;transform:translateY(0)}}{P(1.06)}{{opacity:.25;transform:translateY(-222px)}}{P(1.08)},100%{{opacity:0;transform:translateY(-222px)}}}}"
-             f".bl{{opacity:0;animation:bl {T}s linear infinite both}}")
-    # score counts up with every kill
+             f".bl{{opacity:0;animation:bl {T}s linear infinite both}}"
+             "@keyframes shr{0%,100%{opacity:.7;transform:scale(1)}50%{opacity:1;transform:scale(1.07)}}.shr{animation:shr .5s ease-in-out infinite}")
+    # score counts up with every kill; combo shows when kills come quickly (as in the game)
     order = sorted(f_["tc"] for f_ in fight)
     marks = [0.0] + order + [T]
     hud = ""
     for k in range(len(marks) - 1):
         t0, t1 = marks[k], marks[k + 1]
-        fcss += (f"@keyframes sc{k}{{0%,{P(t0)}{{opacity:{1 if k == 0 else 0}}}{P(t0 + .001)}{{opacity:1}}{P(t1)}{{opacity:{1 if k < len(marks) - 2 else 1}}}{P(t1 + .001)},100%{{opacity:0}}}}"
+        fcss += (f"@keyframes sc{k}{{0%,{P(t0)}{{opacity:{1 if k == 0 else 0}}}{P(t0 + .001)}{{opacity:1}}{P(t1)}{{opacity:1}}{P(t1 + .001)},100%{{opacity:0}}}}"
                  f".sc{k}{{opacity:{1 if k == 0 else 0};animation:sc{k} {T}s linear infinite}}")
         hud += f'<path class="sc{k}" d="{mf.path(f"SCORE {4200 + 100 * k:06d}", 10, fx + 12, fy + 20, 1)[0]}" fill="{c["accent"]}"/>'
+    combo = 0
+    for k, tk in enumerate(order):
+        combo = combo + 1 if k and tk - order[k - 1] < 1.7 else 1
+        if combo >= 2:
+            end = order[k + 1] if k + 1 < len(order) and order[k + 1] - tk < 1.7 else tk + 1.7
+            fcss += (f"@keyframes cm{k}{{0%,{P(tk)}{{opacity:0}}{P(tk + .001)}{{opacity:1}}{P(end)}{{opacity:1}}{P(end + .001)},100%{{opacity:0}}}}.cm{k}{{opacity:0;animation:cm{k} {T}s linear infinite}}")
+            hud += f'<path class="cm{k}" d="{mf.path(f"COMBO x{combo}", 10, fx + fw - 12 - mf.width(f"COMBO x{combo}", 10, 1), fy + 38, 1)[0]}" fill="{c["gold"] if "gold" in c else "#FBBF24"}"/>'
     hud += f'<path d="{mf.path("WAVE 3", 10, fx + fw - 62, fy + 20, 1)[0]}" fill="{c["muted"]}"/>'
-    ship = (f'<g transform="translate({fx + fw / 2} {fy + fh - 22})"><g class="sh"><path d="M0 -16 L11 12 L0 6 L-11 12Z" fill="url(#g1)"/>'
+    hud += "".join(f'<path d="M{fx + fw - 18 - i * 14} {fy + 54} l4 -10 l4 10 l-4 -3z" fill="{c["pink"]}"/>' for i in range(3)) + hud_fx
+    ship = (f'<g transform="translate({cxf} {SHIP_Y})"><g class="sh">{ship_fx}<path d="M0 -16 L11 12 L0 6 L-11 12Z" fill="url(#g1)"/>'
             f'<path class="fl" d="M-3 9 Q0 24 3 9Z" fill="{c["pink"]}"/></g></g>')
     # ---- right side copy
     title, tw = sf.path("Bug Hunter", 64, 330, 98)
@@ -475,12 +540,7 @@ def arcade_card(mode: str) -> str:
         chips += f'<rect x="{x}" y="200" width="{cw:.0f}" height="24" rx="12" fill="none" stroke="{[c["accent"], c["second"], c["pink"], c["green"]][k]}" stroke-width="1.6"/><path d="{mf.path(lab, 10, x + 11, 216, 1)[0]}" fill="{c["ink"]}"/>'
         x += cw + 8
     scan = "".join(f'<rect x="{fx}" y="{fy + k * 6}" width="{fw}" height="1" fill="#000" opacity=".16"/>' for k in range(fh // 6))
-    pw = (f'<g class="pwr"><circle class="pwh" cx="{fx + 150}" cy="{fy - 12}" r="14" fill="{c["green"]}"/>'
-          f'<circle class="pwsp" cx="{fx + 150}" cy="{fy - 12}" r="13" fill="none" stroke="{c["green"]}" stroke-width="2" stroke-dasharray="4 5" stroke-linecap="round"/>'
-          f'<circle cx="{fx + 150}" cy="{fy - 12}" r="10" fill="{c["card"]}" stroke="{c["green"]}" stroke-width="2"/>'
-          f'<path d="{mf.path("H", 11, fx + 145, fy - 8)[0]}" fill="{c["green"]}"/>'
-          + "".join(f'<circle class="st" cx="{fx + 150 + (k - 1) * 5}" cy="{fy - 26 - k * 7}" r="{1.8 - k * .4:.1f}" fill="{c["green"]}" opacity="{.7 - k * .2:.1f}"/>' for k in range(3)) +
-          f'</g>')
+    pw = pickups
     css = fcss + ("@keyframes wob{0%,100%{transform:rotate(-7deg)}50%{transform:rotate(7deg)}}.wob{transform-box:fill-box;transform-origin:center;animation:wob .5s ease-in-out infinite}"
            "@keyframes pwr{from{transform:translate(0,0)}to{transform:translate(-40px,300px)}}.pwr{animation:pwr 9s linear infinite;animation-delay:-3s}"
            "@keyframes pop{0%,100%{opacity:0;transform:translateY(0)}10%{opacity:1}40%{opacity:0;transform:translateY(-22px)}}.pop{animation:pop 3.4s ease-out infinite}"
@@ -507,7 +567,7 @@ def arcade_card(mode: str) -> str:
             f'<rect x=".5" y=".5" width="{W - 1}" height="{H - 1}" rx="30" fill="{c["card"]}" stroke="{c["line"]}"/>'
             f'<rect class="run" x=".5" y=".5" width="{W - 1}" height="{H - 1}" rx="30" fill="none" stroke="url(#g1)" stroke-width="3" pathLength="1000"/>'
             f'<rect x="{fx}" y="{fy}" width="{fw}" height="{fh}" rx="18" fill="url(#pbg)" stroke="{c["accent"]}" stroke-opacity=".5"/>'
-            f'<g clip-path="url(#pf)">{stars}{bugs}{booms}{bullets}{ship}{pw}<g class="crt">{scan}</g>{hud}</g>'
+            f'<g clip-path="url(#pf)">{stars}{bugs}{booms}{bullets}{pw}{ship}<g class="crt">{scan}</g>{hud}</g>'
             f'<path d="{title}" fill="url(#g1)"/><path d="{sub}" fill="{c["accent"]}"/>{pd}{chips}'
             f'<rect class="pl" x="{bx}" y="{by}" width="{bw}" height="{bh}" rx="26" fill="none" stroke="url(#g1)" stroke-width="2.5"/>'
             f'<g class="bob"><clipPath id="bcl"><rect x="{bx}" y="{by}" width="{bw}" height="{bh}" rx="26"/></clipPath><rect x="{bx}" y="{by}" width="{bw}" height="{bh}" rx="26" fill="url(#g1)"/>'
