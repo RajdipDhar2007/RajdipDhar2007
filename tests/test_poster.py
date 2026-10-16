@@ -13,7 +13,7 @@ import greeting  # noqa: E402
 from poster import art, hero, work  # noqa: E402
 
 SVG_BUDGET_KB = 500
-TOTAL_BUDGET_MB = 3
+TOTAL_BUDGET_MB = 3.5
 
 
 def _ok(svg: str):

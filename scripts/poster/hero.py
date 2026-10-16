@@ -250,35 +250,68 @@ def button(label: str, icon_name: str | None, mode: str, primary: bool) -> str:
 
 
 
+def _mixhex(a: str, b: str, f: float) -> str:
+    x = [int(a[i:i + 2], 16) for i in (1, 3, 5)]
+    y = [int(b[i:i + 2], 16) for i in (1, 3, 5)]
+    return "#%02X%02X%02X" % tuple(int(p + (q - p) * f) for p, q in zip(x, y))
+
+
+def star3d(cx: float, cy: float, ro: float, ri: float, depth: int = 10, cls: str = "") -> str:
+    """Faceted golden five-point star with an extruded body (layers fan out via --k when .ex is animated)."""
+    import math
+    LIGHT, MID, DARK = "#FFF1A6", "#FFC93C", "#B9740A"
+    pts = [(cx + (ro if i % 2 == 0 else ri) * math.cos(-math.pi / 2 + i * math.pi / 5), cy + (ro if i % 2 == 0 else ri) * math.sin(-math.pi / 2 + i * math.pi / 5)) for i in range(10)]
+    outline = " ".join(f"{x:.1f},{y:.1f}" for x, y in pts)
+    layers = "".join(f'<g class="ex" style="--k:{n}"><polygon points="{outline}" fill="{_mixhex("#C98A0B", "#6B4300", n / depth)}" stroke="{_mixhex("#C98A0B", "#6B4300", n / depth)}" stroke-width="2" stroke-linejoin="round" transform="translate({n * .5:.1f} {n * 1.1:.1f})"/></g>' for n in range(depth, 0, -1))
+    facets = ""
+    for k in range(5):                     # outer tip k is point 2k; inner points sit at 2k+1 (right) and 2k-1 (left)
+        o, ir, il = pts[2 * k], pts[(2 * k + 1) % 10], pts[(2 * k - 1) % 10]
+        for a, b, side in ((il, o, 0), (o, ir, 1)):
+            mx, my = (a[0] + b[0]) / 2 - cx, (a[1] + b[1]) / 2 - cy
+            ang = math.atan2(my, mx) + (0.55 if side else -0.55)            # face tilt so the two halves of each tip differ
+            lit = .5 + .5 * math.cos(ang - math.radians(-130))               # light from the top left
+            col = _mixhex(DARK, LIGHT, lit) if lit < .6 else _mixhex(MID, LIGHT, (lit - .6) / .4)
+            facets += f'<polygon points="{cx:.1f},{cy:.1f} {a[0]:.1f},{a[1]:.1f} {b[0]:.1f},{b[1]:.1f}" fill="{col}" stroke="{col}" stroke-width=".8" stroke-linejoin="round"/>'
+    return (f'<g class="{cls}">{layers}<g class="fr">{facets}<polygon points="{outline}" fill="none" stroke="#FFF8D6" stroke-opacity=".85" stroke-width="1.6" stroke-linejoin="round"/>'
+            f'<clipPath id="sc{int(cx)}{int(cy)}"><polygon points="{outline}"/></clipPath><g clip-path="url(#sc{int(cx)}{int(cy)})"><rect class="ssh" x="{cx - ro - 60:.0f}" y="{cy - ro:.0f}" width="26" height="{ro * 2:.0f}" fill="#fff" opacity=".75" transform="skewX(-20)"/></g></g></g>')
+
+
 def star_cta(mode: str) -> str:
-    """Closing call-to-action: a big glowing star, a hand-lettered ask and a shimmering button."""
+    """Closing call-to-action: a faceted 3D golden star, a hand-lettered ask and a pressable glossy 3D button."""
     import math
     c = PAL[mode]
-    W, H, T = 830, 290, 10.0
+    W, H, T = 830, 300, 10.0
     sf, bf, hf = typo.font(typo.SCRIPT), typo.font(typo.BODY), typo.font(typo.HEAD)
-    # five-point star (outer r, inner r) centred at (150, 145)
-    cx, cy, ro, ri = 150, 150, 74, 32
-    pts = " ".join(f"{cx + (ro if i % 2 == 0 else ri) * math.cos(-math.pi / 2 + i * math.pi / 5):.1f},{cy + (ro if i % 2 == 0 else ri) * math.sin(-math.pi / 2 + i * math.pi / 5):.1f}" for i in range(10))
-    # title with a draw-on look
-    gl = sf.glyphs("Enjoyed the tour?", 52, 300, 108)
+    cx, cy = 150, 142
+    gl = sf.glyphs("Enjoyed the tour?", 52, 300, 104)
     full = "".join(g[0] for g in gl)
-    css = ""
-    draw = ""
+    css, draw = "", ""
     for i, (d, _, _) in enumerate(gl):
         t0 = .2 + i * .08
-        css += kf(f"d{i}", T, [(0, "stroke-dashoffset:1;opacity:1"), (t0, "stroke-dashoffset:1;opacity:1"), (t0 + .7, "stroke-dashoffset:0;opacity:1"), (T - .7, "stroke-dashoffset:0;opacity:1"), (T - .3, "opacity:0;stroke-dashoffset:0"), (T, "opacity:0;stroke-dashoffset:1")]) + f".d{i}{{animation:d{i} {T}s ease-in-out infinite}}"
+        css += kf(f"d{i}", T, [(0, "stroke-dashoffset:1;opacity:1"), (t0, "stroke-dashoffset:1;opacity:1"), (t0 + .7, "stroke-dashoffset:0;opacity:1"), (T - .7, "stroke-dashoffset:0;opacity:1"), (T - .3, "opacity:0;stroke-dashoffset:0"), (T, "opacity:0")]) + f".d{i}{{animation:d{i} {T}s linear infinite}}"
         draw += f'<path class="d{i}" d="{d}" pathLength="1" fill="none" stroke="url(#g1)" stroke-width="1.6" stroke-dasharray="1" stroke-dashoffset="1"/>'
     css += kf("tf", T, [(0, "opacity:0"), (1.4, "opacity:0"), (2.4, "opacity:1"), (T - .7, "opacity:1"), (T - .3, "opacity:0"), (T, "opacity:0")]) + f".tf{{animation:tf {T}s linear infinite}}"
     lines = bf.wrap("If this profile made you smile, drop a star on this repo. It tells me the work is worth sharing and keeps me building.", 15, 460)
-    sub = "".join(f'<path d="{bf.path(l, 15, 300, 150 + k * 23)[0]}" fill="{c["muted"]}"/>' for k, l in enumerate(lines))
-    css += kf("sb", T, [(0, "opacity:0;transform:translateY(8px)"), (2.0, "opacity:0;transform:translateY(8px)"), (2.8, "opacity:1;transform:none"), (T - .7, "opacity:1;transform:none"), (T - .3, "opacity:0"), (T, "opacity:0")]) + f".sb{{animation:sb {T}s ease-out infinite}}"
-    # button
-    bw, bh, bx, by = 236, 54, 300, 214
-    lab, lw = hf.path("Star this repo", 18, 0, 0)
-    bx_text = bx + 62
-    bsx, bsy = bx + 38, by + bh / 2
-    bpts = " ".join(f"{bsx + (11 if k % 2 == 0 else 4.6) * math.cos(-math.pi / 2 + k * math.pi / 5):.1f},{bsy + (11 if k % 2 == 0 else 4.6) * math.sin(-math.pi / 2 + k * math.pi / 5):.1f}" for k in range(10))
-    # falling mini stars
+    sub = "".join(f'<path d="{bf.path(l, 15, 300, 146 + k * 23)[0]}" fill="{c["muted"]}"/>' for k, l in enumerate(lines))
+    css += kf("sb", T, [(0, "opacity:0;transform:translateY(8px)"), (2.0, "opacity:0;transform:translateY(8px)"), (2.8, "opacity:1;transform:none"), (T - .7, "opacity:1;transform:none"), (T - .3, "opacity:0"), (T, "opacity:0")]) + f".sb{{animation:sb {T}s linear infinite}}"
+    # ---- 3D button
+    bw, bh, bx, by, dp = 300, 58, 300, 206, 7
+    dark = "#0D1117" if mode == "dark" else "#fff"
+    lab, lw = sf.path("Star this repo", 25, 0, 0)
+    face = f'<rect x="{bx}" y="{by}" width="{bw}" height="{bh}" rx="29" fill="url(#g1)"/>'
+    plate = f'<rect x="{bx}" y="{by + dp}" width="{bw}" height="{bh}" rx="29" fill="url(#g1d)"/>'
+    gloss = f'<path d="M{bx + 18} {by + 4} H{bx + bw - 18} A25 25 0 0 1 {bx + bw - 24} {by + 25} H{bx + 24} A25 25 0 0 1 {bx + 18} {by + 4}Z" fill="#fff" opacity=".28"/>'
+    mini = star3d(bx + 40, by + bh / 2 + 1, 15, 6.6, 5, "mini")
+    chev = "".join(f'<path class="chv" d="M{bx + bw - 54 + k * 12} {by + 19} l8 10 l-8 10" fill="none" stroke="{dark}" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" style="animation-delay:{k * .2:.1f}s"/>' for k in range(3))
+    button = (f'<ellipse class="clk" cx="{bx + bw / 2}" cy="{by + bh / 2}" rx="{bw / 2}" ry="{bh / 2}" fill="none" stroke="url(#g1)" stroke-width="3"/>'
+              f'{plate}<g class="press"><clipPath id="bcl"><rect x="{bx}" y="{by}" width="{bw}" height="{bh}" rx="29"/></clipPath>{face}{gloss}'
+              f'<g clip-path="url(#bcl)"><rect class="shn" x="{bx - 90}" y="{by}" width="50" height="{bh}" fill="#fff" opacity=".45" transform="skewX(-20)"/></g>'
+              f'{mini}<path d="{lab}" transform="translate({bx + 72 + 1} {by + 38.5})" fill="#fff" opacity=".4"/><path d="{lab}" transform="translate({bx + 72} {by + 37})" fill="{dark}"/>{chev}</g>')
+    note, nw = sf.path("go on, tap it", 19, 0, 0)
+    doodle = (f'<path class="dd" d="M{bx + bw + 20} {by + 40} q16 8 30 -6 q10 -10 4 -20" fill="none" stroke="{c["pink"]}" stroke-width="2.4" stroke-linecap="round" pathLength="100"/>'
+              f'<path class="dd" d="M{bx + bw + 46} {by + 20} l8 -2 l-1 9" fill="none" stroke="{c["pink"]}" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" pathLength="100"/>'
+              f'<path d="{note}" transform="translate({bx + bw + 62} {by + 46})" fill="{c["muted"]}" class="nt"/>')
+    # ---- falling mini stars, orbiting sparkles
     rr = __import__("random").Random(9)
     rain = ""
     for j in range(14):
@@ -287,35 +320,38 @@ def star_cta(mode: str) -> str:
         k = r * 0.28
         d = f"M{x} {-r} Q{x + k} {-k} {x + r} 0 Q{x + k} {k} {x} {r} Q{x - k} {k} {x - r} 0 Q{x - k} {-k} {x} {-r}Z"
         rain += f'<path class="fall" d="{d}" fill="{[c["accent"], c["second"], c["pink"]][j % 3]}" style="animation-delay:-{rr.uniform(0, 9):.1f}s;animation-duration:{rr.randint(6, 11)}s"/>'
-    # orbiting sparkles around the big star
-    orbit = f"M{cx - 100} {cy} a100 100 0 1 0 200 0 a100 100 0 1 0 -200 0"
-    sparks = "".join(f'<path class="orb" d="M0 -7 Q2 -2 7 0 Q2 2 0 7 Q-2 2 -7 0 Q-2 -2 0 -7Z" fill="{col}" style="offset-path:path({A}{orbit}{A});animation-delay:-{k * 1.3:.1f}s"/>' for k, col in enumerate([c["accent"], c["pink"], c["second"], c["accent"]]))
+    orbit = f"M{cx - 104} {cy} a104 104 0 1 0 208 0 a104 104 0 1 0 -208 0"
+    sparks = "".join(f'<path class="orb" d="M0 -7 Q2 -2 7 0 Q2 2 0 7 Q-2 2 -7 0 Q-2 -2 0 -7Z" fill="{col}" style="offset-path:path({A}{orbit}{A});animation-delay:-{k * 1.5:.1f}s"/>' for k, col in enumerate(["#FFD54A", c["pink"], c["accent"], "#FFF1A6"]))
     css += ("@keyframes fall{0%{transform:translateY(-10px) rotate(0);opacity:0}10%{opacity:.8}100%{transform:translateY(300px) rotate(180deg);opacity:0}}.fall{animation:fall 8s linear infinite}"
             "@keyframes orb{from{offset-distance:0%}to{offset-distance:100%}}.orb{animation:orb 6s linear infinite}"
-            "@keyframes bst{0%,100%{transform:scale(1) rotate(0)}50%{transform:scale(1.12) rotate(8deg)}}.bst{transform-box:fill-box;transform-origin:center;animation:bst 2.6s ease-in-out infinite}"
-            "@keyframes glow{0%,100%{opacity:.25;transform:scale(1)}50%{opacity:.6;transform:scale(1.2)}}.glow{transform-box:fill-box;transform-origin:center;animation:glow 2.6s ease-in-out infinite}"
+            "@keyframes sway{0%,100%{transform:rotate(-6deg) scaleX(.93)}50%{transform:rotate(6deg) scaleX(1)}}.sway{transform-box:fill-box;transform-origin:50% 90%;animation:sway 4s ease-in-out infinite}"
+            "@keyframes ex{0%,100%{transform:translate(calc(var(--k) * -.55px),0)}50%{transform:translate(calc(var(--k) * .55px),0)}}.ex{animation:ex 4s ease-in-out infinite}"
+            "@keyframes ssh{0%,40%{transform:translateX(0)}80%,100%{transform:translateX(230px)}}.ssh{animation:ssh 3.4s ease-in-out infinite}"
+            "@keyframes mn{0%,100%{transform:scaleX(1) rotate(-8deg)}50%{transform:scaleX(.8) rotate(8deg)}}.mini{transform-box:fill-box;transform-origin:center;animation:mn 2.4s ease-in-out infinite}"
+            "@keyframes glow{0%,100%{opacity:.3;transform:scale(1)}50%{opacity:.7;transform:scale(1.2)}}.glow{transform-box:fill-box;transform-origin:center;animation:glow 2.6s ease-in-out infinite}"
+            "@keyframes shd{0%,100%{transform:scale(1);opacity:.35}50%{transform:scale(.8);opacity:.2}}.shd{transform-box:fill-box;transform-origin:center;animation:shd 4s ease-in-out infinite}"
             "@keyframes run{to{stroke-dashoffset:-1000}}.run{stroke-dasharray:180 820;animation:run 6s linear infinite}"
-            "@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}.bob{animation:bob 3s ease-in-out infinite}"
-            "@keyframes shn{0%{transform:translateX(0)}45%,100%{transform:translateX(320px)}}.shn{animation:shn 3.4s ease-in-out infinite}"
-            "@keyframes arr{0%,100%{transform:translateX(0)}50%{transform:translateX(5px)}}.arr{animation:arr 1.2s ease-in-out infinite}"
-            "@keyframes ring{0%{r:44;opacity:.7}100%{r:112;opacity:0}}.ring{animation:ring 2.8s ease-out infinite}" + _tw())
+            "@keyframes press{0%,78%,100%{transform:translateY(0)}86%{transform:translateY(" + str(dp - 1) + "px)}93%{transform:translateY(0)}}.press{animation:press 3.2s ease-in-out infinite}"
+            "@keyframes clk{0%,84%{transform:scale(1);opacity:0}86%{opacity:.9}100%{transform:scale(1.35,1.9);opacity:0}}.clk{transform-box:fill-box;transform-origin:center;animation:clk 3.2s ease-out infinite}"
+            "@keyframes shn{0%{transform:translateX(0)}45%,100%{transform:translateX(420px)}}.shn{animation:shn 3.4s ease-in-out infinite}"
+            "@keyframes chv{0%,100%{opacity:.25}35%{opacity:1}}.chv{animation:chv 1.2s ease-in-out infinite}"
+            "@keyframes ring{0%{r:50;opacity:.7}100%{r:118;opacity:0}}.ring{animation:ring 2.8s ease-out infinite}"
+            "@keyframes dd{0%{stroke-dashoffset:100}40%,85%{stroke-dashoffset:0}100%{stroke-dashoffset:-100}}.dd{stroke-dasharray:100;animation:dd 5s ease-in-out infinite}"
+            "@keyframes nt{0%,30%{opacity:0}50%,85%{opacity:1}100%{opacity:0}}.nt{animation:nt 5s ease-in-out infinite}" + _tw())
     body = (f'<clipPath id="pc"><rect x="1" y="1" width="{W - 2}" height="{H - 2}" rx="30"/></clipPath>'
             f'<rect x=".5" y=".5" width="{W - 1}" height="{H - 1}" rx="30" fill="{c["card"]}" stroke="{c["line"]}"/>'
-            f'<g clip-path="url(#pc)"><circle cx="{cx}" cy="{cy}" r="120" fill="url(#rg)" class="glow"/>{rain}</g>'
+            f'<g clip-path="url(#pc)"><circle cx="{cx}" cy="{cy}" r="124" fill="url(#rg)" class="glow"/>{rain}</g>'
             f'<rect class="run" x=".5" y=".5" width="{W - 1}" height="{H - 1}" rx="30" fill="none" stroke="url(#g1)" stroke-width="3" pathLength="1000"/>'
-            f'<circle class="ring" cx="{cx}" cy="{cy}" r="44" fill="none" stroke="{c["accent"]}" stroke-width="2"/>'
-            f'<circle class="ring" cx="{cx}" cy="{cy}" r="44" fill="none" stroke="{c["pink"]}" stroke-width="2" style="animation-delay:-1.4s"/>'
-            f'<ellipse cx="{cx}" cy="{cy}" rx="100" ry="100" fill="none" stroke="{c["line"]}" stroke-dasharray="3 6"/>{sparks}'
-            f'<g class="bst"><polygon points="{pts}" fill="url(#g1)" stroke="url(#g1)" stroke-width="8" stroke-linejoin="round"/>'
-            f'<polygon points="{pts}" fill="none" stroke="#fff" stroke-opacity=".5" stroke-width="2" stroke-linejoin="round" transform="translate({cx} {cy}) scale(.55) translate({-cx} {-cy})"/></g>'
-            f'<g class="tf" fill="url(#g1)"><path d="{full}"/></g>{draw}<g class="sb">{sub}</g>'
-            f'<g class="bob"><clipPath id="bcl"><rect x="{bx}" y="{by}" width="{bw}" height="{bh}" rx="27"/></clipPath>'
-            f'<rect x="{bx}" y="{by}" width="{bw}" height="{bh}" rx="27" fill="url(#g1)"/>'
-            f'<g clip-path="url(#bcl)"><rect class="shn" x="{bx - 90}" y="{by}" width="50" height="{bh}" fill="#fff" opacity=".4" transform="skewX(-20)"/></g>'
-            f'<polygon points="{bpts}" fill="{"#0D1117" if mode == "dark" else "#fff"}"/>'
-            f'<path d="{hf.path("Star this repo", 18, bx_text, by + 34)[0]}" fill="{"#0D1117" if mode == "dark" else "#fff"}"/>'
-            f'<g class="arr"><path d="M{bx + bw - 40} {by + 27} h18 m-7 -7 l7 7 l-7 7" fill="none" stroke="{"#0D1117" if mode == "dark" else "#fff"}" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></g></g>')
-    defs = _grad(c, "g1") + f'<radialGradient id="rg"><stop offset="0" stop-color="{c["accent"]}" stop-opacity=".55"/><stop offset="1" stop-color="{c["accent"]}" stop-opacity="0"/></radialGradient>'
+            f'<circle class="ring" cx="{cx}" cy="{cy}" r="50" fill="none" stroke="#FFD54A" stroke-width="2"/>'
+            f'<circle class="ring" cx="{cx}" cy="{cy}" r="50" fill="none" stroke="{c["pink"]}" stroke-width="2" style="animation-delay:-1.4s"/>'
+            f'<ellipse cx="{cx}" cy="{cy}" rx="104" ry="104" fill="none" stroke="{c["line"]}" stroke-dasharray="3 6"/>{sparks}'
+            f'<ellipse class="shd" cx="{cx}" cy="{cy + 98}" rx="62" ry="9" fill="#000"/>'
+            f'<g class="sway">{star3d(cx, cy, 78, 34)}</g>'
+            f'<g class="tf" fill="url(#g1)"><path d="{full}"/></g>{draw}<g class="sb">{sub}</g>{button}{doodle}'
+            f'{star4(bx - 14, by - 10, 6, c["accent"], "tw")}{star4(bx + bw + 6, by + bh + 2, 5, c["pink"], "tw", "style=" + chr(34) + "animation-delay:-1.3s" + chr(34))}')
+    dk = lambda col: _mixhex(col, "#000000", .45)
+    defs = (_grad(c, "g1") + lin_grad("g1d", [(0, dk(c["accent"])), (.55, dk(c["second"])), (1, dk(c["pink"]))], 0, 0, 1, 0)
+            + f'<radialGradient id="rg"><stop offset="0" stop-color="#FFC93C" stop-opacity=".5"/><stop offset="1" stop-color="#FFC93C" stop-opacity="0"/></radialGradient>')
     return doc(W, H, body, css, defs, "Enjoyed the tour? Star this repo", pad_y=8)
 
 
@@ -413,7 +449,7 @@ def arcade_card(mode: str) -> str:
            "@keyframes crt{from{transform:translateY(0)}to{transform:translateY(6px)}}.crt{animation:crt .5s linear infinite}"
            "@keyframes bf{from{transform:translateY(0)}to{transform:translateY(330px)}}.bf{animation:bf 7s linear infinite}"
            "@keyframes sw{0%,100%{transform:translateX(calc(var(--a) * -1))}50%{transform:translateX(var(--a))}}.sw{animation:sw 3s ease-in-out infinite}"
-           "@keyframes sh{" + "".join(f"{k * 1.25:g}%{{transform:translateX({-70 * _m.cos(2 * _m.pi * k / 80):.1f}px)}}" for k in range(81)) + "}.sh{animation:sh 4.4s linear infinite}"
+           "@keyframes sh{" + "".join(f"{k * 2.5:g}%{{transform:translateX({-70 * _m.cos(2 * _m.pi * k / 40):.1f}px)}}" for k in range(41)) + "}.sh{animation:sh 4.4s linear infinite}"
            "@keyframes bl{0%{opacity:0;transform:translateY(0)}1%{opacity:1;transform:translateY(0)}25%{opacity:.2;transform:translateY(-230px)}26%,100%{opacity:0;transform:translateY(-230px)}}.bl{opacity:0;animation:bl 4.4s linear infinite both}"
            "@keyframes bm{0%{r:4;opacity:1}100%{r:26;opacity:0}}.bm{animation:bm 3.4s ease-out infinite}"
            "@keyframes st{0%{transform:translateY(0);opacity:.2}50%{opacity:1}100%{transform:translateY(40px);opacity:.2}}.st{animation:st 5s linear infinite}"

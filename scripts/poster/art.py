@@ -163,68 +163,95 @@ def header(mode: str) -> str:
 
 
 def footer(mode: str) -> str:
+    """Night-sky finale: parallax skyline with blinking windows, a ringed planet with a satellite, a rocket that keeps launching,
+    drifting hearts, a wavy glowing 'Thanks' line, cycling messages and an equalizer along the bottom edge."""
+    import math
     c = PAL[mode]
-    H, T = 300, 12.0
+    W_, H = 1000, 330
     r = rng(5)
-    adefs, abody, acss = _aurora(c, H, T)
-    pbody, pcss = _particles(c, r, 36, H, 20)
-    from svgkit import wave_path
-    wv, wcss = "", "@keyframes wv{from{transform:translateX(0)}to{transform:translateX(-1000px)}}.wv{animation:wv var(--d) linear infinite}"
-    for b, a, p, ph, dur, op in [(44, 14, 1000, 0, 18, .35), (32, 11, 500, 1.2, 12, .6), (22, 8, 250, 2.4, 9, 1)]:
-        wv += f'<path class="wv" d="{wave_path(2000, b, a, p, ph, close_to=0)}" fill="{c["page"]}" opacity="{op}" style="--d:{dur}s"/>'
-    # shooting stars
-    stars = "".join(f'<g class="ss" style="animation-delay:-{k * 2.7:.1f}s"><line x1="0" y1="0" x2="-70" y2="-24" stroke="url(#st)" stroke-width="2" stroke-linecap="round"/></g>'.replace('<g class="ss"', f'<g class="ss" transform="translate({150 + k * 260} {40 + (k % 2) * 40})"') for k in range(4))
-    scss = "@keyframes ssh{0%{transform:translate(0,0);opacity:0}8%{opacity:1}35%,100%{transform:translate(220px,76px);opacity:0}}.ss line{animation:ssh 5.4s ease-in infinite;animation-delay:inherit}"
-    stars = "".join(f'<g transform="translate({120 + k * 250} {58 + (k % 2) * 46})"><line class="sl" x1="0" y1="0" x2="-80" y2="-27" stroke="url(#st)" stroke-width="2.2" stroke-linecap="round" style="animation-delay:-{k * 1.6:.1f}s"/></g>' for k in range(4))
-    scss = "@keyframes ssh{0%{transform:translate(0,0);opacity:0}6%{opacity:1}30%,100%{transform:translate(230px,78px);opacity:0}}.sl{animation:ssh 6.4s ease-in infinite}"
-    sf = typo.font(typo.SCRIPT)
-    msg = "Thanks for stopping by"
-    size = 62
-    mw = sf.width(msg, size)
-    x0 = (1000 - mw) / 2
-    gl = sf.glyphs(msg, size, x0, 150)
-    letters, lcss = "", ""
-    for i, (d, _, _) in enumerate(gl):
-        t0 = 0.2 + i * 0.07
-        lcss += kf(f"f{i}", T, [(0, "opacity:0;transform:translateY(18px)"), (t0, "opacity:0;transform:translateY(18px)"), (t0 + .55, "opacity:1;transform:translateY(0)"),
-                                (T - .8, "opacity:1;transform:translateY(0)"), (T - .3, "opacity:0;transform:translateY(-8px)"), (T, "opacity:0")]) + f".f{i}{{animation:f{i} {T}s cubic-bezier(.2,.8,.2,1) infinite}}"
-        letters += f'<path class="f{i}" d="{d}" fill="url(#gf)"/>'
-    mf = typo.font(typo.MONO_B)
-    sub = "LET'S BUILD SOMETHING TOGETHER"
-    sd, sw = mf.path(sub, 14, 0, 0, 3)
-    lcss += kf("sb", T, [(0, "opacity:0"), (1.6, "opacity:0"), (2.4, "opacity:1"), (T - .8, "opacity:1"), (T - .3, "opacity:0"), (T, "opacity:0")]) + f".sb{{animation:sb {T}s linear infinite}}"
-    sub_el = f'<path class="sb" d="{sd}" transform="translate({500 - sw / 2:.0f} 196)" fill="{c["muted"]}"/>'
-    hd, hwid = mf.path("MADE WITH PYTHON, SVG & CURIOSITY", 11, 0, 0, 2)
-    made = f'<path d="{hd}" transform="translate({500 - hwid / 2:.0f} 262)" fill="{c["muted"]}" opacity=".8"/>'
-    heart = (f'<path class="hb" d="M500 232 c-6-8 -18-3 -12 7 l12 12 l12-12 c6-10 -6-15 -12-7z" fill="{c["pink"]}" transform="translate(0 -4)"/>'
-             "<style>@keyframes hb{0%,100%{transform:scale(1)}15%{transform:scale(1.25)}30%{transform:scale(1)}45%{transform:scale(1.18)}}.hb{transform-box:fill-box;transform-origin:center;animation:hb 1.6s ease-in-out infinite}</style>")
-    defs = adefs + lin_grad("gf", [(0, c["accent"]), (.5, c["second"]), (1, c["pink"])], 0, 0, 1, 0) + lin_grad("st", [(0, "#fff"), (1, "#fff")], 0, 0, 1, 0).replace('stop-color="#fff"/><stop offset="1" stop-color="#fff"', f'stop-color="{c["accent"]}"/><stop offset="1" stop-color="{c["accent"]}" stop-opacity="0"')
-    bg = (f'<linearGradient id="bgf" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="{c["base2"]}"/><stop offset="1" stop-color="{c["base"]}"/></linearGradient>'
-          f'<rect width="1000" height="{H}" fill="url(#bgf)"/>')
-    rk = (f'<g class="rkt"><g transform="rotate(-18)"><path d="M0 -16 C10 -8 10 8 6 16 H-6 C-10 8 -10 -8 0 -16Z" fill="{c["ink"]}"/><circle cx="0" cy="-3" r="4" fill="{c["accent"]}"/>'
-          f'<path d="M-6 8 L-14 18 L-6 15Z M6 8 L14 18 L6 15Z" fill="{c["pink"]}"/><path class="fl" d="M-4 16 Q0 34 4 16Z" fill="{c["accent"]}"/></g></g>')
-    rcss2 = ("@keyframes rkt{0%{transform:translate(-60px,250px);opacity:0}4%{opacity:1}50%{transform:translate(1060px,40px);opacity:1}51%,100%{transform:translate(1060px,40px);opacity:0}}"
-             ".rkt{animation:rkt 16s linear infinite;opacity:0}@keyframes fl{0%,100%{transform:scaleY(1)}50%{transform:scaleY(1.7)}}.fl{transform-box:fill-box;transform-origin:top;animation:fl .25s ease-in-out infinite}")
-    fr = rng(41)
-    mnt = ""
-    for layer, (col, op, hmax, dur) in enumerate([(c["second"], .22, 46, 90), (c["accent"], .30, 30, 60)]):
-        x, d = 0, "M0 300"
+    adefs, abody, acss = _aurora(c, H, 12.0)
+    pbody, pcss = _particles(c, r, 26, H, 20)
+    sf, mf = typo.font(typo.SCRIPT), typo.font(typo.MONO_B)
+    sky = c["ink"]
+    css = ("@keyframes twk{0%,100%{opacity:.15}50%{opacity:1}}.twk{animation:twk var(--d) ease-in-out infinite}"
+           "@keyframes ssh{0%{transform:translate(0,0);opacity:0}6%{opacity:1}30%,100%{transform:translate(230px,78px);opacity:0}}.sl{animation:ssh 6.4s ease-in infinite}"
+           "@keyframes mv{from{transform:translateX(0)}to{transform:translateX(-1000px)}}.far{animation:mv 90s linear infinite}.near{animation:mv 48s linear infinite}"
+           "@keyframes win{0%,100%{opacity:.15}50%{opacity:1}}.win{animation:win var(--d) steps(1) infinite}"
+           "@keyframes orbr{to{transform:rotate(360deg)}}.ringp{transform-box:fill-box;transform-origin:center}"
+           "@keyframes sat{from{offset-distance:0%}to{offset-distance:100%}}.sat{animation:sat 7s linear infinite}"
+           "@keyframes fly{from{offset-distance:0%}to{offset-distance:100%}}.rk{animation:fly 9s cubic-bezier(.45,0,.55,1) infinite}"
+           "@keyframes hrt{0%{transform:translate(0,0) scale(.6);opacity:0}12%{opacity:.9}50%{transform:translate(14px,-90px) scale(1)}100%{transform:translate(-10px,-190px) scale(.8);opacity:0}}.hrt{animation:hrt var(--d) ease-in-out infinite}"
+           "@keyframes wave{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}.lt{animation:wave 2.6s ease-in-out infinite}"
+           "@keyframes gl{0%,100%{opacity:.35}50%{opacity:.8}}.gl{animation:gl 3s ease-in-out infinite}"
+           "@keyframes shm{0%,30%{transform:translateX(-160px)}80%,100%{transform:translateX(1120px)}}.shm{animation:shm 5s ease-in-out infinite}"
+           "@keyframes msg{0%{opacity:0;transform:translateY(10px)}4%,22%{opacity:1;transform:translateY(0)}26%,100%{opacity:0;transform:translateY(-10px)}}.msg{opacity:0;animation:msg 16s ease-in-out infinite both}"
+           "@keyframes eq{0%,100%{transform:scaleY(.25)}50%{transform:scaleY(1)}}.eq{transform-box:fill-box;transform-origin:50% 100%;animation:eq var(--d) ease-in-out infinite}"
+           "@keyframes hb{0%,100%{transform:scale(1)}15%{transform:scale(1.3)}30%{transform:scale(1)}45%{transform:scale(1.2)}}.hb{transform-box:fill-box;transform-origin:center;animation:hb 1.4s ease-in-out infinite}"
+           "@keyframes pls{0%{r:6;opacity:.8}100%{r:26;opacity:0}}.pls{animation:pls 2.4s ease-out infinite}"
+           "@keyframes pulse{0%,100%{opacity:.5}50%{opacity:1}}.pulse{animation:pulse 1.2s ease-in-out infinite}")
+    # ---- stars
+    stars = "".join(f'<circle class="twk" cx="{r.randint(8, 992)}" cy="{r.randint(6, 210)}" r="{r.choice([.8, 1.1, 1.5, 2])}" fill="{sky}" style="--d:{r.uniform(2, 5):.1f}s;animation-delay:-{r.uniform(0, 5):.1f}s"/>' for _ in range(70))
+    shoot = "".join(f'<g transform="translate({90 + k * 280} {30 + (k % 2) * 50})"><line class="sl" x1="0" y1="0" x2="-80" y2="-27" stroke="url(#st)" stroke-width="2.2" stroke-linecap="round" style="animation-delay:-{k * 2.1:.1f}s"/></g>' for k in range(4))
+    # ---- ringed planet + satellite
+    px, py, pr = 870, 96, 30
+    orbit = f"M{px - 74} {py + 6} a74 22 -18 1 0 148 -12 a74 22 -18 1 0 -148 12"
+    planet = (f'<circle cx="{px}" cy="{py}" r="{pr + 14}" fill="{c["second"]}" opacity=".18" class="gl"/>'
+              f'<circle cx="{px}" cy="{py}" r="{pr}" fill="url(#pln)"/><circle cx="{px - 10}" cy="{py - 8}" r="5" fill="#fff" opacity=".14"/><circle cx="{px + 9}" cy="{py + 10}" r="7" fill="#000" opacity=".12"/>'
+              f'<ellipse cx="{px}" cy="{py}" rx="58" ry="14" fill="none" stroke="{c["accent"]}" stroke-width="3" opacity=".75" transform="rotate(-18 {px} {py})"/>'
+              f'<path d="M{px - 58} {py} A58 14 0 0 0 {px + 58} {py}" fill="none" stroke="{c["pink"]}" stroke-width="3" opacity=".9" transform="rotate(-18 {px} {py})"/>'
+              f'<g class="sat" style="offset-path:path({A}{orbit}{A})"><rect x="-4" y="-2.5" width="8" height="5" rx="1" fill="{c["ink"]}"/><rect x="-10" y="-1" width="5" height="2" fill="{c["accent"]}"/><rect x="5" y="-1" width="5" height="2" fill="{c["accent"]}"/></g>')
+    # ---- parallax skyline
+    def skyline(seed, hmax, col, op, windows, cls):
+        fr = rng(seed)
+        x, shapes, wins = 0, "", ""
         while x < 1000:
-            w = fr.randint(60, 140)
-            d += f" L{x + w / 2:.0f} {300 - fr.randint(hmax // 2, hmax)} L{x + w} 300"
-            x += w
-        d += " L1000 300Z"
-        mnt += f'<g class="mt{layer}" style="animation-duration:{dur}s"><path d="{d}" fill="{col}" opacity="{op}"/><path d="{d}" transform="translate(1000 0)" fill="{col}" opacity="{op}"/></g>'
-    flies = "".join(f'<circle class="ff" cx="{fr.randint(30, 970)}" cy="{fr.randint(190, 285)}" r="2.4" fill="{c["green"]}" style="animation-duration:{fr.randint(5, 9)}s;animation-delay:-{fr.uniform(0, 8):.1f}s"/>' for _ in range(12))
-    mcss = ("@keyframes mt{from{transform:translateX(0)}to{transform:translateX(-1000px)}}.mt0,.mt1{animation:mt 80s linear infinite}"
-            "@keyframes ff{0%{transform:translate(0,0);opacity:0}20%{opacity:1}50%{transform:translate(26px,-18px);opacity:.3}80%{opacity:1}100%{transform:translate(-14px,10px);opacity:0}}.ff{animation:ff 7s ease-in-out infinite}")
-    rcss2 += mcss
-    cp = [(90, 60), (190, 110), (300, 70), (410, 120), (560, 60), (690, 105), (800, 65), (910, 115)]
-    lines = f'<polyline points="{" ".join(f"{x},{y}" for x, y in cp)}" fill="none" stroke="{c["accent"]}" stroke-opacity=".35" stroke-dasharray="4 6" class="cl"/>'
-    dots = "".join(f'<circle class="cd" cx="{x}" cy="{y}" r="3" fill="{c["ink"]}" style="animation-delay:-{k * .5:.1f}s"/>' for k, (x, y) in enumerate(cp))
-    rcss2 += "@keyframes cl{to{stroke-dashoffset:-100}}.cl{animation:cl 6s linear infinite}@keyframes cd{0%,100%{opacity:.25;r:2}50%{opacity:1;r:4.5}}.cd{animation:cd 2.4s ease-in-out infinite}"
-    body = bg + abody + pbody + lines + dots + stars + mnt + flies + rk + letters + sub_el + heart.replace('translate(0 -4)', 'translate(0 8)') + made + wv
-    return doc(1000, H, body, acss + pcss + scss + lcss + wcss + rcss2, defs, "Thanks for stopping by: animated footer")
+            w, h = fr.randint(22, 52), fr.randint(int(hmax * .35), hmax)
+            shapes += f'<rect x="{x}" y="{298 - h}" width="{w}" height="{h}" fill="{col}"/>'
+            if fr.random() < .3:
+                shapes += f'<rect x="{x + w / 2 - 1}" y="{298 - h - 12}" width="2" height="12" fill="{col}"/>'
+            if windows:
+                for wy in range(298 - h + 7, 292, 9):
+                    for wx in range(x + 5, x + w - 6, 8):
+                        if fr.random() < .3:
+                            wins += f'<rect class="win" x="{wx}" y="{wy}" width="3.4" height="4.4" fill="{fr.choice([c["accent"], c["pink"], "#FBBF24"])}" style="--d:{fr.uniform(1.5, 6):.1f}s;animation-delay:-{fr.uniform(0, 6):.1f}s"/>'
+            x += w + fr.randint(2, 8)
+        grp = f'<g opacity="{op}">{shapes}</g>{wins}'
+        return f'<g class="{cls}">{grp}<g transform="translate(1000 0)">{grp}</g></g>'
+    city = skyline(31, 62, c["second"], .28, False, "far") + skyline(32, 50, c["page"] if mode == "dark" else c["ink"], .92 if mode == "dark" else .22, True, "near")
+    # ---- rocket on a looping flight path, with a trail behind it
+    flight = "M-40 310 C 220 90, 560 250, 1060 30"
+    trail = "".join(f'<circle class="rk" r="{5 - k * .6:.1f}" fill="{[c["accent"], c["pink"], "#FBBF24"][k % 3]}" opacity="{.7 - k * .09:.2f}" style="offset-path:path({A}{flight}{A});animation-delay:{k * .07:.2f}s"/>' for k in range(1, 8))
+    rocket = (f'<g class="rk" style="offset-path:path({A}{flight}{A});offset-rotate:auto"><g transform="translate(-4 0)"><path d="M16 0 C6 -9 -8 -9 -14 -6 L-14 6 C-8 9 6 9 16 0Z" fill="{c["ink"]}"/>'
+              f'<circle cx="3" cy="0" r="3.6" fill="{c["accent"]}"/><path d="M-6 -7 L-14 -13 L-14 -5Z M-6 7 L-14 13 L-14 5Z" fill="{c["pink"]}"/><path d="M-14 -3 Q-30 0 -14 3Z" fill="#FBBF24"/></g></g>')
+    # ---- hearts
+    hearts = "".join(f'<g transform="translate({60 + k * 78 + (k % 3) * 11} 268)"><path class="hrt" d="M0 0 c-5 -7 -16 -2 -10 6 l10 10 l10 -10 c6 -8 -5 -13 -10 -6z" fill="{[c["pink"], c["accent"], c["second"]][k % 3]}" style="--d:{5 + (k * 7) % 5}s;animation-delay:-{k * 1.3:.1f}s"/></g>' for k in range(12))
+    # ---- headline: wavy letters over a glowing copy, shimmer sweep
+    msg, size = "Thanks for stopping by", 64
+    x0 = (W_ - sf.width(msg, size)) / 2
+    gl = sf.glyphs(msg, size, x0, 140)
+    full = "".join(g[0] for g in gl)
+    letters = "".join(f'<path class="lt" d="{d}" fill="url(#gf)" style="animation-delay:-{i * .13:.2f}s"/>' for i, (d, _, _) in enumerate(gl))
+    head = (f'<g class="gl" filter="url(#glow)"><path d="{full}" fill="url(#gf)"/></g>{letters}'
+            f'<clipPath id="hc"><path d="{full}"/></clipPath><g clip-path="url(#hc)"><rect class="shm" x="0" y="70" width="60" height="90" fill="#fff" opacity=".65" transform="skewX(-22)"/></g>')
+    # ---- cycling subtitles
+    subs = ["LET'S BUILD SOMETHING TOGETHER", "OPEN TO INTERNSHIPS & COLLABS", "SEE YOU ON GITHUB", "KEEP SHIPPING, KEEP LEARNING"]
+    sub_el = ""
+    for k, t in enumerate(subs):
+        d, w = mf.path(t, 14, 0, 0, 3)
+        sub_el += f'<g class="msg" style="animation-delay:{k * 4}s"><path d="{d}" transform="translate({500 - w / 2:.0f} 190)" fill="{c["ink"]}"/></g>'
+    hd, hwid = mf.path("MADE WITH PYTHON, SVG & CURIOSITY", 11, 0, 0, 2)
+    made = (f'<path d="{hd}" transform="translate({500 - hwid / 2 + 14:.0f} 222)" fill="{c["muted"]}" opacity=".9"/>'
+            f'<circle class="pls" cx="{500 - hwid / 2 - 6:.0f}" cy="218" r="6" fill="none" stroke="{c["pink"]}" stroke-width="2"/>'
+            f'<path class="hb" d="M{500 - hwid / 2 - 6:.0f} 222 c-3 -4 -9 -1 -6 4 l6 6 l6 -6 c3 -5 -3 -8 -6 -4z" fill="{c["pink"]}"/>')
+    # ---- equalizer along the bottom edge
+    eq = "".join(f'<rect class="eq" x="{k * 20 + 3}" y="{H - 30}" width="12" height="30" rx="4" fill="url(#gf)" opacity=".7" style="--d:{.7 + (math.sin(k * 1.7) + 1) * .5:.2f}s;animation-delay:-{(k * .37) % 2:.2f}s"/>' for k in range(50))
+    defs = (adefs + lin_grad("gf", [(0, c["accent"]), (.5, c["second"]), (1, c["pink"])], 0, 0, 1, 0)
+            + '<linearGradient id="st" x1="0" x2="1"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#fff"/></linearGradient>'
+            + f'<radialGradient id="pln" cx=".35" cy=".3" r=".85"><stop offset="0" stop-color="{c["pink"]}"/><stop offset=".6" stop-color="{c["second"]}"/><stop offset="1" stop-color="{c["base"] if mode == "dark" else c["second"]}"/></radialGradient>'
+            + '<filter id="glow" x="-20%" y="-50%" width="140%" height="200%"><feGaussianBlur stdDeviation="7"/></filter>'
+            + f'<linearGradient id="bgf" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="{c["base2"]}"/><stop offset="1" stop-color="{c["base"]}"/></linearGradient>')
+    body = (f'<rect width="{W_}" height="{H}" fill="url(#bgf)"/>{abody}{stars}{pbody}{shoot}{planet}{city}{hearts}{trail}{rocket}{head}{sub_el}{made}{eq}')
+    return doc(W_, H, body, acss + pcss + css, defs, "Thanks for stopping by: animated night-sky footer")
 
 
 def build():
