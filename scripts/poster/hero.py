@@ -370,21 +370,70 @@ def arcade_card(mode: str) -> str:
     # ---- mini playfield
     stars = "".join(f'<circle class="st" cx="{fx + rr.randint(4, fw - 4)}" cy="{fy + rr.randint(0, fh)}" r="{rr.choice([.8, 1.1, 1.5])}" fill="{c["ink"]}" style="animation-duration:{rr.randint(3, 7)}s;animation-delay:-{rr.uniform(0, 6):.1f}s"/>' for _ in range(34))
 
-    def bug(x, col, dur, delay, amp):
-        return (f'<g class="bf" style="animation-duration:{dur}s;animation-delay:-{delay}s"><g class="sw" style="animation-duration:{dur / 2}s;--a:{amp}px"><g transform="translate({x} {fy - 20})">'
-                f'<ellipse cx="0" cy="2" rx="11" ry="13" fill="{c["card"]}" stroke="{col}" stroke-width="2"/>'
-                f'<path d="M-11 -4 l-7 -3 M-11 3 l-8 1 M-11 9 l-7 5 M11 -4 l7 -3 M11 3 l8 1 M11 9 l7 5 M-3 -13 l-4 -7 M3 -13 l4 -7" stroke="{col}" stroke-width="2" stroke-linecap="round"/>'
-                f'<circle cx="-4" cy="-4" r="2.4" fill="#fff"/><circle cx="4" cy="-4" r="2.4" fill="#fff"/></g></g></g>')
-    bugs = bug(fx + 60, c["green"], 7, 0, 22) + bug(fx + 130, c["pink"], 6, 2.3, 30) + bug(fx + 200, c["second"], 8, 4.6, 18) + bug(fx + 95, c["green"], 9, 6.1, 26)
+    # ---- a scripted fight: every bug is shot down by a real bullet, at the moment that bullet reaches it
     import math as _m
-    SHIP_T = 4.4                                            # ship sweep period (s); x(t) = -70 cos(2 pi t / T)
-    bullets = "".join(
-        f'<rect class="bl" x="{fx + fw / 2 + (-70 * _m.cos(2 * _m.pi * (n * .22) / SHIP_T)) - 2:.1f}" y="{fy + fh - 52}" width="4" height="14" rx="2" fill="{c["accent"]}" style="animation-delay:{n * .22:.2f}s"/>'
-        for n in range(20))
-    booms = "".join(f'<circle class="bm" cx="{fx + x}" cy="{fy + y}" r="6" fill="none" stroke="{col}" stroke-width="3" style="animation-delay:-{d}s"/>' for x, y, col, d in [(70, 90, c["green"], 0), (170, 130, c["pink"], 1.7), (120, 60, c["accent"], 3.1)])
+    T, SHIP_T, VB, V = 13.2, 4.4, 209.0, 48.0                 # loop, ship sweep, bullet speed, bug speed (px/s)
+    cxf, Y0, YTOP = fx + fw / 2, fy + fh - 52, fy - 14
+
+    def shipx(t):
+        return cxf - 70 * _m.cos(2 * _m.pi * t / SHIP_T)
+
+    def P(t):
+        return f"{max(0.0, min(100.0, t / T * 100)):.3f}%"
+    fires = [n * .22 for n in range(60)]
+    plan = [(5, 80, c["green"]), (14, 125, c["pink"]), (24, 95, c["second"]), (33, 140, c["green"]), (43, 85, c["pink"]), (52, 118, c["second"])]
+    fight = []
+    for n, yh, col in plan:
+        bxp = shipx(fires[n])
+        s0 = fires[n] + (Y0 - (yh + 10)) / VB - (yh - YTOP) / V
+        best = None
+        for m_, tf in enumerate(fires):                       # the first bullet that really meets this bug
+            if abs(shipx(tf) - bxp) > 13:
+                continue
+            t = (Y0 - YTOP - 10 + VB * tf + V * s0) / (VB + V)
+            if t >= max(tf, s0) and t < T and (best is None or t < best[0]):
+                best = (t, m_)
+        tc, m_ = best
+        fight.append(dict(x=bxp, s=s0, tc=tc, yc=YTOP + V * (tc - s0), m=m_, col=col))
+    hit = {f_["m"]: f_["tc"] for f_ in fight}
+    fcss, bugs, booms = "", "", ""
+    for i, f_ in enumerate(fight):
+        x_, y_, s0, tc, col = f_["x"], f_["yc"], f_["s"], f_["tc"], f_["col"]
+        fcss += (f"@keyframes bg{i}{{0%,{P(s0)}{{opacity:0;transform:translate({x_:.1f}px,{YTOP}px)}}{P(s0 + .03)}{{opacity:1;transform:translate({x_:.1f}px,{YTOP}px)}}"
+                 f"{P(tc)}{{opacity:1;transform:translate({x_:.1f}px,{y_:.1f}px)}}{P(tc + .03)},100%{{opacity:0;transform:translate({x_:.1f}px,{y_:.1f}px)}}}}.bg{i}{{opacity:0;animation:bg{i} {T}s linear infinite}}")
+        fcss += (f"@keyframes bm{i}{{0%,{P(tc)}{{r:3;opacity:0}}{P(tc + .03)}{{r:3;opacity:1}}{P(tc + .55)},100%{{r:30;opacity:0}}}}.bm{i}{{opacity:0;animation:bm{i} {T}s ease-out infinite}}"
+                 f"@keyframes sd{i}{{0%,{P(tc)}{{opacity:0;transform:translate(0,0)}}{P(tc + .03)}{{opacity:1;transform:translate(0,0)}}{P(tc + .5)},100%{{opacity:0;transform:translate(var(--dx),var(--dy))}}}}.sd{i}{{opacity:0;animation:sd{i} {T}s ease-out infinite}}"
+                 f"@keyframes pt{i}{{0%,{P(tc)}{{opacity:0;transform:translateY(0)}}{P(tc + .05)}{{opacity:1;transform:translateY(0)}}{P(tc + .9)},100%{{opacity:0;transform:translateY(-26px)}}}}.pt{i}{{opacity:0;animation:pt{i} {T}s ease-out infinite}}")
+        bugs += (f'<g class="bg{i}"><g class="wob" style="animation-delay:-{i * .13:.2f}s"><ellipse cx="0" cy="2" rx="11" ry="13" fill="{c["card"]}" stroke="{col}" stroke-width="2"/>'
+                 f'<path d="M-11 -4 l-7 -3 M-11 3 l-8 1 M-11 9 l-7 5 M11 -4 l7 -3 M11 3 l8 1 M11 9 l7 5 M-3 -13 l-4 -7 M3 -13 l4 -7" stroke="{col}" stroke-width="2" stroke-linecap="round"/>'
+                 f'<circle cx="-4" cy="-4" r="2.4" fill="#fff"/><circle cx="4" cy="-4" r="2.4" fill="#fff"/></g></g>')
+        shards = "".join(f'<circle class="sd{i}" cx="{x_:.1f}" cy="{y_:.1f}" r="2.4" fill="{[col, c["accent"], "#fff"][k % 3]}" style="--dx:{22 * _m.cos(k * _m.pi / 3):.0f}px;--dy:{22 * _m.sin(k * _m.pi / 3):.0f}px"/>' for k in range(6))
+        booms += (f'<circle class="bm{i}" cx="{x_:.1f}" cy="{y_:.1f}" r="3" fill="none" stroke="{col}" stroke-width="3"/>{shards}'
+                  f'<path class="pt{i}" d="{mf.path("+100", 11, x_ - 14, y_ - 10, 1)[0]}" fill="{c["pink"]}"/>')
+    bullets = ""
+    for m_, tf in enumerate(fires):
+        if m_ in hit:
+            dt_ = hit[m_] - tf
+            fcss += (f"@keyframes bh{m_}{{0%{{opacity:0;transform:translateY(0)}}.01%{{opacity:1;transform:translateY(0)}}{P(dt_)}{{opacity:1;transform:translateY({-VB * dt_:.1f}px)}}{P(dt_ + .02)},100%{{opacity:0;transform:translateY({-VB * dt_:.1f}px)}}}}"
+                     f".bh{m_}{{opacity:0;animation:bh{m_} {T}s linear infinite both}}")
+            cls = f"bh{m_}"
+        else:
+            cls = "bl"
+        bullets += f'<rect class="{cls}" x="{shipx(tf) - 2:.1f}" y="{Y0}" width="4" height="14" rx="2" fill="{c["accent"]}" style="animation-delay:{tf:.2f}s"/>'
+    fcss += (f"@keyframes bl{{0%{{opacity:0;transform:translateY(0)}}.01%{{opacity:1;transform:translateY(0)}}{P(1.06)}{{opacity:.25;transform:translateY(-222px)}}{P(1.08)},100%{{opacity:0;transform:translateY(-222px)}}}}"
+             f".bl{{opacity:0;animation:bl {T}s linear infinite both}}")
+    # score counts up with every kill
+    order = sorted(f_["tc"] for f_ in fight)
+    marks = [0.0] + order + [T]
+    hud = ""
+    for k in range(len(marks) - 1):
+        t0, t1 = marks[k], marks[k + 1]
+        fcss += (f"@keyframes sc{k}{{0%,{P(t0)}{{opacity:{1 if k == 0 else 0}}}{P(t0 + .001)}{{opacity:1}}{P(t1)}{{opacity:{1 if k < len(marks) - 2 else 1}}}{P(t1 + .001)},100%{{opacity:0}}}}"
+                 f".sc{k}{{opacity:{1 if k == 0 else 0};animation:sc{k} {T}s linear infinite}}")
+        hud += f'<path class="sc{k}" d="{mf.path(f"SCORE {4200 + 100 * k:06d}", 10, fx + 12, fy + 20, 1)[0]}" fill="{c["accent"]}"/>'
+    hud += f'<path d="{mf.path("WAVE 3", 10, fx + fw - 62, fy + 20, 1)[0]}" fill="{c["muted"]}"/>'
     ship = (f'<g transform="translate({fx + fw / 2} {fy + fh - 22})"><g class="sh"><path d="M0 -16 L11 12 L0 6 L-11 12Z" fill="url(#g1)"/>'
             f'<path class="fl" d="M-3 9 Q0 24 3 9Z" fill="{c["pink"]}"/></g></g>')
-    hud = f'<path d="{mf.path("SCORE 004210", 10, fx + 12, fy + 20, 1)[0]}" fill="{c["accent"]}"/><path d="{mf.path("WAVE 3", 10, fx + fw - 62, fy + 20, 1)[0]}" fill="{c["muted"]}"/>'
     # ---- right side copy
     title, tw = sf.path("Bug Hunter", 64, 330, 98)
     sub, _ = mf.path("A  PLAYABLE  ARCADE  SHOOTER", 12, 332, 126, 3)
@@ -431,9 +480,9 @@ def arcade_card(mode: str) -> str:
           f'<circle cx="{fx + 150}" cy="{fy - 12}" r="10" fill="{c["card"]}" stroke="{c["green"]}" stroke-width="2"/>'
           f'<path d="{mf.path("H", 11, fx + 145, fy - 8)[0]}" fill="{c["green"]}"/>'
           + "".join(f'<circle class="st" cx="{fx + 150 + (k - 1) * 5}" cy="{fy - 26 - k * 7}" r="{1.8 - k * .4:.1f}" fill="{c["green"]}" opacity="{.7 - k * .2:.1f}"/>' for k in range(3)) +
-          f'</g>'
-          f'<path class="pop" d="{mf.path("+100", 11, fx + 60, fy + 120, 1)[0]}" fill="{c["gold"] if "gold" in c else c["pink"]}"/>')
-    css = ("@keyframes pwr{from{transform:translate(0,0)}to{transform:translate(-40px,300px)}}.pwr{animation:pwr 9s linear infinite;animation-delay:-3s}"
+          f'</g>')
+    css = fcss + ("@keyframes wob{0%,100%{transform:rotate(-7deg)}50%{transform:rotate(7deg)}}.wob{transform-box:fill-box;transform-origin:center;animation:wob .5s ease-in-out infinite}"
+           "@keyframes pwr{from{transform:translate(0,0)}to{transform:translate(-40px,300px)}}.pwr{animation:pwr 9s linear infinite;animation-delay:-3s}"
            "@keyframes pop{0%,100%{opacity:0;transform:translateY(0)}10%{opacity:1}40%{opacity:0;transform:translateY(-22px)}}.pop{animation:pop 3.4s ease-out infinite}"
            "@keyframes qin{0%{opacity:0;transform:translateY(14px);clip-path:inset(0 100% 0 0)}2%{opacity:1}6%{opacity:1;transform:translateY(0);clip-path:inset(-4px 0 -4px 0)}11%{opacity:1;transform:translateY(0);clip-path:inset(-4px 0 -4px 0)}12.5%,100%{opacity:0;transform:translateY(-14px);clip-path:inset(-4px 0 -4px 0)}}"
            ".q{opacity:0;animation:qin 28.8s ease-out infinite both}.q0{opacity:1}"
@@ -446,11 +495,7 @@ def arcade_card(mode: str) -> str:
            "@keyframes pwsp{to{transform:rotate(360deg)}}.pwsp{transform-box:fill-box;transform-origin:center;animation:pwsp 2.4s linear infinite}"
            "@keyframes qbar{0%,100%{opacity:.5}50%{opacity:1}}.qb{animation:qbar 1.8s ease-in-out infinite}"
            "@keyframes crt{from{transform:translateY(0)}to{transform:translateY(6px)}}.crt{animation:crt .5s linear infinite}"
-           "@keyframes bf{from{transform:translateY(0)}to{transform:translateY(330px)}}.bf{animation:bf 7s linear infinite}"
-           "@keyframes sw{0%,100%{transform:translateX(calc(var(--a) * -1))}50%{transform:translateX(var(--a))}}.sw{animation:sw 3s ease-in-out infinite}"
            "@keyframes sh{" + "".join(f"{k * 2.5:g}%{{transform:translateX({-70 * _m.cos(2 * _m.pi * k / 40):.1f}px)}}" for k in range(41)) + "}.sh{animation:sh 4.4s linear infinite}"
-           "@keyframes bl{0%{opacity:0;transform:translateY(0)}1%{opacity:1;transform:translateY(0)}25%{opacity:.2;transform:translateY(-230px)}26%,100%{opacity:0;transform:translateY(-230px)}}.bl{opacity:0;animation:bl 4.4s linear infinite both}"
-           "@keyframes bm{0%{r:4;opacity:1}100%{r:26;opacity:0}}.bm{animation:bm 3.4s ease-out infinite}"
            "@keyframes st{0%{transform:translateY(0);opacity:.2}50%{opacity:1}100%{transform:translateY(40px);opacity:.2}}.st{animation:st 5s linear infinite}"
            "@keyframes fl{0%,100%{transform:scaleY(1)}50%{transform:scaleY(1.7)}}.fl{transform-box:fill-box;transform-origin:top;animation:fl .25s ease-in-out infinite}"
            "@keyframes run{to{stroke-dashoffset:-1000}}.run{stroke-dasharray:180 820;animation:run 6s linear infinite}"
