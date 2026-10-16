@@ -230,7 +230,18 @@ def action_band(p: dict, mode: str, idx: int) -> str:
     return doc(W, H, body, css, _grad(c, "g1"), f"{verb} {p['name']}: " + " ".join(p["band"]["sub"].split()))
 
 
-MORE = [("TaskFlow", "task"), ("MathForge", "sigma"), ("Rack Up", "game"), ("Periodic Table", "atom"), ("and more", "plus")]
+MORE = [("TaskFlow", "task", "TaskFlow"), ("MathForge", "sigma", "MathForge"), ("Rack Up", "game", "Rack_Up-Onchain_Hi-Lo"),
+        ("Periodic Table", "atom", "Periodic-Table"), ("and more", "plus", None)]   # (label, glyph, repo; None = repositories page)
+MORE_CSS = ("@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}.pl{animation:bob 4.4s ease-in-out infinite}"
+            "@keyframes run{to{stroke-dashoffset:-400}}.run{stroke-dasharray:70 330;animation:run 4.5s linear infinite}"
+            "@keyframes shn{0%{transform:translateX(0)}45%,100%{transform:translateX(260px)}}.shn{animation:shn 4.8s ease-in-out infinite}"
+            "@keyframes flow{0%{stroke-dashoffset:100}100%{stroke-dashoffset:-100}}.flow{stroke-dasharray:18 82;animation:flow 2.4s linear infinite}"
+            "@keyframes chk2{0%,20%{stroke-dasharray:0 100}50%,85%{stroke-dasharray:100 0}100%{stroke-dasharray:0 100}}.chk2{animation:chk2 3.6s ease-in-out infinite}"
+            "@keyframes swing{0%,100%{transform:rotate(-14deg)}50%{transform:rotate(14deg)}}.swing{animation:swing 2.8s ease-in-out infinite}"
+            "@keyframes spin2{to{transform:rotate(360deg)}}.spin2{animation:spin2 6s linear infinite}"
+            "@keyframes arw{0%,100%{transform:translateX(0)}50%{transform:translateX(7px)}}.arw{animation:arw 1.3s ease-in-out infinite}"
+            "@keyframes mq{from{transform:translateX(0)}to{transform:translateX(-80px)}}.mq{animation:mq 4s linear infinite}"
+            "@keyframes gl{0%,100%{opacity:.1;transform:scale(1)}50%{opacity:.28;transform:scale(1.2)}}.gl{transform-box:fill-box;transform-origin:center;animation:gl 3s ease-in-out infinite}")
 
 
 def _more_glyph(kind: str, col: str, c: dict) -> str:
@@ -249,65 +260,48 @@ def _more_glyph(kind: str, col: str, c: dict) -> str:
     return star4(0, 0, 11, col, "tw")
 
 
-def more_repos(mode: str) -> str:
-    """'More on my repositories' banner: floating pills, each with a live glyph, under a flowing headline."""
+def more_header(mode: str) -> str:
+    """Headline strip of the 'more repositories' block (links to the repositories page)."""
     c = PAL[mode]
-    W, H = 830, 132
-    hf, mf = typo.font(typo.HEAD), typo.font(typo.MONO_B)
-    cols = [c["accent"], c["second"], c["pink"], c["green"], c["accent"]]
-    head, hw = mf.path("MORE FROM MY REPOSITORIES", 12, 0, 0, 4)
-    pills, tot = [], 0
-    for k, (name, kind) in enumerate(MORE):
-        tw = hf.width(name, 14.5)
-        extra = 0
-        if name == "Rack Up":
-            bd, bw = mf.path("BASE SEPOLIA", 8, 0, 0, .8)
-            extra = bw + 16
-        pw = tw + 50 + extra
-        pills.append((name, kind, pw, tw, extra))
-        tot += pw + 10
-    x = (W - tot + 10) / 2
-    css = ("@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}.pl{animation:bob 4.4s ease-in-out infinite}"
-           "@keyframes run{to{stroke-dashoffset:-400}}.run{stroke-dasharray:70 330;animation:run 4.5s linear infinite}"
-           "@keyframes shn{0%{transform:translateX(0)}45%,100%{transform:translateX(220px)}}.shn{animation:shn 4.8s ease-in-out infinite}"
-           "@keyframes flow{0%{stroke-dashoffset:100}100%{stroke-dashoffset:-100}}.flow{stroke-dasharray:18 82;animation:flow 2.4s linear infinite}"
-           "@keyframes chk2{0%,20%{stroke-dasharray:0 100}50%,85%{stroke-dasharray:100 0}100%{stroke-dasharray:0 100}}.chk2{animation:chk2 3.6s ease-in-out infinite}"
-           "@keyframes swing{0%,100%{transform:rotate(-14deg)}50%{transform:rotate(14deg)}}.swing{animation:swing 2.8s ease-in-out infinite}"
-           "@keyframes spin2{to{transform:rotate(360deg)}}.spin2{animation:spin2 6s linear infinite}"
-           "@keyframes arw{0%,100%{transform:translateX(0)}50%{transform:translateX(7px)}}.arw{animation:arw 1.3s ease-in-out infinite}"
-           "@keyframes mq{from{transform:translateX(0)}to{transform:translateX(-80px)}}.mq{animation:mq 4s linear infinite}"
-           "@keyframes gl{0%,100%{opacity:.1;transform:scale(1)}50%{opacity:.28;transform:scale(1.2)}}.gl{transform-box:fill-box;transform-origin:center;animation:gl 3s ease-in-out infinite}" + _tw())
+    W, H = 830, 84
+    mf = typo.font(typo.MONO_B)
+    head, hw = mf.path("MORE FROM MY REPOSITORIES", 13, 0, 0, 4)
     body = (f'<clipPath id="mc"><rect x="1" y="1" width="{W - 2}" height="{H - 2}" rx="28"/></clipPath>'
             f'<rect x=".5" y=".5" width="{W - 1}" height="{H - 1}" rx="28" fill="{c["card"]}" stroke="{c["line"]}"/>'
-            # drifting dotted grid behind
-            f'<g clip-path="url(#mc)"><g class="mq">' + "".join(f'<circle cx="{gx * 20}" cy="{gy * 20 + 6}" r="1.3" fill="{c["line"]}"/>' for gx in range(-4, 48) for gy in range(0, 7)) + '</g></g>'
+            f'<g clip-path="url(#mc)"><g class="mq">' + "".join(f'<circle cx="{gx * 20}" cy="{gy * 20 + 6}" r="1.3" fill="{c["line"]}"/>' for gx in range(-4, 48) for gy in range(0, 5)) + '</g></g>'
             f'<rect class="run" x=".5" y=".5" width="{W - 1}" height="{H - 1}" rx="28" fill="none" stroke="url(#g1)" stroke-width="2.6" pathLength="400"/>'
-            f'<path d="{head}" transform="translate({(W - hw) / 2:.1f} 36)" fill="url(#g1)"/>'
-            f'{star4((W - hw) / 2 - 22, 31, 6, c["accent"], "tw")}{star4((W + hw) / 2 + 22, 31, 6, c["pink"], "tw", "style=" + chr(34) + "animation-delay:-1.2s" + chr(34))}'
-            f'<line x1="{(W - hw) / 2}" y1="48" x2="{(W + hw) / 2}" y2="48" stroke="{c["line"]}" stroke-width="2" stroke-linecap="round"/>'
-            f'<line class="flow" x1="{(W - hw) / 2}" y1="48" x2="{(W + hw) / 2}" y2="48" stroke="url(#g1)" stroke-width="3" stroke-linecap="round" pathLength="100"/>')
-    for k, (name, kind, pw, tw, extra) in enumerate(pills):
-        col = cols[k]
-        nd, _ = hf.path(name, 14.5, x + 42, 100)
-        body += (f'<g class="pl" style="animation-delay:-{k * .85:.2f}s"><clipPath id="pk{k}"><rect x="{x:.1f}" y="66" width="{pw:.1f}" height="44" rx="22"/></clipPath>'
-                 f'<circle class="gl" cx="{x + 24:.1f}" cy="88" r="20" fill="{col}" style="animation-delay:-{k * .6:.1f}s"/>'
-                 f'<rect x="{x:.1f}" y="66" width="{pw:.1f}" height="44" rx="22" fill="{c["card"]}" fill-opacity=".85" stroke="{col}" stroke-opacity=".7" stroke-width="1.6"/>'
-                 f'<g clip-path="url(#pk{k})"><rect class="shn" x="{x - 60:.1f}" y="66" width="26" height="44" fill="#fff" opacity=".12" transform="skewX(-20)" style="animation-delay:-{k * .9:.1f}s"/></g>'
-                 f'<g transform="translate({x + 24:.1f} 88)">{_more_glyph(kind, col, c)}</g><path d="{nd}" fill="{c["ink"]}"/>')
-        if extra:
-            bd, bw = mf.path("BASE SEPOLIA", 8, x + 42 + tw + 12, 93, .8)
-            body += f'<rect x="{x + 42 + tw + 6:.1f}" y="80" width="{bw + 12:.1f}" height="16" rx="8" fill="{col}" opacity=".16"/><path d="{bd}" fill="{col}"/>'
-        body += "</g>"
-        x += pw + 10
-    # call-to-action arrow on the right edge
-    body += (f'<g class="arw"><path d="M{W - 56} 30 h20 m-8 -8 l8 8 l-8 8" fill="none" stroke="url(#g1)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>')
-    return doc(W, H, body, css, _grad(PAL[mode], "g1"), "More on my repositories page: TaskFlow, MathForge, Rack Up (Web3 game on Base Sepolia), Periodic Table and more", pad_y=8)
+            f'<path d="{head}" transform="translate({(W - hw) / 2:.1f} 40)" fill="url(#g1)"/>'
+            f'{star4((W - hw) / 2 - 24, 35, 6, c["accent"], "tw")}{star4((W + hw) / 2 + 24, 35, 6, c["pink"], "tw", "style=" + chr(34) + "animation-delay:-1.2s" + chr(34))}'
+            f'<line x1="{(W - hw) / 2}" y1="54" x2="{(W + hw) / 2}" y2="54" stroke="{c["line"]}" stroke-width="2" stroke-linecap="round"/>'
+            f'<line class="flow" x1="{(W - hw) / 2}" y1="54" x2="{(W + hw) / 2}" y2="54" stroke="url(#g1)" stroke-width="3" stroke-linecap="round" pathLength="100"/>'
+            f'<g class="arw"><path d="M{W - 58} 34 h22 m-9 -9 l9 9 l-9 9" fill="none" stroke="url(#g1)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>')
+    return doc(W, H, body, MORE_CSS + _tw(), _grad(c, "g1"), "More from my repositories: open the repositories page", pad_y=4)
+
+
+def repo_pill(label: str, kind: str, idx: int, mode: str) -> str:
+    """One floating repository pill; its own SVG so the README can link each one to its repo."""
+    c = PAL[mode]
+    hf = typo.font(typo.HEAD)
+    col = [c["accent"], c["second"], c["pink"], c["green"], c["accent"]][idx]
+    tw = hf.width(label, 15)
+    pad_l, pad_r, h = 50, 24, 46
+    pw = tw + pad_l + pad_r
+    W = int(pw) + 6
+    nd, _ = hf.path(label, 15, 3 + pad_l, 28.5)
+    body = (f'<g class="pl" style="animation-delay:-{idx * .85:.2f}s"><clipPath id="pk"><rect x="3" y="1" width="{pw:.1f}" height="{h}" rx="{h / 2}"/></clipPath>'
+            f'<circle class="gl" cx="27" cy="{1 + h / 2}" r="20" fill="{col}" style="animation-delay:-{idx * .6:.1f}s"/>'
+            f'<rect x="3" y="1" width="{pw:.1f}" height="{h}" rx="{h / 2}" fill="{c["card"]}" fill-opacity=".9" stroke="{col}" stroke-opacity=".75" stroke-width="1.6"/>'
+            f'<g clip-path="url(#pk)"><rect class="shn" x="-40" y="1" width="26" height="{h}" fill="#fff" opacity=".13" transform="skewX(-20)" style="animation-delay:-{idx * .9:.1f}s"/></g>'
+            f'<g transform="translate(27 {1 + h / 2})">{_more_glyph(kind, col, c)}</g><path d="{nd}" fill="{c["ink"]}"/></g>')
+    return doc(W, h + 2, body, MORE_CSS + _tw(), "", label, pad_y=7)
 
 
 def build():
     for m in MODES:
         write(OUT / "sections" / f"toolbox-{m}.svg", toolbox(m))
-        write(OUT / "sections" / f"more-{m}.svg", more_repos(m))
+        write(OUT / "sections" / f"more-{m}.svg", more_header(m))
+        for k, (label, kind, _repo) in enumerate(MORE):
+            write(OUT / "sections" / f"more-{k}-{m}.svg", repo_pill(label, kind, k, m))
         for i, p in enumerate(PROJECTS):
             write(OUT / "projects" / f"{p['key']}-{m}.svg", project_card(p, m, i))
             write(OUT / "projects" / f"{p['key']}-band-{m}.svg", action_band(p, m, i))

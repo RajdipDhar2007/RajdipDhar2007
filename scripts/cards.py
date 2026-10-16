@@ -196,57 +196,72 @@ def dashboard_svg(mode: str, stats: dict, langs: list[tuple[str, int]], streak: 
         css += dcss
         body += (f'<g class="bb" style="animation-delay:-{i * .9:.1f}s">{panel(x, 8, 190, 120, i)}{art(x + 112, 22, col, c)}'
                  f'{ic(x + 24, 34)}{digits}<path d="{lab.path(label, 13, x + 24, 118)[0]}" fill="{c["muted"]}"/></g>')
-    # ---------------------------------------------------------------- languages: test tubes
+    # ---------------------------------------------------------------- languages: 3D test tubes
     import math
     top = langs[:5]
     vmax = max((v for _, v in top), default=1) or 1
     total = sum(v for _, v in top) or 1
     pal = [c["accent"], c["second"], c["pink"], c["green"], "#F59E0B"]
     css += ("@keyframes rise{0%{transform:translateY(var(--h))}20%,88%{transform:translateY(0)}100%{transform:translateY(var(--h))}}.rise{animation:rise 10s cubic-bezier(.3,.8,.2,1) infinite both}"
-            "@keyframes wv{to{transform:translateX(-46px)}}.wv{animation:wv 1.6s linear infinite}.wv2{animation:wv 2.4s linear infinite reverse}"
             "@keyframes dr{0%{transform:translateY(0) scale(.5);opacity:0}12%{opacity:1;transform:translateY(0) scale(1)}58%{transform:translateY(var(--dy));opacity:1}60%,100%{transform:translateY(var(--dy));opacity:0}}.dr{animation:dr 2.6s ease-in infinite}"
-            "@keyframes spl{0%,58%{rx:0;opacity:0}60%{rx:3;opacity:.9}100%{rx:17;opacity:0}}.spl{animation:spl 2.6s ease-out infinite}"
+            "@keyframes rpl{0%,58%{transform:scale(.1);opacity:0}60%{opacity:.95}100%{transform:scale(1);opacity:0}}.rpl{transform-box:fill-box;transform-origin:center;animation:rpl 2.6s ease-out infinite}"
             "@keyframes bub{0%{transform:translateY(0) scale(.6);opacity:0}15%{opacity:.8}100%{transform:translateY(var(--by));opacity:0}}.bub{animation:bub 3.4s ease-in infinite}"
-            "@keyframes tglow{0%,100%{opacity:.14;transform:scale(1)}50%{opacity:.34;transform:scale(1.15)}}.tglow{transform-box:fill-box;transform-origin:center;animation:tglow 3s ease-in-out infinite}"
-            "@keyframes nz{0%,100%{transform:translateY(0)}50%{transform:translateY(2px)}}.nz{animation:nz 2.6s ease-in-out infinite}")
+            "@keyframes sway{0%,100%{transform:rotate(-2.2deg)}50%{transform:rotate(2.2deg)}}.sway{animation:sway 5s ease-in-out infinite}"
+            "@keyframes spk{0%,25%{transform:translateX(-30px)}65%,100%{transform:translateX(60px)}}.spk{animation:spk 4.2s ease-in-out infinite}"
+            "@keyframes brth{0%,100%{transform:scaleY(1)}50%{transform:scaleY(.72)}}.brth{transform-box:fill-box;transform-origin:center;animation:brth 2.2s ease-in-out infinite}"
+            "@keyframes swl{to{stroke-dashoffset:-60}}.swl{stroke-dasharray:14 46;animation:swl 2.4s linear infinite}"
+            "@keyframes fsh{0%,100%{opacity:.28;transform:scale(1)}50%{opacity:.5;transform:scale(1.12)}}.fsh{transform-box:fill-box;transform-origin:center;animation:fsh 5s ease-in-out infinite}"
+            "@keyframes nz{0%,100%{transform:translateY(0)}50%{transform:translateY(2px)}}.nz{animation:nz 2.6s ease-in-out infinite}"
+            "@keyframes ttl{0%,20%{transform:translateX(-140px)}60%,100%{transform:translateX(360px)}}.ttl{animation:ttl 5s ease-in-out infinite}"
+            "@keyframes brush{0%{stroke-dashoffset:200}35%,85%{stroke-dashoffset:0}100%{stroke-dashoffset:-200}}.brush{stroke-dasharray:200;animation:brush 6s ease-in-out infinite}")
+    script_f = typo.font(typo.SCRIPT)
+
+    def fancy_title(text, x, y, col, tid):
+        td, tw_ = script_f.path(text, 30, x, y)
+        return (f'<clipPath id="{tid}"><path d="{td}"/></clipPath><path d="{td}" fill="url(#g1)"/>'
+                f'<g clip-path="url(#{tid})"><rect class="ttl" x="{x}" y="{y - 34}" width="46" height="46" fill="#fff" opacity=".7" transform="skewX(-22)"/></g>'
+                f'<path class="brush" d="M{x} {y + 10} q{tw_ * .25:.0f} -7 {tw_ * .5:.0f} -2 t{tw_ * .5:.0f} -3" fill="none" stroke="{col}" stroke-width="3" stroke-linecap="round" pathLength="200"/>'
+                f'{star4(x + tw_ + 14, y - 22, 6, col, "tw")}{star4(x + tw_ + 30, y - 6, 4, c["accent"], "tw", "style=" + chr(34) + "animation-delay:-1s" + chr(34))}')
+
     body += f'<g class="bb" style="animation-delay:-1s">{panel(0, 150, 405, 300, 4)}'
-    body += f'<path d="{mono.path("TOP LANGUAGES", 12, 28, 190, 3)[0]}" fill="{c["accent"]}"/>'
-    body += f'<path d="{body_f.path("liquid level = how much I code", 11.5, 28, 208)[0]}" fill="{c["muted"]}"/>'
-    TW, TOP, BOT, PITCH = 46, 238, 388, 70
+    body += fancy_title("Top Languages", 28, 196, c["accent"], "ttl1")
+    TW, TOP, BOT, PITCH = 46, 242, 388, 70
     x_start = 28 + (349 - PITCH * len(top)) / 2 + (PITCH - TW) / 2
     for i, (name, v) in enumerate(top):
         col = pal[i]
         x = x_start + i * PITCH
         r = TW / 2
-        inner_h = BOT - TOP
+        cxm = x + r
         lvl = .16 + .78 * math.sqrt(v / vmax)
-        ys = BOT - lvl * (inner_h - 6)
+        ys = BOT - lvl * (BOT - TOP - 10)
         tube = f"M{x} {TOP} V{BOT - r} A{r} {r} 0 0 0 {x + TW} {BOT - r} V{TOP}"
-        wave = lambda yy, amp, ph: ("M" + f"{x - 46 + ph:.1f} {yy:.1f} " + "".join(f"q{TW / 4:.1f} {-amp} {TW / 2:.1f} 0 t{TW / 2:.1f} 0 " for _ in range(5)) + f"V{BOT + 6} H{x - 46 + ph:.1f}Z")
-        bubbles = "".join(f'<circle class="bub" cx="{x + 10 + (k * 13) % (TW - 18):.1f}" cy="{BOT - 8 - (k % 2) * 6}" r="{1.6 + k * .5:.1f}" fill="#fff" fill-opacity=".7" style="--by:{-(BOT - ys - 16):.0f}px;animation-delay:{i * .35 + k * 1.1:.2f}s"/>' for k in range(3))
-        ticks = "".join(f'<line x1="{x + TW}" y1="{TOP + 20 + k * 38}" x2="{x + TW - (9 if k % 2 == 0 else 5)}" y2="{TOP + 20 + k * 38}" stroke="{c["muted"]}" stroke-opacity=".6" stroke-width="1.6" stroke-linecap="round"/>' for k in range(3))
+        bubbles = "".join(f'<circle class="bub" cx="{x + 10 + (k * 13) % (TW - 18):.1f}" cy="{BOT - 8 - (k % 2) * 6}" r="{1.6 + k * .5:.1f}" fill="#fff" fill-opacity=".75" style="--by:{-(BOT - ys - 16):.0f}px;animation-delay:{i * .35 + k * 1.1:.2f}s"/>' for k in range(3))
         pctv = 100 * v / total
         nd, nw = lab.path(name, 13.5, 0, 0)
         pd, pw = mono.path(f"{pctv:.1f}%", 12, 0, 0, 1)
-        cxm = x + r
+        ripples = "".join(f'<ellipse class="rpl" cx="{cxm}" cy="{ys:.1f}" rx="{r - 3}" ry="{(r - 3) * .3:.1f}" fill="none" stroke="#fff" stroke-width="1.5" style="animation-delay:{i * .5 + k * .12:.2f}s"/>' for k in range(2))
         body += (f'<clipPath id="tb{i}"><path d="{tube} Z"/></clipPath>'
-                 f'<ellipse class="tglow" cx="{cxm}" cy="{BOT - 6}" rx="34" ry="14" fill="{col}" style="animation-delay:-{i * .6:.1f}s"/>'
-                 # dropper nozzle, falling drop and splash
-                 f'<g class="nz" style="animation-delay:-{i * .5:.1f}s"><path d="M{cxm - 5} 214 h10 l-2 12 h-6z" fill="{c["line"]}"/><rect x="{cxm - 7}" y="211" width="14" height="4" rx="2" fill="{c["muted"]}" opacity=".7"/></g>'
-                 f'<path class="dr" d="M{cxm} 220 q-4 6 -4 9 a4 4 0 0 0 8 0 q0 -3 -4 -9z" fill="{col}" style="--dy:{ys - 228:.0f}px;animation-delay:{i * .5:.1f}s"/>'
-                 f'<ellipse class="spl" cx="{cxm}" cy="{ys:.1f}" rx="0" ry="2.4" fill="none" stroke="#fff" stroke-width="1.6" style="animation-delay:{i * .5:.1f}s"/>'
-                 # liquid
-                 f'<g clip-path="url(#tb{i})"><rect x="{x}" y="{TOP}" width="{TW}" height="{BOT - TOP}" fill="{c["page"]}" opacity=".25"/>'
-                 f'<g class="rise" style="--h:{BOT - ys + 8:.0f}px;animation-delay:{i * .14:.2f}s">'
-                 f'<path class="wv2" d="{wave(ys - 2, 3.2, 23)}" fill="{col}" opacity=".45"/><path class="wv" d="{wave(ys, 3.6, 0)}" fill="{col}"/>'
-                 f'<rect x="{x}" y="{ys + 6:.1f}" width="{TW}" height="{BOT - ys:.1f}" fill="{col}"/>'
-                 f'<rect x="{x}" y="{ys + 6:.1f}" width="{TW}" height="{BOT - ys:.1f}" fill="url(#shade)"/>{bubbles}</g></g>'
-                 # glass
-                 f'<path d="{tube}" fill="none" stroke="{c["ink"]}" stroke-opacity=".45" stroke-width="2.2" stroke-linecap="round"/>'
-                 f'<path d="M{x - 4} {TOP} H{x + TW + 4}" stroke="{c["ink"]}" stroke-opacity=".55" stroke-width="3" stroke-linecap="round"/>'
-                 f'<path d="M{x + 7} {TOP + 12} V{BOT - 26}" stroke="#fff" stroke-opacity=".4" stroke-width="3" stroke-linecap="round"/>{ticks}'
-                 f'<path d="{nd}" transform="translate({cxm - nw / 2:.1f} 412)" fill="{c["ink"]}"/>'
-                 f'<path d="{pd}" transform="translate({cxm - pw / 2:.1f} 432)" fill="{col}"/>')
+                 f'<ellipse class="fsh" cx="{cxm}" cy="{BOT + 4}" rx="{r + 10}" ry="8" fill="{col}" style="animation-delay:-{i * .7:.1f}s"/>'
+                 f'<ellipse cx="{cxm}" cy="{BOT + 3}" rx="{r + 3}" ry="5" fill="#000" opacity=".28"/>'
+                 f'<g class="nz" style="animation-delay:-{i * .5:.1f}s"><path d="M{cxm - 5} 218 h10 l-2 12 h-6z" fill="{c["line"]}"/><rect x="{cxm - 7}" y="215" width="14" height="4" rx="2" fill="{c["muted"]}" opacity=".7"/></g>'
+                 f'<g class="sway" style="transform-origin:{cxm}px {BOT}px;animation-delay:-{i * .9:.1f}s">'
+                 # back of the opening, glass body
+                 f'<ellipse cx="{cxm}" cy="{TOP}" rx="{r}" ry="6" fill="{c["page"]}" opacity=".5"/>'
+                 f'<path d="{tube} Z" fill="url(#glass)"/>'
+                 f'<g clip-path="url(#tb{i})"><g class="rise" style="--h:{BOT - ys + 12:.0f}px;animation-delay:{i * .14:.2f}s">'
+                 f'<rect x="{x}" y="{ys:.1f}" width="{TW}" height="{BOT - ys + 4:.1f}" fill="{col}"/>'
+                 f'<rect x="{x}" y="{ys:.1f}" width="{TW}" height="{BOT - ys + 4:.1f}" fill="url(#cyl)"/>'
+                 # liquid surface seen in perspective
+                 f'<ellipse cx="{cxm}" cy="{ys:.1f}" rx="{r - 1}" ry="6" fill="{col}"/><ellipse class="brth" cx="{cxm}" cy="{ys:.1f}" rx="{r - 1}" ry="6" fill="#fff" opacity=".35"/>'
+                 f'<ellipse class="swl" cx="{cxm}" cy="{ys:.1f}" rx="{r - 6}" ry="3.2" fill="none" stroke="#fff" stroke-opacity=".8" stroke-width="1.8" stroke-linecap="round" pathLength="60"/>'
+                 f'{ripples}{bubbles}</g>'
+                 f'<rect class="spk" x="{x}" y="{TOP}" width="9" height="{BOT - TOP}" fill="#fff" opacity=".3" transform="skewX(-8)"/></g>'
+                 f'<path d="{tube}" fill="none" stroke="{c["ink"]}" stroke-opacity=".5" stroke-width="2.2" stroke-linecap="round"/>'
+                 f'<ellipse cx="{cxm}" cy="{TOP}" rx="{r + 2.5}" ry="6.5" fill="none" stroke="{c["ink"]}" stroke-opacity=".7" stroke-width="2.4"/>'
+                 f'<path d="M{x + 6} {TOP + 14} V{BOT - 26}" stroke="#fff" stroke-opacity=".45" stroke-width="3" stroke-linecap="round"/></g>'
+                 f'<path class="dr" d="M{cxm} 224 q-4 6 -4 9 a4 4 0 0 0 8 0 q0 -3 -4 -9z" fill="{col}" style="--dy:{ys - 232:.0f}px;animation-delay:{i * .5:.1f}s"/>'
+                 f'<path d="{nd}" transform="translate({cxm - nw / 2:.1f} 416)" fill="{c["ink"]}"/>'
+                 f'<path d="{pd}" transform="translate({cxm - pw / 2:.1f} 436)" fill="{col}"/>')
     body += "</g>"
     # ---------------------------------------------------------------- streak
     cur = streak["current"]
@@ -279,7 +294,7 @@ def dashboard_svg(mode: str, stats: dict, langs: list[tuple[str, int]], streak: 
     css += dcss
     embers = "".join(f'<circle class="emb" cx="{cx + (k - 2.5) * 6}" cy="{cy - 36}" r="{1.4 + (k % 3) * .5:.1f}" fill="{[c["pink"], c["accent"], "#F59E0B"][k % 3]}" style="--ex:{(k - 2.5) * 5:.0f}px;animation-delay:{k * .4:.1f}s"/>' for k in range(6))
     body += f'<g class="bb" style="animation-delay:-2s">{panel(425, 150, 405, 300, 5)}'
-    body += f'<path d="{mono.path("CONTRIBUTION STREAK", 12, 453, 190, 3)[0]}" fill="{c["pink"]}"/>'
+    body += fancy_title("Contribution Streak", 453, 196, c["pink"], "ttl2")
     body += (f'<circle class="aura" cx="{cx}" cy="{cy}" r="{r + 4}" fill="url(#aura)"/>{ticks}'
              f'<circle cx="{cx}" cy="{cy}" r="{r}" fill="none" stroke="{c["line"]}" stroke-width="10"/>'
              f'<circle class="rg" cx="{cx}" cy="{cy}" r="{r}" fill="none" stroke="url(#g1)" stroke-width="10" stroke-linecap="round" stroke-dasharray="{circ:.0f}" '
@@ -311,7 +326,9 @@ def dashboard_svg(mode: str, stats: dict, langs: list[tuple[str, int]], streak: 
                  f'<clipPath id="sk{i}"><rect x="{px}" y="{y}" width="148" height="76" rx="18"/></clipPath><g clip-path="url(#sk{i})"><rect class="sweep" x="{px - 70}" y="{y}" width="24" height="76" fill="{col}" opacity=".16" transform="skewX(-20)" style="animation-delay:{i * 1.3:.1f}s"/></g>'
                  f'<g transform="translate(0 -8)">{glyph}</g><path d="{ld}" fill="{col}" transform="translate(0 -8)"/>{sdig}')
     body += star4(790, 190, 6, c["accent"], "tw") + "</g>"
-    defs_extra = (f'<linearGradient id="shade" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity=".25"/><stop offset=".35" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".28"/></linearGradient>'
+    defs_extra = (f'<linearGradient id="cyl" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#000" stop-opacity=".38"/><stop offset=".22" stop-color="#fff" stop-opacity=".22"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".45"/></linearGradient>'
+                  f'<linearGradient id="glass" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="{c["ink"]}" stop-opacity=".16"/><stop offset=".3" stop-color="{c["ink"]}" stop-opacity=".03"/><stop offset="1" stop-color="{c["ink"]}" stop-opacity=".12"/></linearGradient>'
+                  + f'<linearGradient id="shade" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity=".25"/><stop offset=".35" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".28"/></linearGradient>'
                   f'<radialGradient id="aura"><stop offset="0" stop-color="{c["pink"]}" stop-opacity=".5"/><stop offset="1" stop-color="{c["pink"]}" stop-opacity="0"/></radialGradient>')
     return doc(W, H, body, css, _grad(c, "g1") + defs_extra, "GitHub stats: commits, pull requests, stars, followers, top languages and contribution streak", pad_y=8)
 

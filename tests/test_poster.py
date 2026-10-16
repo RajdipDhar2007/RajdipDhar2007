@@ -69,7 +69,7 @@ def test_committed_assets_fit_the_budget():
 def test_readme_references_existing_files():
     text = (ROOT / "README.md").read_text(encoding="utf-8")
     for ref in re.findall(r'(?:src|srcset|href)="(?!https?:|mailto:|#)([^"]+)"', text):
-        assert (ROOT / ref).exists(), f"README references missing file {ref}"
+        assert (ROOT / ref.split("?")[0]).exists(), f"README references missing file {ref}"
     assert text.count("<picture>") >= 20
 
 

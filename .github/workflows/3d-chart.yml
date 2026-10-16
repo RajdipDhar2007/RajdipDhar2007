@@ -2,7 +2,7 @@ name: 3D contribution chart
 
 on:
   schedule:
-    - cron: "30 18 * * *"
+    - cron: "20 */3 * * *"
   workflow_dispatch:
 
 permissions:
@@ -32,11 +32,13 @@ jobs:
           fetch contribution-dark.svg  "colors=1B2A41&colors=0E7490&colors=22D3EE&colors=A78BFA&colors=F472B6&strokeColor=0D1117&dark=true"
           fetch contribution-light.svg "colors=E6ECF5&colors=9EC5FE&colors=4C9AFF&colors=8250DF&colors=D6336C&strokeColor=FFFFFF"
 
+      - name: Bust the README image cache
+        run: python scripts/bust.py 3d
       - name: Commit
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add assets/3d/
+          git add README.md assets/3d/
           if git diff --cached --quiet; then echo "nothing to commit"; exit 0; fi
           git commit -m "chore: refresh 3D contribution chart [skip ci]"
           # other workflows may push at the same time: rebase and retry instead of failing

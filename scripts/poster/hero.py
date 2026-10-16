@@ -500,7 +500,7 @@ def greeting_svg(mode: str, text: str, stamp: str, scene="morning", slot=None) -
         scene = "night" if scene else "morning"
     c = PAL[mode]
     warm = "#FB923C" if mode == "dark" else "#EA580C"
-    W, H = 830, 98
+    W, H = 830, 88
     hf, bf = typo.font(typo.HEAD), typo.font(typo.MONO)
     d, w = hf.path(text, 18, 104, 38)
     sd, sw = bf.path(stamp, 11.5, 122, 60)
@@ -520,7 +520,8 @@ def greeting_svg(mode: str, text: str, stamp: str, scene="morning", slot=None) -
            "@keyframes steam{0%{transform:translateY(0);opacity:0}30%{opacity:.8}100%{transform:translateY(-8px);opacity:0}}.steam{animation:steam 2.4s ease-in infinite}"
            "@keyframes leaf{0%{transform:translate(0,-10px) rotate(0);opacity:0}15%{opacity:.8}100%{transform:translate(-120px,100px) rotate(240deg);opacity:0}}.leaf{animation:leaf 9s linear infinite}"
            "@keyframes pad{0%,100%{transform:rotate(-8deg)}50%{transform:rotate(8deg)}}.pad{transform-box:fill-box;transform-origin:center;animation:pad 1.6s ease-in-out infinite}" + _tw())
-    defs = _grad(c, "g1")
+    defs = _grad(c, "g1") + (f'<linearGradient id="fade" x1="0" y1="0" x2="1" y2="0"><stop offset=".42" stop-color="#fff" stop-opacity="0"/><stop offset=".78" stop-color="#fff" stop-opacity="1"/></linearGradient>'
+                             f'<mask id="sm" maskUnits="userSpaceOnUse" x="0" y="0" width="{W}" height="{H}"><rect width="{W}" height="{H}" fill="url(#fade)"/></mask>')
     scn = ""
     if scene == "night":      # crescent + twinkles
         icon_svg = (f'<path d="M52 22 a20 20 0 1 0 12 36 a16 16 0 1 1 -12 -36z" fill="{c["second"]}"/>'
@@ -559,19 +560,6 @@ def greeting_svg(mode: str, text: str, stamp: str, scene="morning", slot=None) -
         rays = "".join(f'<line x1="42" y1="10" x2="42" y2="18" stroke="{c["accent"]}" stroke-width="3" stroke-linecap="round" transform="rotate({a} 42 42)"/>' for a in range(0, 360, 45))
         icon_svg = f'<g class="spin">{rays}</g><circle cx="42" cy="42" r="12" fill="{c["pink"]}"/>'
         scn = "".join(f'<g class="cld" style="animation-delay:-{k * 5}s;animation-duration:{18 + k * 4}s"><ellipse cx="540" cy="{20 + k * 20}" rx="30" ry="9" fill="{c["accent"]}" opacity=".18"/><ellipse cx="560" cy="{14 + k * 20}" rx="20" ry="8" fill="{c["accent"]}" opacity=".18"/></g>' for k in range(3))
-    slot = slot or (scene if scene in SLOTS else "morning")
-    # day timeline: four slots, the current one lit with a travelling glow
-    names = [("morning", "MORNING", "05-12"), ("afternoon", "AFTERNOON", "12-17"), ("evening", "EVENING", "17-22"), ("night", "NIGHT", "22-05")]
-    tl, tx, sw_, gap = "", 104, 118, 8
-    for k, (key, nm, rng_) in enumerate(names):
-        x0 = tx + k * (sw_ + gap)
-        on = key == slot
-        lab, _ = bf.path(nm, 8.5, x0 + 10, 85, 1.2)
-        tl += (f'<rect x="{x0}" y="76" width="{sw_}" height="14" rx="7" fill="{"url(#g1)" if on else "none"}" fill-opacity="{1 if on else 0}" stroke="{c["line"] if not on else "none"}"/>'
-               f'<path d="{lab}" fill="{"#0D1117" if (on and mode == "dark") else ("#fff" if on else c["muted"])}"/>')
-        if on:
-            tl += (f'<clipPath id="tlc"><rect x="{x0}" y="76" width="{sw_}" height="14" rx="7"/></clipPath><g clip-path="url(#tlc)"><rect class="tlg" x="{x0 - 30}" y="76" width="22" height="14" fill="#fff" opacity=".5" transform="skewX(-20)"/></g>'
-                   f'<rect class="tlp" x="{x0}" y="76" width="{sw_}" height="14" rx="7" fill="none" stroke="{c["accent"]}" stroke-width="2"/>')
     chip = ""
     if scene in ("saturday", "sunday"):
         lab_t = "SATURDAY MODE" if scene == "saturday" else "SUNDAY MODE"
@@ -586,14 +574,14 @@ def greeting_svg(mode: str, text: str, stamp: str, scene="morning", slot=None) -
             "@keyframes rsp{to{transform:rotate(360deg)}}.rsp{transform-box:fill-box;transform-origin:center;animation:rsp 24s linear infinite}"
             "@keyframes live{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(1.6)}}.live{transform-box:fill-box;transform-origin:center;animation:live 1.4s ease-in-out infinite}"
             "@keyframes brd{from{transform:rotate(0)}to{transform:rotate(360deg)}}")
-    body = (f'<clipPath id="gc"><rect x="1" y="1" width="{W - 2}" height="{H - 2}" rx="28"/></clipPath><g clip-path="url(#gc)"><g transform="scale(1 1.17)">{scn}</g></g>'
+    body = (f'<clipPath id="gc"><rect x="1" y="1" width="{W - 2}" height="{H - 2}" rx="28"/></clipPath><g clip-path="url(#gc)"><g mask="url(#sm)"><g transform="scale(1 1.05)">{scn}</g></g></g>'
             f'<rect x=".5" y=".5" width="{W - 1}" height="{H - 1}" rx="28" fill="none" stroke="{c["line"]}"/>'
             f'<rect class="run" x=".5" y=".5" width="{W - 1}" height="{H - 1}" rx="28" fill="none" stroke="url(#g1)" stroke-width="2.6" pathLength="400"/>'
-            f'<circle class="rsp" cx="52" cy="49" r="36" fill="none" stroke="url(#g1)" stroke-width="1.8" stroke-dasharray="4 8" stroke-linecap="round"/>'
-            f'<g transform="translate(10 7)">{icon_svg}</g>'
+            f'<circle class="rsp" cx="52" cy="44" r="36" fill="none" stroke="url(#g1)" stroke-width="1.8" stroke-dasharray="4 8" stroke-linecap="round"/>'
+            f'<g transform="translate(10 2)">{icon_svg}</g>'
             f'<clipPath id="tx"><path d="{d}"/></clipPath><g class="typ"><path d="{d}" fill="{c["ink"]}"/>'
             f'<g clip-path="url(#tx)"><rect class="shm" x="104" y="14" width="70" height="34" fill="url(#g1)" opacity=".9" transform="skewX(-20)"/></g></g>'
-            f'<circle class="live" cx="108" cy="56" r="3.4" fill="{c["green"]}"/><path d="{sd}" fill="{c["muted"]}"/>{chip}{tl}')
+            f'<circle class="live" cx="108" cy="56" r="3.4" fill="{c["green"]}"/><path d="{sd}" fill="{c["muted"]}"/>{chip}')
     return doc(W, H, body, css, defs, text)
 
 

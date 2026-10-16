@@ -2,8 +2,8 @@ name: Live greeting
 
 on:
   schedule:
-    # exactly on the IST slot boundaries 05:00, 12:00, 17:00, 22:00 (= 23:30, 06:30, 11:30, 16:30 UTC),
-    - cron: "30 23,6,11,16 * * *"
+    # hourly on the IST hour (= :30 UTC); this includes the slot boundaries 05:00, 12:00, 17:00, 22:00 IST
+    - cron: "30 * * * *"
   workflow_dispatch:
 
 permissions:
@@ -23,11 +23,13 @@ jobs:
           python-version: "3.12"
       - run: pip install fonttools
       - run: python scripts/greeting.py
+      - name: Bust the README image cache
+        run: python scripts/bust.py live
       - name: Commit
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add assets/live/
+          git add README.md assets/live/
           if git diff --cached --quiet; then echo "nothing to commit"; exit 0; fi
           git commit -m "chore: refresh greeting [skip ci]"
           # other workflows may push at the same time: rebase and retry instead of failing

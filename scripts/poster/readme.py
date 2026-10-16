@@ -3,6 +3,7 @@
     python scripts/poster/readme.py
 """
 from __future__ import annotations
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -35,6 +36,18 @@ def card(key: str, name: str, band_url: str) -> str:
     return (f'<td width="50%" align="center" valign="top">\n'
             f'<a href="https://github.com/{owner}/{name}">{top}</a><br>\n'
             f'<a href="{band_url}">{band}</a>\n</td>')
+
+
+def more_pills(owner: str) -> str:
+    """One linked pill per repository; the last one ("and more") opens the repositories page."""
+    pills = [("TaskFlow", "TaskFlow"), ("MathForge", "MathForge"), ("Rack Up, a Web3 game on Base Sepolia", "Rack_Up-Onchain_Hi-Lo"),
+             ("Periodic Table", "Periodic-Table"), ("and more repositories", None)]
+    out = []
+    for k, (alt, repo) in enumerate(pills):
+        url = f"https://github.com/{owner}/{repo}" if repo else f"https://github.com/{owner}?tab=repositories"
+        img = pic("assets/sections/more-" + str(k) + "-{m}.svg", alt, "", 'align="top"').replace(' width=""', "")
+        out.append(f'<a href="{url}">{img}</a>')
+    return "\n".join(out)
 
 
 def main() -> None:
@@ -78,7 +91,10 @@ def main() -> None:
 </tr>
 </table>
 
-<p align="center"><a href="https://github.com/{owner}?tab=repositories">{pic("assets/sections/more-{m}.svg", "More on my repositories page: TaskFlow, MathForge, Rack Up (Web3 game on Base Sepolia), Periodic Table and more")}</a></p>
+<p align="center"><a href="https://github.com/{owner}?tab=repositories">{pic("assets/sections/more-{m}.svg", "More from my repositories: open the repositories page")}</a></p>
+<p align="center">
+{more_pills(owner)}
+</p>
 
 {title("stats", "By the numbers")}
 <p align="center">{pic("assets/stats/dashboard-{m}.svg", "GitHub stats: commits, pull requests, stars, followers, top languages and contribution streak")}</p>
@@ -105,7 +121,10 @@ def main() -> None:
 {pic("assets/banners/footer-{m}.svg", "Thanks for stopping by")}
 </div>
 '''
-    README.write_text(out, encoding="utf-8")
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+    from bust import carry
+    old = README.read_text(encoding="utf-8") if README.exists() else ""
+    README.write_text(carry(old, out), encoding="utf-8")
     print("README.md written")
 
 

@@ -2,7 +2,7 @@ name: Stats dashboard
 
 on:
   schedule:
-    - cron: "0 1 * * *"
+    - cron: "10 * * * *"
   workflow_dispatch:
 
 permissions:
@@ -30,11 +30,13 @@ jobs:
           GITHUB_REPOSITORY_OWNER: ${{ github.repository_owner }}
         run: python scripts/cards.py
 
+      - name: Bust the README image cache
+        run: python scripts/bust.py stats
       - name: Commit
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add assets/stats/
+          git add README.md assets/stats/
           if git diff --cached --quiet; then echo "nothing to commit"; exit 0; fi
           git commit -m "chore: refresh stats dashboard [skip ci]"
           # other workflows may push at the same time: rebase and retry instead of failing
