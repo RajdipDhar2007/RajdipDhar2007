@@ -31,6 +31,12 @@ def greeting(now: dt.datetime) -> tuple[str, str]:
     return "Night in Kolkata. Rajdip is probably debugging", "night"
 
 
+def slot(now: dt.datetime) -> str:
+    """Time-of-day slot in IST: morning 05-12, afternoon 12-17, evening 17-22, night 22-05."""
+    h = now.astimezone(IST).hour
+    return "morning" if 5 <= h < 12 else "afternoon" if 12 <= h < 17 else "evening" if 17 <= h < 22 else "night"
+
+
 def stamp(now: dt.datetime) -> str:
     return "Last auto-updated: " + now.astimezone(IST).strftime("%Y-%m-%d %H:%M IST")
 
@@ -39,7 +45,7 @@ def main() -> None:
     now = dt.datetime.now(dt.timezone.utc)
     text, scene = greeting(now)
     for m in MODES:
-        write(OUT / "live" / f"greeting-{m}.svg", greeting_svg(m, text, stamp(now), scene))
+        write(OUT / "live" / f"greeting-{m}.svg", greeting_svg(m, text, stamp(now), scene, slot(now)))
 
 
 if __name__ == "__main__":

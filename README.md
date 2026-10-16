@@ -55,7 +55,7 @@
 </tr>
 </table>
 
-<p align="center"><sub>More on my <a href="https://github.com/RajdipDhar2007?tab=repositories">repositories</a> page: TaskFlow, MathForge, Rack Up (Web3 game on Base Sepolia), Periodic Table and more.</sub></p>
+<p align="center"><a href="https://github.com/RajdipDhar2007?tab=repositories"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/sections/more-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/sections/more-light.svg"><img alt="More on my repositories page: TaskFlow, MathForge, Rack Up (Web3 game on Base Sepolia), Periodic Table and more" src="assets/sections/more-light.svg" width="100%" ></picture></a></p>
 
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/sections/divider2-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/sections/divider2-light.svg"><img alt="" src="assets/sections/divider2-light.svg" width="100%" ></picture></p>
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/titles/stats-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/titles/stats-light.svg"><img alt="By the numbers" src="assets/titles/stats-light.svg" width="100%" ></picture></p>
@@ -85,7 +85,6 @@
 <a href="https://github.com/RajdipDhar2007"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/contact/github-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/contact/github-light.svg"><img alt="Rajdip on GitHub" src="assets/contact/github-light.svg" width="250" ></picture></a>
 <!-- TODO_RAJDIP: add LinkedIn, portfolio, LeetCode / Codeforces and X pills (see contact_pill() in scripts/poster/hero.py) -->
 </p>
-<p align="center"><sub>Fastest reply: email &middot; open to internships and collaborations</sub></p>
 
 <p align="center"><a href="https://github.com/RajdipDhar2007/RajdipDhar2007"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/sections/star-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/sections/star-light.svg"><img alt="Enjoyed the tour? Star this repo" src="assets/sections/star-light.svg" width="100%" ></picture></a></p>
 

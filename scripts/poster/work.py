@@ -74,8 +74,8 @@ def toolbox(mode: str) -> str:
     for p in PILLS:
         pw = pf.width(p, 15) + 62
         pills.append((p, pw))
-        tot += pw + 12
-    x = (W - tot + 12) / 2
+        tot += pw + 10
+    x = (W - tot + 10) / 2
     for i, (p, pw) in enumerate(pills):
         pd, _ = pf.path(p, 15, x + 38, y + 29)
         body += (f'<g class="tl" style="animation-delay:-{i * .8:.1f}s"><rect x="{x:.1f}" y="{y}" width="{pw:.1f}" height="44" rx="22" fill="{c["card"]}" stroke="url(#g1)" stroke-width="1.6"/>'
@@ -230,9 +230,84 @@ def action_band(p: dict, mode: str, idx: int) -> str:
     return doc(W, H, body, css, _grad(c, "g1"), f"{verb} {p['name']}: " + " ".join(p["band"]["sub"].split()))
 
 
+MORE = [("TaskFlow", "task"), ("MathForge", "sigma"), ("Rack Up", "game"), ("Periodic Table", "atom"), ("and more", "plus")]
+
+
+def _more_glyph(kind: str, col: str, c: dict) -> str:
+    """Tiny animated glyph, drawn around (0,0) in a ~22px box."""
+    if kind == "task":
+        return (f'<rect x="-9" y="-9" width="18" height="18" rx="5" fill="none" stroke="{col}" stroke-width="2.4"/>'
+                f'<path class="chk2" d="M-4 0 L-1 3.5 L5 -4" fill="none" stroke="{col}" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" pathLength="100"/>')
+    if kind == "sigma":
+        return f'<g class="swing"><path d="M6 -9 H-6 L1 0 L-6 9 H7" fill="none" stroke="{col}" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></g>'
+    if kind == "game":
+        return (f'<g class="swing"><path d="M0 -10 L9 -5 V5 L0 10 L-9 5 V-5Z" fill="none" stroke="{col}" stroke-width="2.4" stroke-linejoin="round"/>'
+                f'<path d="M0 0 L9 -5 M0 0 L-9 -5 M0 0 V10" stroke="{col}" stroke-width="1.8" stroke-linecap="round"/></g>')
+    if kind == "atom":
+        return (f'<g class="spin2"><ellipse rx="10" ry="4" fill="none" stroke="{col}" stroke-width="1.8"/><ellipse rx="10" ry="4" fill="none" stroke="{col}" stroke-width="1.8" transform="rotate(60)"/>'
+                f'<ellipse rx="10" ry="4" fill="none" stroke="{col}" stroke-width="1.8" transform="rotate(120)"/></g><circle r="2.6" fill="{col}"/>')
+    return star4(0, 0, 11, col, "tw")
+
+
+def more_repos(mode: str) -> str:
+    """'More on my repositories' banner: floating pills, each with a live glyph, under a flowing headline."""
+    c = PAL[mode]
+    W, H = 830, 132
+    hf, mf = typo.font(typo.HEAD), typo.font(typo.MONO_B)
+    cols = [c["accent"], c["second"], c["pink"], c["green"], c["accent"]]
+    head, hw = mf.path("MORE FROM MY REPOSITORIES", 12, 0, 0, 4)
+    pills, tot = [], 0
+    for k, (name, kind) in enumerate(MORE):
+        tw = hf.width(name, 14.5)
+        extra = 0
+        if name == "Rack Up":
+            bd, bw = mf.path("BASE SEPOLIA", 8, 0, 0, .8)
+            extra = bw + 16
+        pw = tw + 50 + extra
+        pills.append((name, kind, pw, tw, extra))
+        tot += pw + 10
+    x = (W - tot + 10) / 2
+    css = ("@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}.pl{animation:bob 4.4s ease-in-out infinite}"
+           "@keyframes run{to{stroke-dashoffset:-400}}.run{stroke-dasharray:70 330;animation:run 4.5s linear infinite}"
+           "@keyframes shn{0%{transform:translateX(0)}45%,100%{transform:translateX(220px)}}.shn{animation:shn 4.8s ease-in-out infinite}"
+           "@keyframes flow{0%{stroke-dashoffset:100}100%{stroke-dashoffset:-100}}.flow{stroke-dasharray:18 82;animation:flow 2.4s linear infinite}"
+           "@keyframes chk2{0%,20%{stroke-dasharray:0 100}50%,85%{stroke-dasharray:100 0}100%{stroke-dasharray:0 100}}.chk2{animation:chk2 3.6s ease-in-out infinite}"
+           "@keyframes swing{0%,100%{transform:rotate(-14deg)}50%{transform:rotate(14deg)}}.swing{animation:swing 2.8s ease-in-out infinite}"
+           "@keyframes spin2{to{transform:rotate(360deg)}}.spin2{animation:spin2 6s linear infinite}"
+           "@keyframes arw{0%,100%{transform:translateX(0)}50%{transform:translateX(7px)}}.arw{animation:arw 1.3s ease-in-out infinite}"
+           "@keyframes mq{from{transform:translateX(0)}to{transform:translateX(-80px)}}.mq{animation:mq 4s linear infinite}"
+           "@keyframes gl{0%,100%{opacity:.1;transform:scale(1)}50%{opacity:.28;transform:scale(1.2)}}.gl{transform-box:fill-box;transform-origin:center;animation:gl 3s ease-in-out infinite}" + _tw())
+    body = (f'<clipPath id="mc"><rect x="1" y="1" width="{W - 2}" height="{H - 2}" rx="28"/></clipPath>'
+            f'<rect x=".5" y=".5" width="{W - 1}" height="{H - 1}" rx="28" fill="{c["card"]}" stroke="{c["line"]}"/>'
+            # drifting dotted grid behind
+            f'<g clip-path="url(#mc)"><g class="mq">' + "".join(f'<circle cx="{gx * 20}" cy="{gy * 20 + 6}" r="1.3" fill="{c["line"]}"/>' for gx in range(-4, 48) for gy in range(0, 7)) + '</g></g>'
+            f'<rect class="run" x=".5" y=".5" width="{W - 1}" height="{H - 1}" rx="28" fill="none" stroke="url(#g1)" stroke-width="2.6" pathLength="400"/>'
+            f'<path d="{head}" transform="translate({(W - hw) / 2:.1f} 36)" fill="url(#g1)"/>'
+            f'{star4((W - hw) / 2 - 22, 31, 6, c["accent"], "tw")}{star4((W + hw) / 2 + 22, 31, 6, c["pink"], "tw", "style=" + chr(34) + "animation-delay:-1.2s" + chr(34))}'
+            f'<line x1="{(W - hw) / 2}" y1="48" x2="{(W + hw) / 2}" y2="48" stroke="{c["line"]}" stroke-width="2" stroke-linecap="round"/>'
+            f'<line class="flow" x1="{(W - hw) / 2}" y1="48" x2="{(W + hw) / 2}" y2="48" stroke="url(#g1)" stroke-width="3" stroke-linecap="round" pathLength="100"/>')
+    for k, (name, kind, pw, tw, extra) in enumerate(pills):
+        col = cols[k]
+        nd, _ = hf.path(name, 14.5, x + 42, 100)
+        body += (f'<g class="pl" style="animation-delay:-{k * .85:.2f}s"><clipPath id="pk{k}"><rect x="{x:.1f}" y="66" width="{pw:.1f}" height="44" rx="22"/></clipPath>'
+                 f'<circle class="gl" cx="{x + 24:.1f}" cy="88" r="20" fill="{col}" style="animation-delay:-{k * .6:.1f}s"/>'
+                 f'<rect x="{x:.1f}" y="66" width="{pw:.1f}" height="44" rx="22" fill="{c["card"]}" fill-opacity=".85" stroke="{col}" stroke-opacity=".7" stroke-width="1.6"/>'
+                 f'<g clip-path="url(#pk{k})"><rect class="shn" x="{x - 60:.1f}" y="66" width="26" height="44" fill="#fff" opacity=".12" transform="skewX(-20)" style="animation-delay:-{k * .9:.1f}s"/></g>'
+                 f'<g transform="translate({x + 24:.1f} 88)">{_more_glyph(kind, col, c)}</g><path d="{nd}" fill="{c["ink"]}"/>')
+        if extra:
+            bd, bw = mf.path("BASE SEPOLIA", 8, x + 42 + tw + 12, 93, .8)
+            body += f'<rect x="{x + 42 + tw + 6:.1f}" y="80" width="{bw + 12:.1f}" height="16" rx="8" fill="{col}" opacity=".16"/><path d="{bd}" fill="{col}"/>'
+        body += "</g>"
+        x += pw + 10
+    # call-to-action arrow on the right edge
+    body += (f'<g class="arw"><path d="M{W - 56} 30 h20 m-8 -8 l8 8 l-8 8" fill="none" stroke="url(#g1)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>')
+    return doc(W, H, body, css, _grad(PAL[mode], "g1"), "More on my repositories page: TaskFlow, MathForge, Rack Up (Web3 game on Base Sepolia), Periodic Table and more", pad_y=8)
+
+
 def build():
     for m in MODES:
         write(OUT / "sections" / f"toolbox-{m}.svg", toolbox(m))
+        write(OUT / "sections" / f"more-{m}.svg", more_repos(m))
         for i, p in enumerate(PROJECTS):
             write(OUT / "projects" / f"{p['key']}-{m}.svg", project_card(p, m, i))
             write(OUT / "projects" / f"{p['key']}-band-{m}.svg", action_band(p, m, i))

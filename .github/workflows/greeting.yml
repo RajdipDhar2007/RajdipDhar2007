@@ -2,7 +2,8 @@ name: Live greeting
 
 on:
   schedule:
-    - cron: "0 0,6,12,18 * * *"
+    # exactly on the IST slot boundaries 05:00, 12:00, 17:00, 22:00 (= 23:30, 06:30, 11:30, 16:30 UTC),
+    - cron: "30 23,6,11,16 * * *"
   workflow_dispatch:
 
 permissions:

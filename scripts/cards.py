@@ -196,44 +196,124 @@ def dashboard_svg(mode: str, stats: dict, langs: list[tuple[str, int]], streak: 
         css += dcss
         body += (f'<g class="bb" style="animation-delay:-{i * .9:.1f}s">{panel(x, 8, 190, 120, i)}{art(x + 112, 22, col, c)}'
                  f'{ic(x + 24, 34)}{digits}<path d="{lab.path(label, 13, x + 24, 118)[0]}" fill="{c["muted"]}"/></g>')
-    # languages panel
+    # ---------------------------------------------------------------- languages: test tubes
+    import math
     top = langs[:5]
+    vmax = max((v for _, v in top), default=1) or 1
     total = sum(v for _, v in top) or 1
     pal = [c["accent"], c["second"], c["pink"], c["green"], "#F59E0B"]
+    css += ("@keyframes rise{0%{transform:translateY(var(--h))}20%,88%{transform:translateY(0)}100%{transform:translateY(var(--h))}}.rise{animation:rise 10s cubic-bezier(.3,.8,.2,1) infinite both}"
+            "@keyframes wv{to{transform:translateX(-46px)}}.wv{animation:wv 1.6s linear infinite}.wv2{animation:wv 2.4s linear infinite reverse}"
+            "@keyframes dr{0%{transform:translateY(0) scale(.5);opacity:0}12%{opacity:1;transform:translateY(0) scale(1)}58%{transform:translateY(var(--dy));opacity:1}60%,100%{transform:translateY(var(--dy));opacity:0}}.dr{animation:dr 2.6s ease-in infinite}"
+            "@keyframes spl{0%,58%{rx:0;opacity:0}60%{rx:3;opacity:.9}100%{rx:17;opacity:0}}.spl{animation:spl 2.6s ease-out infinite}"
+            "@keyframes bub{0%{transform:translateY(0) scale(.6);opacity:0}15%{opacity:.8}100%{transform:translateY(var(--by));opacity:0}}.bub{animation:bub 3.4s ease-in infinite}"
+            "@keyframes tglow{0%,100%{opacity:.14;transform:scale(1)}50%{opacity:.34;transform:scale(1.15)}}.tglow{transform-box:fill-box;transform-origin:center;animation:tglow 3s ease-in-out infinite}"
+            "@keyframes nz{0%,100%{transform:translateY(0)}50%{transform:translateY(2px)}}.nz{animation:nz 2.6s ease-in-out infinite}")
     body += f'<g class="bb" style="animation-delay:-1s">{panel(0, 150, 405, 300, 4)}'
     body += f'<path d="{mono.path("TOP LANGUAGES", 12, 28, 190, 3)[0]}" fill="{c["accent"]}"/>'
+    body += f'<path d="{body_f.path("liquid level = how much I code", 11.5, 28, 208)[0]}" fill="{c["muted"]}"/>'
+    TW, TOP, BOT, PITCH = 46, 238, 388, 70
+    x_start = 28 + (349 - PITCH * len(top)) / 2 + (PITCH - TW) / 2
     for i, (name, v) in enumerate(top):
-        y = 218 + i * 44
+        col = pal[i]
+        x = x_start + i * PITCH
+        r = TW / 2
+        inner_h = BOT - TOP
+        lvl = .16 + .78 * math.sqrt(v / vmax)
+        ys = BOT - lvl * (inner_h - 6)
+        tube = f"M{x} {TOP} V{BOT - r} A{r} {r} 0 0 0 {x + TW} {BOT - r} V{TOP}"
+        wave = lambda yy, amp, ph: ("M" + f"{x - 46 + ph:.1f} {yy:.1f} " + "".join(f"q{TW / 4:.1f} {-amp} {TW / 2:.1f} 0 t{TW / 2:.1f} 0 " for _ in range(5)) + f"V{BOT + 6} H{x - 46 + ph:.1f}Z")
+        bubbles = "".join(f'<circle class="bub" cx="{x + 10 + (k * 13) % (TW - 18):.1f}" cy="{BOT - 8 - (k % 2) * 6}" r="{1.6 + k * .5:.1f}" fill="#fff" fill-opacity=".7" style="--by:{-(BOT - ys - 16):.0f}px;animation-delay:{i * .35 + k * 1.1:.2f}s"/>' for k in range(3))
+        ticks = "".join(f'<line x1="{x + TW}" y1="{TOP + 20 + k * 38}" x2="{x + TW - (9 if k % 2 == 0 else 5)}" y2="{TOP + 20 + k * 38}" stroke="{c["muted"]}" stroke-opacity=".6" stroke-width="1.6" stroke-linecap="round"/>' for k in range(3))
         pctv = 100 * v / total
-        nd, _ = lab.path(name, 14, 28, y)
-        pd, pw = lab.path(f"{pctv:.1f}%", 13, 0, y)
-        body += (f'<path d="{nd}" fill="{c["ink"]}"/><path d="{pd}" transform="translate({377 - pw:.0f} 0)" fill="{c["muted"]}"/>'
-                 f'<rect x="28" y="{y + 9}" width="349" height="8" rx="4" fill="{c["line"]}"/>'
-                 f'<rect class="gr" x="28" y="{y + 9}" width="{max(349 * v / total, 6):.1f}" height="8" rx="4" fill="{pal[i]}" style="animation-delay:{i * .12:.2f}s"/>'
-                 f'<clipPath id="bc{i}"><rect x="28" y="{y + 9}" width="{max(349 * v / total, 6):.1f}" height="8" rx="4"/></clipPath>'
-                 f'<g clip-path="url(#bc{i})"><rect class="bshine" x="0" y="{y + 9}" width="26" height="8" fill="#fff" opacity=".55" transform="skewX(-25)" style="animation-delay:{i * .5:.1f}s"/></g>')
+        nd, nw = lab.path(name, 13.5, 0, 0)
+        pd, pw = mono.path(f"{pctv:.1f}%", 12, 0, 0, 1)
+        cxm = x + r
+        body += (f'<clipPath id="tb{i}"><path d="{tube} Z"/></clipPath>'
+                 f'<ellipse class="tglow" cx="{cxm}" cy="{BOT - 6}" rx="34" ry="14" fill="{col}" style="animation-delay:-{i * .6:.1f}s"/>'
+                 # dropper nozzle, falling drop and splash
+                 f'<g class="nz" style="animation-delay:-{i * .5:.1f}s"><path d="M{cxm - 5} 214 h10 l-2 12 h-6z" fill="{c["line"]}"/><rect x="{cxm - 7}" y="211" width="14" height="4" rx="2" fill="{c["muted"]}" opacity=".7"/></g>'
+                 f'<path class="dr" d="M{cxm} 220 q-4 6 -4 9 a4 4 0 0 0 8 0 q0 -3 -4 -9z" fill="{col}" style="--dy:{ys - 228:.0f}px;animation-delay:{i * .5:.1f}s"/>'
+                 f'<ellipse class="spl" cx="{cxm}" cy="{ys:.1f}" rx="0" ry="2.4" fill="none" stroke="#fff" stroke-width="1.6" style="animation-delay:{i * .5:.1f}s"/>'
+                 # liquid
+                 f'<g clip-path="url(#tb{i})"><rect x="{x}" y="{TOP}" width="{TW}" height="{BOT - TOP}" fill="{c["page"]}" opacity=".25"/>'
+                 f'<g class="rise" style="--h:{BOT - ys + 8:.0f}px;animation-delay:{i * .14:.2f}s">'
+                 f'<path class="wv2" d="{wave(ys - 2, 3.2, 23)}" fill="{col}" opacity=".45"/><path class="wv" d="{wave(ys, 3.6, 0)}" fill="{col}"/>'
+                 f'<rect x="{x}" y="{ys + 6:.1f}" width="{TW}" height="{BOT - ys:.1f}" fill="{col}"/>'
+                 f'<rect x="{x}" y="{ys + 6:.1f}" width="{TW}" height="{BOT - ys:.1f}" fill="url(#shade)"/>{bubbles}</g></g>'
+                 # glass
+                 f'<path d="{tube}" fill="none" stroke="{c["ink"]}" stroke-opacity=".45" stroke-width="2.2" stroke-linecap="round"/>'
+                 f'<path d="M{x - 4} {TOP} H{x + TW + 4}" stroke="{c["ink"]}" stroke-opacity=".55" stroke-width="3" stroke-linecap="round"/>'
+                 f'<path d="M{x + 7} {TOP + 12} V{BOT - 26}" stroke="#fff" stroke-opacity=".4" stroke-width="3" stroke-linecap="round"/>{ticks}'
+                 f'<path d="{nd}" transform="translate({cxm - nw / 2:.1f} 412)" fill="{c["ink"]}"/>'
+                 f'<path d="{pd}" transform="translate({cxm - pw / 2:.1f} 432)" fill="{col}"/>')
     body += "</g>"
-    # streak panel
-    cx, cy, r = 425 + 112, 300, 62
-    circ = 2 * 3.14159 * r
-    frac = min(streak["current"], 30) / 30 if streak["current"] else 0.02
-    cd, cw = big.path(str(streak["current"]), 46, 0, 0)
+    # ---------------------------------------------------------------- streak
+    cur = streak["current"]
+    marks = [7, 14, 30, 50, 100, 200, 300, 365, 500, 750, 1000, 2000]
+    nxt = next((m for m in marks if m > cur), cur + 1)
+    frac = max(cur / nxt, .02)
+    cx, cy, r = 425 + 108, 296, 60
+    circ = 2 * math.pi * r
+    nt = 60
+    lit = int(round(frac * nt))
+    ticks = ""
+    for k in range(nt):
+        a = k / nt * 2 * math.pi - math.pi / 2
+        x1, y1, x2, y2 = (cx + (r + 14) * math.cos(a), cy + (r + 14) * math.sin(a), cx + (r + (22 if k % 5 == 0 else 19)) * math.cos(a), cy + (r + (22 if k % 5 == 0 else 19)) * math.sin(a))
+        if k < lit:
+            ticks += f'<line class="tk" x1="{x1:.1f}" y1="{y1:.1f}" x2="{x2:.1f}" y2="{y2:.1f}" stroke="{[c["accent"], c["second"], c["pink"]][k * 3 // nt]}" stroke-width="2.4" stroke-linecap="round" style="animation-delay:{k * .05:.2f}s"/>'
+        else:
+            ticks += f'<line x1="{x1:.1f}" y1="{y1:.1f}" x2="{x2:.1f}" y2="{y2:.1f}" stroke="{c["line"]}" stroke-width="2" stroke-linecap="round"/>'
+    css += ("@keyframes tk{0%,100%{opacity:.35}40%{opacity:1}}.tk{animation:tk 3s ease-in-out infinite}"
+            "@keyframes cmtr{to{stroke-dashoffset:-" + f"{circ:.0f}" + "}}.cmtr{animation:cmtr 3.2s linear infinite}"
+            "@keyframes emb{0%{transform:translate(0,0) scale(1);opacity:0}15%{opacity:1}100%{transform:translate(var(--ex),-58px) scale(.2);opacity:0}}.emb{animation:emb 2.4s ease-out infinite}"
+            "@keyframes aura{0%,100%{opacity:.18;transform:scale(1)}50%{opacity:.42;transform:scale(1.15)}}.aura{transform-box:fill-box;transform-origin:center;animation:aura 2.2s ease-in-out infinite}"
+            "@keyframes wob{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(3deg)}}.wob{transform-box:fill-box;transform-origin:bottom;animation:wob 2.2s ease-in-out infinite}"
+            "@keyframes sweep{0%,20%{transform:translateX(0)}70%,100%{transform:translateX(220px)}}.sweep{animation:sweep 4.5s ease-in-out infinite}")
+    script, scr_w = typo.font(typo.SCRIPT).path("day streak", 17, 0, 0)
+    num = str(cur)
+    nsize = 54
+    nw_ = sum(big.advance(ch, nsize) for ch in num)
+    digits, dcss = _roll(num, cx - nw_ / 2, cy + 24, nsize, big, "sk", 0.4)
+    css += dcss
+    embers = "".join(f'<circle class="emb" cx="{cx + (k - 2.5) * 6}" cy="{cy - 36}" r="{1.4 + (k % 3) * .5:.1f}" fill="{[c["pink"], c["accent"], "#F59E0B"][k % 3]}" style="--ex:{(k - 2.5) * 5:.0f}px;animation-delay:{k * .4:.1f}s"/>' for k in range(6))
     body += f'<g class="bb" style="animation-delay:-2s">{panel(425, 150, 405, 300, 5)}'
     body += f'<path d="{mono.path("CONTRIBUTION STREAK", 12, 453, 190, 3)[0]}" fill="{c["pink"]}"/>'
-    body += (f'<circle cx="{cx}" cy="{cy}" r="{r}" fill="none" stroke="{c["line"]}" stroke-width="10"/>'
+    body += (f'<circle class="aura" cx="{cx}" cy="{cy}" r="{r + 4}" fill="url(#aura)"/>{ticks}'
+             f'<circle cx="{cx}" cy="{cy}" r="{r}" fill="none" stroke="{c["line"]}" stroke-width="10"/>'
              f'<circle class="rg" cx="{cx}" cy="{cy}" r="{r}" fill="none" stroke="url(#g1)" stroke-width="10" stroke-linecap="round" stroke-dasharray="{circ:.0f}" '
              f'style="--full:{circ:.0f};--off:{circ * (1 - frac):.0f}" transform="rotate(-90 {cx} {cy})"/>'
-f'<g transform="translate({cx} {cy - 22})"><g class="flame"><path d="M0 -22 C10 -10 14 -2 8 8 C5 13 -5 13 -8 8 C-14 -2 -8 -10 0 -22Z" fill="url(#g1)"/>'
+             f'<circle class="cmtr" cx="{cx}" cy="{cy}" r="{r}" fill="none" stroke="#fff" stroke-opacity=".85" stroke-width="3" stroke-linecap="round" stroke-dasharray="14 {circ - 14:.0f}"/>'
+             f'{embers}<g transform="translate({cx} {cy - 44}) scale(1.2)"><g class="flame"><path d="M0 -22 C10 -10 14 -2 8 8 C5 13 -5 13 -8 8 C-14 -2 -8 -10 0 -22Z" fill="url(#g1)"/>'
              f'<path d="M0 -6 C5 0 6 4 3 8 C1 10 -1 10 -3 8 C-6 4 -4 0 0 -6Z" fill="{c["page"]}" opacity=".55"/></g></g>'
-             f'<path d="{big.path(str(streak["current"]), 46, cx - cw / 2, cy + 22)[0]}" fill="{c["ink"]}"/>'
-             f'<path d="{lab.path("days", 13, cx - lab.width("days", 13) / 2, cy + 44)[0]}" fill="{c["muted"]}"/>')
-    for i, (val, label, col) in enumerate([(streak["longest"], "longest streak", c["second"]), (streak["total"], "total contributions", c["accent"])]):
-        y = 258 + i * 76
-        vd, _ = big.path(str(val), 30, 0, 0)
-        body += (f'<path d="{big.path(str(val), 30, 700, y)[0]}" fill="{col}"/>'
-                 f'<path d="{lab.path(label, 12.5, 700, y + 24)[0]}" fill="{c["muted"]}"/>')
+             f'{digits}<path d="{script}" transform="translate({cx - scr_w / 2:.1f} {cy + 45})" fill="url(#g1)"/>')
+    # milestone line
+    msg = f"{nxt - cur} days to {nxt}" if cur < nxt else "keep it going"
+    md, mw = mono.path(msg.upper(), 10, 0, 0, 2)
+    body += (f'<path d="{md}" transform="translate({cx - mw / 2:.1f} 408)" fill="{c["muted"]}"/>'
+             f'<rect x="{cx - 80}" y="418" width="160" height="6" rx="3" fill="{c["line"]}"/>'
+             f'<clipPath id="mb"><rect x="{cx - 80}" y="418" width="{160 * frac:.0f}" height="6" rx="3"/></clipPath><rect x="{cx - 80}" y="418" width="{160 * frac:.0f}" height="6" rx="3" fill="url(#g1)"/>'
+             f'<g clip-path="url(#mb)"><rect class="bshine" x="{cx - 100}" y="418" width="20" height="6" fill="#fff" opacity=".7" transform="skewX(-25)"/></g>')
+    # side cards
+    for i, (val, label, col, kind) in enumerate([(streak["longest"], "LONGEST STREAK", c["second"], "trophy"), (streak["total"], "CONTRIBUTIONS", c["accent"], "grid")]):
+        y = 214 + i * 96
+        px = 668
+        sdig, scss = _roll(str(val), px + 18, y + 67, 28, big, f"sc{i}", 0.6 + i * .25)
+        css += scss
+        if kind == "trophy":
+            glyph = (f'<path d="M{px + 18} {y + 18} h20 v10 a10 10 0 0 1 -20 0z M{px + 18} {y + 21} h-6 a6 6 0 0 0 6 10 M{px + 38} {y + 21} h6 a6 6 0 0 1 -6 10 M{px + 28} {y + 38} v6 M{px + 21} {y + 45} h14" '
+                     f'fill="none" stroke="{col}" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>')
+        else:
+            glyph = "".join(f'<rect class="tk" x="{px + 14 + gx * 11}" y="{y + 18 + gy * 11}" width="8" height="8" rx="2" fill="{col}" opacity="{.35 + .2 * ((gx + gy) % 3)}" style="animation-delay:{(gx + gy) * .25:.2f}s"/>' for gx in range(3) for gy in range(3))
+        ld, _ = mono.path(label, 8.5, px + 58, y + 34, 1.4)
+        body += (f'<rect x="{px + .5}" y="{y + .5}" width="147" height="75" rx="18" fill="{col}" fill-opacity=".07" stroke="{col}" stroke-opacity=".55"/>'
+                 f'<clipPath id="sk{i}"><rect x="{px}" y="{y}" width="148" height="76" rx="18"/></clipPath><g clip-path="url(#sk{i})"><rect class="sweep" x="{px - 70}" y="{y}" width="24" height="76" fill="{col}" opacity=".16" transform="skewX(-20)" style="animation-delay:{i * 1.3:.1f}s"/></g>'
+                 f'<g transform="translate(0 -8)">{glyph}</g><path d="{ld}" fill="{col}" transform="translate(0 -8)"/>{sdig}')
     body += star4(790, 190, 6, c["accent"], "tw") + "</g>"
-    return doc(W, H, body, css, _grad(c, "g1"), "GitHub stats: commits, pull requests, stars, followers, top languages and contribution streak", pad_y=8)
+    defs_extra = (f'<linearGradient id="shade" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity=".25"/><stop offset=".35" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".28"/></linearGradient>'
+                  f'<radialGradient id="aura"><stop offset="0" stop-color="{c["pink"]}" stop-opacity=".5"/><stop offset="1" stop-color="{c["pink"]}" stop-opacity="0"/></radialGradient>')
+    return doc(W, H, body, css, _grad(c, "g1") + defs_extra, "GitHub stats: commits, pull requests, stars, followers, top languages and contribution streak", pad_y=8)
 
 
 def main() -> None:

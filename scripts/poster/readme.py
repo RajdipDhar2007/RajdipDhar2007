@@ -78,7 +78,7 @@ def main() -> None:
 </tr>
 </table>
 
-<p align="center"><sub>More on my <a href="https://github.com/{owner}?tab=repositories">repositories</a> page: TaskFlow, MathForge, Rack Up (Web3 game on Base Sepolia), Periodic Table and more.</sub></p>
+<p align="center"><a href="https://github.com/{owner}?tab=repositories">{pic("assets/sections/more-{m}.svg", "More on my repositories page: TaskFlow, MathForge, Rack Up (Web3 game on Base Sepolia), Periodic Table and more")}</a></p>
 
 {title("stats", "By the numbers")}
 <p align="center">{pic("assets/stats/dashboard-{m}.svg", "GitHub stats: commits, pull requests, stars, followers, top languages and contribution streak")}</p>
@@ -98,7 +98,6 @@ def main() -> None:
 <a href="https://github.com/{owner}">{pic("assets/contact/github-{m}.svg", "Rajdip on GitHub", "250")}</a>
 <!-- TODO_RAJDIP: add LinkedIn, portfolio, LeetCode / Codeforces and X pills (see contact_pill() in scripts/poster/hero.py) -->
 </p>
-<p align="center"><sub>Fastest reply: email &middot; open to internships and collaborations</sub></p>
 
 <p align="center"><a href="https://github.com/{REPO}">{pic("assets/sections/star-{m}.svg", "Enjoyed the tour? Star this repo")}</a></p>
 
