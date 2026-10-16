@@ -41,17 +41,34 @@ def _icon_path(name: str) -> str:
     return json.loads((Path(__file__).resolve().parents[1] / "icons.json").read_text(encoding="utf-8"))[name]["path"]
 
 
+COLORFUL = {"python": "#4FA8FF", "kotlin": "#B07CFF", "github": "#C084FC", "django": "#34D399", "c": "#5C9DFF", "opengl": "#38BDF8", "solidity": "#A78BFA", "git": "#FF6B4A", "vite": "#9B7BFF"}
+METAL_DEFS: list[str] = []
+
+
+def _mix(hexcol: str, other: str, f: float) -> str:
+    a = [int(hexcol[i:i + 2], 16) for i in (1, 3, 5)]
+    b = [int(other[i:i + 2], 16) for i in (1, 3, 5)]
+    return "#%02X%02X%02X" % tuple(int(x + (y - x) * f) for x, y in zip(a, b))
+
+
 def icon3d(key: str, x: float, y: float, size: float, col: str, k: int, dark: bool) -> str:
-    """Extruded (3D) brand glyph: a stack of darker copies that fans out as the glyph sways, plus a glossy front face."""
+    """Metallic, extruded brand glyph: banded chrome-in-colour face with a moving specular sweep, depth layers that fan out as it sways."""
     s = size / 24
-    layers = "".join(f'<g class="ex" style="--k:{n}"><use href="#ic-{key}" transform="translate({x:.1f} {y:.1f}) scale({s:.4f})" fill="{_shade(col, .62 - n * .035)}"/></g>' for n in range(7, 0, -1))
-    front = (f'<g class="fr"><use href="#ic-{key}" transform="translate({x:.1f} {y:.1f}) scale({s:.4f})" fill="{col}"/>'
-             f'<use href="#ic-{key}" transform="translate({x:.1f} {y:.1f}) scale({s:.4f})" fill="url(#gloss)"/></g>')
+    use = lambda extra="": f'<use href="#ic-{key}" transform="translate({x:.1f} {y:.1f}) scale({s:.4f})" {extra}/>'
+    METAL_DEFS.append(
+        f'<linearGradient id="mt{k}" x1="0" y1="0" x2=".85" y2="1"><stop offset="0" stop-color="{_mix(col, "#FFFFFF", .72)}"/><stop offset=".2" stop-color="{col}"/>'
+        f'<stop offset=".42" stop-color="{_shade(col, .42)}"/><stop offset=".6" stop-color="{_mix(col, "#FFFFFF", .25)}"/><stop offset=".8" stop-color="{col}"/><stop offset="1" stop-color="{_shade(col, .55)}"/></linearGradient>'
+        f'<clipPath id="ck{k}"><use href="#ic-{key}" transform="translate({x:.1f} {y:.1f}) scale({s:.4f})"/></clipPath>')
+    layers = "".join(f'<g class="ex" style="--k:{n}">{use(f"fill=" + chr(34) + _shade(col, .6 - n * .045) + chr(34))}</g>' for n in range(8, 0, -1))
+    front = (f'<g class="fr">{use(f"fill=" + chr(34) + f"url(#mt{k})" + chr(34))}'
+             f'{use(f"fill=" + chr(34) + "none" + chr(34) + f" stroke=" + chr(34) + _mix(col, "#FFFFFF", .8) + chr(34) + f" stroke-opacity=" + chr(34) + ".75" + chr(34) + f" stroke-width=" + chr(34) + f"{.8 / s:.2f}" + chr(34))}'
+             f'<g clip-path="url(#ck{k})"><rect class="ish" x="{x - 30:.1f}" y="{y - 4:.1f}" width="14" height="{size + 8:.1f}" fill="#fff" opacity=".7" transform="skewX(-20)" style="animation-delay:-{k * .45 % 3.6:.2f}s"/></g></g>')
     shadow = f'<ellipse class="fsd" cx="{x + size / 2 + 3:.1f}" cy="{y + size + 9:.1f}" rx="{size * .4:.1f}" ry="3.6" fill="#000" opacity="{.38 if dark else .22}" style="animation-delay:-{k * .5 % 3:.1f}s"/>'
     return shadow + f'<g class="sw3" style="animation-delay:-{k * .6 % 4.2:.1f}s">{layers}{front}</g>'
 
 
 def toolbox(mode: str) -> str:
+    METAL_DEFS.clear()
     c = PAL[mode]
     W, TW, TH, GAP = 830, 112, 124, 16
     mf, nf, pf = typo.font(typo.MONO_B), typo.font(typo.MEDIUM), typo.font(typo.HEAD)
@@ -61,6 +78,7 @@ def toolbox(mode: str) -> str:
            "@keyframes flow{0%{stroke-dashoffset:100}100%{stroke-dashoffset:-100}}.flow{stroke-dasharray:22 78;animation:flow 1.6s linear infinite}"
            "@keyframes shn{0%{transform:translateX(0)}40%,100%{transform:translateX(220px)}}.shn{animation:shn 5s ease-in-out infinite}"
            "@keyframes orb{from{offset-distance:0%}to{offset-distance:100%}}.orb{animation:orb 4s linear infinite;filter:drop-shadow(0 0 3px currentColor)}"
+           "@keyframes ish{0%,35%{transform:translateX(0)}75%,100%{transform:translateX(120px)}}.ish{animation:ish 3.6s ease-in-out infinite}"
            "@keyframes ex{0%,100%{transform:translate(calc(var(--k) * -.9px),calc(var(--k) * .7px))}50%{transform:translate(calc(var(--k) * .9px),calc(var(--k) * .7px))}}.ex{animation:ex 4.2s ease-in-out infinite;animation-delay:inherit}"
            "@keyframes sw3{0%,100%{transform:translateY(0) scaleX(.94) skewY(-2deg)}50%{transform:translateY(-3px) scaleX(1) skewY(2deg)}}.sw3{transform-box:fill-box;transform-origin:50% 100%;animation:sw3 4.2s ease-in-out infinite}"
            "@keyframes fsd{0%,100%{transform:scale(1);opacity:.9}50%{transform:scale(.8);opacity:.6}}.fsd{transform-box:fill-box;transform-origin:center;animation:fsd 4.2s ease-in-out infinite}"
@@ -78,7 +96,7 @@ def toolbox(mode: str) -> str:
         x0 = (W - total) / 2
         for i, (key, name) in enumerate(items):
             x = x0 + i * (TW + GAP)
-            col = _brand(key, c, mode)
+            col = COLORFUL.get(key) or _brand(key, c, mode)
             nd, nw = nf.path(name, 13, 0, 0)
             dash = ' stroke-dasharray="6 6"' if learning else ""
             body += (f'<g class="tl" style="animation-delay:-{(k * .7) % 4.6:.1f}s">'
@@ -107,7 +125,7 @@ def toolbox(mode: str) -> str:
                  f'<path d="{pd}" fill="{c["ink"]}"/></g>')
         x += pw + 12
     H = y + 56
-    defs = _grad(c, "g1") + '<linearGradient id="gloss" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset=".45" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".25"/></linearGradient>'
+    defs = _grad(c, "g1") + "".join(METAL_DEFS) + '<linearGradient id="gloss" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset=".45" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".25"/></linearGradient>'
     defs += "".join(f'<path id="ic-{key}" d="{_icon_path(key)}"/>' for _, items, _l in ROWS for key, _n in items)
     return doc(W, int(H), body, css, defs, "Toolbox: Python, TypeScript, JavaScript, Kotlin, C, HTML, React, Vite, Android Studio, OpenGL, Git, GitHub. Learning Django, Solidity, Jupyter, machine learning, data science, LLM apps, automation", pad_y=8)
 
@@ -286,6 +304,8 @@ MORE_CSS = ("@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:transl
             "@keyframes spin2{to{transform:rotate(360deg)}}.spin2{animation:spin2 6s linear infinite}"
             "@keyframes arw{0%,100%{transform:translateX(0)}50%{transform:translateX(7px)}}.arw{animation:arw 1.3s ease-in-out infinite}"
             "@keyframes mq{from{transform:translateX(0)}to{transform:translateX(-80px)}}.mq{animation:mq 4s linear infinite}"
+            "@keyframes mshn{0%,20%{transform:translateX(-80px)}65%,100%{transform:translateX(420px)}}.mshn{animation:mshn 5s ease-in-out infinite}"
+            "@keyframes mbr{0%{stroke-dashoffset:200}35%,85%{stroke-dashoffset:0}100%{stroke-dashoffset:-200}}.mbr{stroke-dasharray:200;animation:mbr 6s ease-in-out infinite}"
             "@keyframes gl{0%,100%{opacity:.1;transform:scale(1)}50%{opacity:.28;transform:scale(1.2)}}.gl{transform-box:fill-box;transform-origin:center;animation:gl 3s ease-in-out infinite}")
 
 
@@ -309,16 +329,17 @@ def more_header(mode: str) -> str:
     """Headline strip of the 'more repositories' block (links to the repositories page)."""
     c = PAL[mode]
     W, H = 830, 84
-    mf = typo.font(typo.MONO_B)
-    head, hw = mf.path("MORE FROM MY REPOSITORIES", 13, 0, 0, 4)
+    sf = typo.font(typo.SCRIPT)
+    head, hw = sf.path("More from my repositories", 34, 0, 0)
+    hx = (W - hw) / 2
     body = (f'<clipPath id="mc"><rect x="1" y="1" width="{W - 2}" height="{H - 2}" rx="28"/></clipPath>'
             f'<rect x=".5" y=".5" width="{W - 1}" height="{H - 1}" rx="28" fill="{c["card"]}" stroke="{c["line"]}"/>'
             f'<g clip-path="url(#mc)"><g class="mq">' + "".join(f'<circle cx="{gx * 20}" cy="{gy * 20 + 6}" r="1.3" fill="{c["line"]}"/>' for gx in range(-4, 48) for gy in range(0, 5)) + '</g></g>'
             f'<rect class="run" x=".5" y=".5" width="{W - 1}" height="{H - 1}" rx="28" fill="none" stroke="url(#g1)" stroke-width="2.6" pathLength="400"/>'
-            f'<path d="{head}" transform="translate({(W - hw) / 2:.1f} 40)" fill="url(#g1)"/>'
-            f'{star4((W - hw) / 2 - 24, 35, 6, c["accent"], "tw")}{star4((W + hw) / 2 + 24, 35, 6, c["pink"], "tw", "style=" + chr(34) + "animation-delay:-1.2s" + chr(34))}'
-            f'<line x1="{(W - hw) / 2}" y1="54" x2="{(W + hw) / 2}" y2="54" stroke="{c["line"]}" stroke-width="2" stroke-linecap="round"/>'
-            f'<line class="flow" x1="{(W - hw) / 2}" y1="54" x2="{(W + hw) / 2}" y2="54" stroke="url(#g1)" stroke-width="3" stroke-linecap="round" pathLength="100"/>'
+            f'<clipPath id="mt"><path d="{head}" transform="translate({hx:.1f} 54)"/></clipPath><path d="{head}" transform="translate({hx:.1f} 54)" fill="url(#g1)"/>'
+            f'<g clip-path="url(#mt)"><rect class="mshn" x="{hx:.1f}" y="14" width="60" height="50" fill="#fff" opacity=".75" transform="skewX(-22)"/></g>'
+            f'<path class="mbr" d="M{hx:.1f} 64 q{hw * .25:.0f} -8 {hw * .5:.0f} -2 t{hw * .5:.0f} -4" fill="none" stroke="url(#g1)" stroke-width="3" stroke-linecap="round" pathLength="200"/>'
+            f'{star4(hx - 24, 38, 7, c["accent"], "tw")}{star4(hx + hw + 24, 34, 7, c["pink"], "tw", "style=" + chr(34) + "animation-delay:-1.2s" + chr(34))}'
             f'<g class="arw"><path d="M{W - 58} 34 h22 m-9 -9 l9 9 l-9 9" fill="none" stroke="url(#g1)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>')
     return doc(W, H, body, MORE_CSS + _tw(), _grad(c, "g1"), "More from my repositories: open the repositories page", pad_y=4)
 

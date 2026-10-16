@@ -47,9 +47,9 @@ def _shade(hexcol: str, k: float) -> str:
 
 def city_svg(mode: str, grid: list[list[int]]) -> str:
     c = PAL[mode]
-    W, H = 830, 350
+    W, H = 830, 392
     ux, uy, vx, vy = 19.0, 3.4, -9.0, 9.0      # screen vectors of one week (along the row) and one weekday (towards the viewer)
-    x0, y0 = 40 + 6 * 9.0 + 6, 122
+    x0, y0 = 40 + 6 * 9.0 + 6, 176
     mono = typo.font(typo.MONO_B)
     pal = LEVELS[mode]
     nw = len(grid)
@@ -69,20 +69,9 @@ def city_svg(mode: str, grid: list[list[int]]) -> str:
 
     css = ("@keyframes up{0%{transform:scaleY(.04)}14%,86%{transform:scaleY(1)}100%{transform:scaleY(.04)}}.bar{transform-box:fill-box;transform-origin:50% 100%;animation:up 12s cubic-bezier(.3,.8,.2,1) infinite both}"
            "@keyframes gl{0%,100%{opacity:0}50%{opacity:.55}}.gl{animation:gl 3.2s ease-in-out infinite}"
-           "@keyframes run{to{stroke-dashoffset:-1000}}.run{stroke-dasharray:140 860;animation:run 7s linear infinite}"
-           "@keyframes tg{0%{r:4;opacity:.9}100%{r:16;opacity:0}}.tg{animation:tg 1.8s ease-out infinite}"
-           "@keyframes fl{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}.fl{animation:fl 3s ease-in-out infinite}" + _tw())
-    # floor slab
-    corners = [pt(-.4, -.4), pt(nw + .2, -.4), pt(nw + .2, 7.4), pt(-.4, 7.4)]
-    floor = " ".join(f"{x:.1f},{y:.1f}" for x, y in corners)
-    body = (f'<clipPath id="cc"><rect x="1" y="1" width="{W - 2}" height="{H - 2}" rx="28"/></clipPath>'
-            f'<rect x=".5" y=".5" width="{W - 1}" height="{H - 1}" rx="28" fill="{c["card"]}" stroke="{c["line"]}"/>'
-            f'<polygon points="{floor}" fill="{c["accent"]}" fill-opacity=".05" stroke="{c["line"]}" stroke-width="1.4"/>'
-            f'<polygon class="run" points="{floor}" fill="none" stroke="url(#g1)" stroke-width="2.6" pathLength="1000" stroke-linejoin="round"/>')
-    # grid lines on the floor
-    for j in range(8):
-        a, b = pt(-.4, j), pt(nw + .2, j)
-        body += f'<line x1="{a[0]:.1f}" y1="{a[1]:.1f}" x2="{b[0]:.1f}" y2="{b[1]:.1f}" stroke="{c["line"]}" stroke-opacity=".6" stroke-dasharray="2 6"/>'
+           "@keyframes nsh{0%,25%{transform:translateX(-80px)}65%,100%{transform:translateX(420px)}}.nsh{animation:nsh 5s ease-in-out infinite}"
+           "@keyframes nbr{0%{stroke-dashoffset:200}35%,85%{stroke-dashoffset:0}100%{stroke-dashoffset:-200}}.nbr{stroke-dasharray:200;animation:nbr 6s ease-in-out infinite}" + _tw())
+    body = ""
     # bars, back (far weekday) to front
     m = .09
     au, av = (ux * (1 - 2 * m), uy * (1 - 2 * m)), (vx * (1 - 2 * m), vy * (1 - 2 * m))
@@ -104,21 +93,22 @@ def city_svg(mode: str, grid: list[list[int]]) -> str:
         glow = f'<polygon class="gl" points="{top}" fill="#fff" style="animation-delay:{(i * .09 + j * .05) % 3.2:.2f}s"/>' if lvl(v) >= 4 else ""
         body += (f'<g class="bar" style="animation-delay:{delay:.2f}s"><polygon points="{front}" fill="{_shade(base, .62)}"/><polygon points="{right}" fill="{_shade(base, .42)}"/>'
                  f'<polygon points="{top}" fill="{_shade(base, 1.1)}"/>{glow}</g>')
-    # "today" beacon above the newest contribution day
-    li, lj = last
-    bx, by = pt(li + .5, lj + .5)
-    bh = hgt(grid[li][lj])
-    body += (f'<g class="fl"><ellipse class="tg" cx="{bx:.1f}" cy="{by - bh - 6:.1f}" rx="6" ry="2.4" fill="none" stroke="{c["pink"]}" stroke-width="2"/>'
-             f'<path d="M{bx:.1f} {by - bh - 12:.1f} l-5 -9 h10z" fill="{c["pink"]}"/></g>')
-    # legend + summary
-    lg, x = f'<path d="{mono.path("LESS", 9, 36, H - 30, 2)[0]}" fill="{c["muted"]}"/>', 78
-    for k, col in enumerate(pal):
-        lg += f'<polygon points="{x},{H - 36} {x + 8},{H - 32} {x},{H - 28} {x - 8},{H - 32}" fill="{col}"/>'
+    # live numbers, top left, in a script face
+    sf = typo.font(typo.SCRIPT)
+    big, bw = sf.path(f"{total:,}", 54, 0, 0)
+    cap, cw = sf.path(f"contributions in the last {nw} weeks", 22, 0, 0)
+    body += (f'<clipPath id="nb"><path d="{big}" transform="translate(30 66)"/></clipPath><path d="{big}" transform="translate(30 66)" fill="url(#g1)"/>'
+             f'<g clip-path="url(#nb)"><rect class="nsh" x="30" y="14" width="46" height="64" fill="#fff" opacity=".7" transform="skewX(-22)"/></g>'
+             f'<path d="{cap}" transform="translate(32 98)" fill="{c["ink"]}"/>'
+             f'<path class="nbr" d="M32 108 q{cw * .25:.0f} -7 {cw * .5:.0f} -2 t{cw * .5:.0f} -3" fill="none" stroke="url(#g1)" stroke-width="3" stroke-linecap="round" pathLength="200"/>'
+             f'{star4(30 + bw + 20, 34, 7, c["accent"], "tw")}{star4(30 + bw + 38, 58, 4.5, c["pink"], "tw", "style=" + chr(34) + "animation-delay:-1s" + chr(34))}')
+    # legend
+    lg, x = f'<path d="{mono.path("LESS", 9, 32, H - 22, 2)[0]}" fill="{c["muted"]}"/>', 74
+    for col in pal:
+        lg += f'<polygon points="{x},{H - 28} {x + 8},{H - 24} {x},{H - 20} {x - 8},{H - 24}" fill="{col}"/>'
         x += 20
-    lg += f'<path d="{mono.path("MORE", 9, x + 4, H - 30, 2)[0]}" fill="{c["muted"]}"/>'
-    sd, sw = mono.path(f"{total} CONTRIBUTIONS  ·  LAST {nw} WEEKS", 10, 0, 0, 2)
-    body += lg + f'<path d="{sd}" transform="translate({W - 36 - sw:.1f} {H - 30})" fill="{c["accent"]}"/>'
-    body += star4(W - 40, 36, 7, c["accent"], "tw") + star4(W - 70, 58, 4, c["pink"], "tw", 'style="animation-delay:-1s"')
+    lg += f'<path d="{mono.path("MORE", 9, x + 4, H - 22, 2)[0]}" fill="{c["muted"]}"/>'
+    body += lg
     return doc(W, H, body, css, _grad(c, "g1"), f"3D contribution city: {total} contributions in the last {nw} weeks")
 
 

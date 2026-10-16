@@ -86,7 +86,7 @@ def divider2(mode: str) -> str:
            "@keyframes bt{0%,100%{transform:scale(1)}15%{transform:scale(1.5)}30%{transform:scale(1)}}.bt{transform-box:fill-box;transform-origin:center;animation:bt 1.4s ease-in-out infinite}" + _tw())
     body = (f'<path d="{d}" fill="none" stroke="url(#g1)" stroke-opacity=".3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>'
             f'<path class="ecg" d="{d}" fill="none" stroke="url(#g1)" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" pathLength="100"/>'
-            f'<circle class="bt" cx="{W / 2}" cy="20" r="5" fill="{c["pink"]}"/>{star4(60, 20, 6, c["accent"], "tw")}{star4(770, 20, 6, c["second"], "tw", "style=" + chr(34) + "animation-delay:-1.2s" + chr(34))}')
+            f'<circle class="bt" cx="{W / 2}" cy="20" r="5" fill="{c["pink"]}"/>{star4(40, 20, 7, c["accent"], "tw")}{star4(790, 20, 7, c["second"], "tw", "style=" + chr(34) + "animation-delay:-1.2s" + chr(34))}')
     return doc(W, H, body, css, _grad(c, "g1"), "divider")
 
 
@@ -340,7 +340,11 @@ def arcade_card(mode: str) -> str:
                 f'<path d="M-11 -4 l-7 -3 M-11 3 l-8 1 M-11 9 l-7 5 M11 -4 l7 -3 M11 3 l8 1 M11 9 l7 5 M-3 -13 l-4 -7 M3 -13 l4 -7" stroke="{col}" stroke-width="2" stroke-linecap="round"/>'
                 f'<circle cx="-4" cy="-4" r="2.4" fill="#fff"/><circle cx="4" cy="-4" r="2.4" fill="#fff"/></g></g></g>')
     bugs = bug(fx + 60, c["green"], 7, 0, 22) + bug(fx + 130, c["pink"], 6, 2.3, 30) + bug(fx + 200, c["second"], 8, 4.6, 18) + bug(fx + 95, c["green"], 9, 6.1, 26)
-    bullets = "".join(f'<rect class="bl" x="{fx + fw / 2 - 2}" y="{fy + fh - 40}" width="4" height="14" rx="2" fill="{c["accent"]}" style="animation-delay:-{k * .22:.2f}s"/>' for k in range(5))
+    import math as _m
+    SHIP_T = 4.4                                            # ship sweep period (s); x(t) = -70 cos(2 pi t / T)
+    bullets = "".join(
+        f'<rect class="bl" x="{fx + fw / 2 + (-70 * _m.cos(2 * _m.pi * (n * .22) / SHIP_T)) - 2:.1f}" y="{fy + fh - 52}" width="4" height="14" rx="2" fill="{c["accent"]}" style="animation-delay:{n * .22:.2f}s"/>'
+        for n in range(20))
     booms = "".join(f'<circle class="bm" cx="{fx + x}" cy="{fy + y}" r="6" fill="none" stroke="{col}" stroke-width="3" style="animation-delay:-{d}s"/>' for x, y, col, d in [(70, 90, c["green"], 0), (170, 130, c["pink"], 1.7), (120, 60, c["accent"], 3.1)])
     ship = (f'<g transform="translate({fx + fw / 2} {fy + fh - 22})"><g class="sh"><path d="M0 -16 L11 12 L0 6 L-11 12Z" fill="url(#g1)"/>'
             f'<path class="fl" d="M-3 9 Q0 24 3 9Z" fill="{c["pink"]}"/></g></g>')
@@ -354,38 +358,63 @@ def arcade_card(mode: str) -> str:
     play, _ = hf.path("PLAY NOW", 17, bx + 66, by + 33, 1)
     tri = f"M{bx + 30} {by + 16} L{bx + 30} {by + 36} L{bx + 46} {by + 26}Z"
     dark = "#0D1117" if mode == "dark" else "#fff"
-    # rotating motivational lines (one CSS cycle, each wipes in, glows, then fades up and out)
-    qx, qw, slot = bx + bw + 24, 224, 3.6
+    # rotating motivational lines in a charging "power-up" card
+    qx, qy, qw_, qh_ = bx + bw + 20, by - 8, 236, 64
+    slot = 3.6
     quotes = ["Debug today, ship tomorrow.", "Small steps still ship big things.", "Every bug is a lesson in disguise.", "Press start on your next idea.",
               "Code it. Break it. Fix it. Level up.", "Be the boss you are trying to beat.", "Progress beats perfect, every run.", "Stay curious. Keep shipping."]
     qparts = ""
     for k, qt in enumerate(quotes):
-        ql = hf.wrap(qt, 14.5, qw)[:2]
-        qd = "".join(f'<path d="{hf.path(l, 14.5, qx, by + 27 + j * 21)[0]}" fill="{c["ink"]}"/>' for j, l in enumerate(ql))
+        size = 15.0
+        while True:
+            ql = sf.wrap(qt, size, 178)
+            if len(ql) <= 2 or size <= 11:
+                break
+            size -= 1
+        qd = "".join(f'<path d="{sf.path(l, size, qx + 52, qy + 38 + j * 17 - (11 if len(ql) == 2 else 0))[0]}" fill="url(#g1)"/>' for j, l in enumerate(ql[:2]))
         qparts += f'<g class="q q{k}" style="animation-delay:{k * slot:.1f}s">{qd}</g>'
-    qlab, _ = mf.path("POWER-UP", 9.5, qx + 14, by + 8, 3)
-    quote = (f'<g class="qb"><path d="M{qx - 12} {by + 3} V{by + bh - 2}" stroke="url(#g1)" stroke-width="3" stroke-linecap="round"/></g>'
-             f'<path class="qlab" d="{qlab}" fill="{c["accent"]}"/>{star4(qx + 4, by + 4, 4.5, c["pink"], "tw")}{qparts}')
+    qlab, _ = mf.path("POWER-UP", 8, qx + 52, qy + 15, 3)
+    bolt = "M4 -13 L-6 2 H-1 L-4 13 L7 -3 H1Z"
+    quote = (f'<rect x="{qx}" y="{qy}" width="{qw_}" height="{qh_}" rx="18" fill="{c["card"]}" fill-opacity=".6" stroke="{c["line"]}"/>'
+             f'<rect class="qrun" x="{qx}" y="{qy}" width="{qw_}" height="{qh_}" rx="18" fill="none" stroke="url(#g1)" stroke-width="2" pathLength="400"/>'
+             f'<circle class="qrip" cx="{qx + 28}" cy="{qy + qh_ / 2}" r="14" fill="none" stroke="{c["accent"]}" stroke-width="2"/>'
+             f'<circle class="qrip" cx="{qx + 28}" cy="{qy + qh_ / 2}" r="14" fill="none" stroke="{c["pink"]}" stroke-width="2" style="animation-delay:-.9s"/>'
+             f'<circle cx="{qx + 28}" cy="{qy + qh_ / 2}" r="17" fill="{c["card"]}" stroke="url(#g1)" stroke-width="2"/>'
+             f'<g transform="translate({qx + 28} {qy + qh_ / 2})"><g class="qbolt"><path d="{bolt}" fill="url(#g1)" stroke="url(#g1)" stroke-width="1.4" stroke-linejoin="round"/></g></g>'
+             f'<path class="qlab" d="{qlab}" fill="{c["accent"]}"/>{qparts}'
+             f'<rect x="{qx + 52}" y="{qy + qh_ - 11}" width="170" height="3" rx="1.5" fill="{c["line"]}"/>'
+             f'<rect class="qchg" x="{qx + 52}" y="{qy + qh_ - 11}" width="170" height="3" rx="1.5" fill="url(#g1)"/>'
+             f'{star4(qx + qw_ - 14, qy + 12, 5, c["pink"], "tw")}')
     chips, x = "", 332
     for k, lab in enumerate(["BOSS FIGHTS", "POWER-UPS", "COMBOS", "MOBILE READY"]):
         cw = mf.width(lab, 10, 1) + 22
         chips += f'<rect x="{x}" y="200" width="{cw:.0f}" height="24" rx="12" fill="none" stroke="{[c["accent"], c["second"], c["pink"], c["green"]][k]}" stroke-width="1.6"/><path d="{mf.path(lab, 10, x + 11, 216, 1)[0]}" fill="{c["ink"]}"/>'
         x += cw + 8
     scan = "".join(f'<rect x="{fx}" y="{fy + k * 6}" width="{fw}" height="1" fill="#000" opacity=".16"/>' for k in range(fh // 6))
-    pw = (f'<g class="pwr"><circle cx="{fx + 150}" cy="{fy - 12}" r="10" fill="{c["card"]}" stroke="{c["green"]}" stroke-width="2"/>'
-          f'<path d="{mf.path("H", 11, fx + 145, fy - 8)[0]}" fill="{c["green"]}"/></g>'
+    pw = (f'<g class="pwr"><circle class="pwh" cx="{fx + 150}" cy="{fy - 12}" r="14" fill="{c["green"]}"/>'
+          f'<circle class="pwsp" cx="{fx + 150}" cy="{fy - 12}" r="13" fill="none" stroke="{c["green"]}" stroke-width="2" stroke-dasharray="4 5" stroke-linecap="round"/>'
+          f'<circle cx="{fx + 150}" cy="{fy - 12}" r="10" fill="{c["card"]}" stroke="{c["green"]}" stroke-width="2"/>'
+          f'<path d="{mf.path("H", 11, fx + 145, fy - 8)[0]}" fill="{c["green"]}"/>'
+          + "".join(f'<circle class="st" cx="{fx + 150 + (k - 1) * 5}" cy="{fy - 26 - k * 7}" r="{1.8 - k * .4:.1f}" fill="{c["green"]}" opacity="{.7 - k * .2:.1f}"/>' for k in range(3)) +
+          f'</g>'
           f'<path class="pop" d="{mf.path("+100", 11, fx + 60, fy + 120, 1)[0]}" fill="{c["gold"] if "gold" in c else c["pink"]}"/>')
     css = ("@keyframes pwr{from{transform:translate(0,0)}to{transform:translate(-40px,300px)}}.pwr{animation:pwr 9s linear infinite;animation-delay:-3s}"
            "@keyframes pop{0%,100%{opacity:0;transform:translateY(0)}10%{opacity:1}40%{opacity:0;transform:translateY(-22px)}}.pop{animation:pop 3.4s ease-out infinite}"
            "@keyframes qin{0%{opacity:0;transform:translateY(14px);clip-path:inset(0 100% 0 0)}2%{opacity:1}6%{opacity:1;transform:translateY(0);clip-path:inset(-4px 0 -4px 0)}11%{opacity:1;transform:translateY(0);clip-path:inset(-4px 0 -4px 0)}12.5%,100%{opacity:0;transform:translateY(-14px);clip-path:inset(-4px 0 -4px 0)}}"
            ".q{opacity:0;animation:qin 28.8s ease-out infinite both}.q0{opacity:1}"
            "@keyframes qlab{0%,100%{opacity:1}50%{opacity:.45}}.qlab{animation:qlab 1.4s ease-in-out infinite}"
+           "@keyframes qrun{to{stroke-dashoffset:-400}}.qrun{stroke-dasharray:70 330;animation:qrun 4s linear infinite}"
+           "@keyframes qrip{0%{r:17;opacity:.8}100%{r:30;opacity:0}}.qrip{animation:qrip 1.8s ease-out infinite}"
+           "@keyframes qbolt{0%,100%{transform:scale(1) rotate(0)}50%{transform:scale(1.25) rotate(-8deg)}}.qbolt{animation:qbolt 1.1s ease-in-out infinite}"
+           "@keyframes qchg{0%{transform:scaleX(0)}90%,100%{transform:scaleX(1)}}.qchg{transform-box:fill-box;transform-origin:left;animation:qchg 3.6s linear infinite}"
+           "@keyframes pwh{0%,100%{opacity:.3;transform:scale(1)}50%{opacity:.8;transform:scale(1.5)}}.pwh{transform-box:fill-box;transform-origin:center;animation:pwh 1s ease-in-out infinite}"
+           "@keyframes pwsp{to{transform:rotate(360deg)}}.pwsp{transform-box:fill-box;transform-origin:center;animation:pwsp 2.4s linear infinite}"
            "@keyframes qbar{0%,100%{opacity:.5}50%{opacity:1}}.qb{animation:qbar 1.8s ease-in-out infinite}"
            "@keyframes crt{from{transform:translateY(0)}to{transform:translateY(6px)}}.crt{animation:crt .5s linear infinite}"
            "@keyframes bf{from{transform:translateY(0)}to{transform:translateY(330px)}}.bf{animation:bf 7s linear infinite}"
            "@keyframes sw{0%,100%{transform:translateX(calc(var(--a) * -1))}50%{transform:translateX(var(--a))}}.sw{animation:sw 3s ease-in-out infinite}"
-           "@keyframes sh{0%,100%{transform:translateX(-70px)}50%{transform:translateX(70px)}}.sh{animation:sh 4.4s ease-in-out infinite}"
-           "@keyframes bl{0%{transform:translateY(0);opacity:1}100%{transform:translateY(-230px);opacity:0}}.bl{animation:bl 1.1s linear infinite}"
+           "@keyframes sh{" + "".join(f"{k * 1.25:g}%{{transform:translateX({-70 * _m.cos(2 * _m.pi * k / 80):.1f}px)}}" for k in range(81)) + "}.sh{animation:sh 4.4s linear infinite}"
+           "@keyframes bl{0%{opacity:0;transform:translateY(0)}1%{opacity:1;transform:translateY(0)}25%{opacity:.2;transform:translateY(-230px)}26%,100%{opacity:0;transform:translateY(-230px)}}.bl{opacity:0;animation:bl 4.4s linear infinite both}"
            "@keyframes bm{0%{r:4;opacity:1}100%{r:26;opacity:0}}.bm{animation:bm 3.4s ease-out infinite}"
            "@keyframes st{0%{transform:translateY(0);opacity:.2}50%{opacity:1}100%{transform:translateY(40px);opacity:.2}}.st{animation:st 5s linear infinite}"
            "@keyframes fl{0%,100%{transform:scaleY(1)}50%{transform:scaleY(1.7)}}.fl{transform-box:fill-box;transform-origin:top;animation:fl .25s ease-in-out infinite}"
@@ -524,8 +553,9 @@ def greeting_svg(mode: str, text: str, stamp: str, scene="morning", slot=None) -
                              f'<mask id="sm" maskUnits="userSpaceOnUse" x="0" y="0" width="{W}" height="{H}"><rect width="{W}" height="{H}" fill="url(#fade)"/></mask>')
     scn = ""
     if scene == "night":      # crescent + twinkles
-        icon_svg = (f'<path d="M52 22 a20 20 0 1 0 12 36 a16 16 0 1 1 -12 -36z" fill="{c["second"]}"/>'
-                    f'{star4(66, 26, 5, c["accent"], "tw")}{star4(30, 30, 4, c["pink"], "tw", "style=" + chr(34) + "animation-delay:-1s" + chr(34))}')
+        icon_svg = (f'<mask id="mm"><rect x="0" y="0" width="84" height="84" fill="#fff"/><circle cx="53" cy="35" r="17" fill="#000"/></mask>'
+                    f'<g class="bobi"><circle cx="40" cy="44" r="20" fill="{c["second"]}" mask="url(#mm)"/></g>'
+                    f'{star4(62, 54, 5, c["accent"], "tw")}{star4(58, 22, 4, c["pink"], "tw", "style=" + chr(34) + "animation-delay:-1s" + chr(34))}')
         scn = "".join(f'<circle class="tws" cx="{rr.randint(520, 800)}" cy="{rr.randint(10, 72)}" r="{rr.choice([1, 1.4, 2])}" fill="{c["ink"]}" style="animation-delay:-{rr.uniform(0, 3):.1f}s"/>' for _ in range(26))
         scn += f'<line class="gsl" x1="560" y1="14" x2="500" y2="-6" stroke="{c["accent"]}" stroke-width="2" stroke-linecap="round"/>'
     elif scene == "evening":  # a dusk porthole (sun sinking into the sea, all clipped to the disc), soft sunset glow, birds, fireflies
@@ -581,7 +611,6 @@ def greeting_svg(mode: str, text: str, stamp: str, scene="morning", slot=None) -
     body = (f'<clipPath id="gc"><rect x="1" y="1" width="{W - 2}" height="{H - 2}" rx="28"/></clipPath><g clip-path="url(#gc)"><g mask="url(#sm)"><g transform="scale(1 1.05)">{scn}</g></g></g>'
             f'<rect x=".5" y=".5" width="{W - 1}" height="{H - 1}" rx="28" fill="none" stroke="{c["line"]}"/>'
             f'<rect class="run" x=".5" y=".5" width="{W - 1}" height="{H - 1}" rx="28" fill="none" stroke="url(#g1)" stroke-width="2.6" pathLength="400"/>'
-            f'<circle class="rsp" cx="52" cy="44" r="36" fill="none" stroke="url(#g1)" stroke-width="1.8" stroke-dasharray="4 8" stroke-linecap="round"/>'
             f'<g transform="translate(10 2)">{icon_svg}</g>'
             f'<clipPath id="tx"><path d="{d}"/></clipPath><g class="typ"><path d="{d}" fill="{c["ink"]}"/>'
             f'<g clip-path="url(#tx)"><rect class="shm" x="104" y="14" width="70" height="34" fill="url(#g1)" opacity=".9" transform="skewX(-20)"/></g></g>'

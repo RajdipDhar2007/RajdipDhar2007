@@ -41,6 +41,11 @@ def pretty(name: str) -> str:
     return " ".join(words[:2]) if len(" ".join(words)) > 16 else " ".join(words)
 
 
+def pill_name(name: str) -> str:
+    full = " ".join(re.sub(r"[_-]+", " ", name).split())
+    return full if len(full) <= 26 else full[:25].rstrip() + "..."
+
+
 def pick_asset(assets: list[dict]) -> tuple[str, str] | None:
     """Best installable release asset as (url, sub-label), or None."""
     def rank(a):
@@ -127,7 +132,7 @@ def main() -> None:
     for f in (OUT / "projects").glob("*.svg"):
         if f.name not in keep:
             f.unlink()
-    more = [dict(name=pretty(o["name"]), url=o["url"], kind=GLYPHS[i % len(GLYPHS)]) for i, o in enumerate(others)]
+    more = [dict(name=pill_name(o["name"]), url=o["url"], kind=GLYPHS[i % len(GLYPHS)]) for i, o in enumerate(others)]
     more.append(dict(name="and more", url=f"https://github.com/{login}?tab=repositories", kind="plus"))
     for k in range(8):                                             # drop stale pills
         for m in MODES:
