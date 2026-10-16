@@ -89,13 +89,17 @@ def toolbox(mode: str) -> str:
 # ------------------------------------------------------------------ projects
 PROJECTS = [
     dict(key="ultimatecraft", name="UltimateCraft", icon="c", chips=["C", "OpenGL"],
-         desc="Open-world voxel survival sandbox written from scratch in C and OpenGL: hand-built physics, real animal sounds, five realms and an epic story."),
+         desc="Open-world voxel survival sandbox written from scratch in C and OpenGL: hand-built physics, real animal sounds, five realms and an epic story.",
+         band=dict(kind="download", sub="WINDOWS  ·  ZIP BUILD", url="https://github.com/RajdipDhar2007/UltimateCraft/releases/download/v5.1.0/UltimateCraft-5.1.0-windows.zip")),
     dict(key="loci", name="Loci", icon="typescript", chips=["TypeScript", "Canvas"],
-         desc="Graph anything in one living 3D space: 2D, implicit, inequality, parametric and 3D surfaces."),
+         desc="Graph anything in one living 3D space: 2D, implicit, inequality, parametric and 3D surfaces.",
+         band=dict(kind="repo", sub="SOURCE  ·  README  ·  STARS", url="https://github.com/RajdipDhar2007/Loci")),
     dict(key="attendtrack", name="AttendTrack", icon="kotlin", chips=["Kotlin", "Jetpack Compose", "Gemini"],
-         desc="Android attendance tracker with a bunk calculator, timetable, exams, study planner and an AI copilot."),
+         desc="Android attendance tracker with a bunk calculator, timetable, exams, study planner and an AI copilot.",
+         band=dict(kind="download", sub="ANDROID  ·  APK INSTALLER", url="https://github.com/RajdipDhar2007/AttendTrack/releases/latest/download/AttendTrack.apk")),
     dict(key="meridian", name="Meridian", icon="react", chips=["React", "TypeScript", "Vite"],
-         desc="Instrument-panel weather app with a live GPS-driven sky. No API keys needed."),
+         desc="Instrument-panel weather app with a live GPS-driven sky. No API keys needed.",
+         band=dict(kind="repo", sub="SOURCE  ·  README  ·  STARS", url="https://github.com/RajdipDhar2007/Meridian")),
 ]
 
 
@@ -167,17 +171,63 @@ def project_card(p: dict, mode: str, idx: int) -> str:
            "@keyframes spin{to{transform:rotate(360deg)}}.wm{transform-box:fill-box;transform-origin:center;animation:spin 40s linear infinite}" + _tw())
     arrow = (f'<g class="arr"><circle cx="{W - 44}" cy="{H - 41}" r="20" fill="url(#g1)"/>'
              f'<path d="M{W - 52} {H - 33} L{W - 36} {H - 49} M{W - 48} {H - 49} H{W - 36} V{H - 37}" fill="none" stroke="{"#0D1117" if mode == "dark" else "#fff"}" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></g>')
-    body = (f'<clipPath id="cc"><rect x="1" y="1" width="{W - 2}" height="{H - 2}" rx="26"/></clipPath>'
-            f'<g class="cb" style="animation-delay:-{idx * 1.3:.1f}s"><rect x="1" y="1" width="{W - 2}" height="{H - 2}" rx="26" fill="{c["card"]}" stroke="{c["line"]}" stroke-width="1.5"/>'
+    body = (f'<clipPath id="cc"><rect x="1" y="1" width="{W - 2}" height="{H + 38}" rx="26"/></clipPath>'
+            f'<g><rect x="1" y="1" width="{W - 2}" height="{H + 38}" rx="26" fill="{c["card"]}" stroke="{c["line"]}" stroke-width="1.5"/>'
             f'<g clip-path="url(#cc)"><circle cx="{W - 30}" cy="40" r="120" fill="{col}" opacity=".10"/>'
             f'<g class="wm">{icon(p["icon"], W - 130, -10, 130, col, "opacity=\".07\"")}</g></g>'
             f'{ART[p["key"]](W - 150, 26, col, c)}'
-            f'<rect class="run" x="1" y="1" width="{W - 2}" height="{H - 2}" rx="26" fill="none" stroke="url(#g1)" stroke-width="3" pathLength="1000" style="animation-delay:-{idx * 1.7:.1f}s"/>'
+            f'<rect class="run" x="1" y="1" width="{W - 2}" height="{H + 38}" rx="26" fill="none" stroke="url(#g1)" stroke-width="3" pathLength="1000" style="animation-delay:-{idx * 1.7:.1f}s"/>'
             f'<g clip-path="url(#cc)">{"".join(f"<circle class=" + chr(34) + "ptl" + chr(34) + f" cx=" + chr(34) + f"{40 + j * 58}" + chr(34) + f" cy=" + chr(34) + f"{H - 10}" + chr(34) + f" r=" + chr(34) + f"{1.6 + (j % 3) * .6}" + chr(34) + f" fill=" + chr(34) + f"{col}" + chr(34) + " style=" + chr(34) + f"animation-delay:-{(j * 1.1 + idx) % 6:.1f}s;animation-duration:{4 + j % 3}s" + chr(34) + "/>" for j in range(6))}</g>'
             f'<g clip-path="url(#cc)"><rect class="sheen" x="-120" y="0" width="70" height="{H}" fill="#fff" opacity=".10" transform="skewX(-20)" style="animation-delay:-{idx * 1.6:.1f}s"/></g>'
             f'<path d="{kd}" fill="{c["accent"]}"/><path d="{td}" fill="url(#g1)"/>{dd}{chips}{arrow}'
             f'{star4(W - 90, 150, 6, c["accent"], "tw")}{star4(W - 40, 120, 4, c["pink"], "tw", "style=" + chr(34) + "animation-delay:-1.3s" + chr(34))}</g>')
-    return doc(W, H, body, css, _grad(c, "g1"), f"{p['name']}: {p['desc']}", pad_y=8)
+    return doc(W, H, body, css, _grad(c, "g1"), f"{p['name']}: {p['desc']}")
+
+
+def action_band(p: dict, mode: str, idx: int) -> str:
+    """Bottom strip of a project card: a big animated button (download the build, or open the repo)."""
+    c = PAL[mode]
+    W, H = 400, 70
+    hf, mf = typo.font(typo.HEAD), typo.font(typo.MONO_B)
+    dl = p["band"]["kind"] == "download"
+    dark = "#0D1117" if mode == "dark" else "#fff"
+    fg = dark if dl else c["ink"]
+    px, py, pw, ph = 20, 10, W - 40, 50
+    label = "DOWNLOAD" if dl else "OPEN REPOSITORY"
+    ld, _ = hf.path(label, 17, 88, py + 25, 2)
+    sd, _ = mf.path(p["band"]["sub"], 9.5, 88, py + 40, 2)
+    if dl:   # arrow into a tray
+        glyph = (f'<g class="bnc"><path d="M0 -9 V5 M-7 -2 L0 5 L7 -2" fill="none" stroke="{fg}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>'
+                 f'<path d="M-9 10 H9" stroke="{fg}" stroke-width="3" stroke-linecap="round"/>')
+    else:    # arrow out of the card
+        glyph = f'<g class="nudge"><path d="M-6 6 L6 -6 M-3 -6 H6 V3" fill="none" stroke="{fg}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>'
+    chev = "".join(f'<path class="chv" d="M{px + pw - 62 + k * 14} {py + 16} l8 9 l-8 9" fill="none" stroke="{fg}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="animation-delay:{k * .22:.2f}s"/>' for k in range(3))
+    fill = 'fill="url(#g1)"' if dl else f'fill="{c["accent"]}" fill-opacity=".07" stroke="url(#g1)" stroke-width="2"'
+    disc = (f'fill="{dark}" fill-opacity=".22"' if dl else f'fill="{c["card"]}" stroke="url(#g1)" stroke-width="2"')
+    prog = f'<rect class="prog" x="{px}" y="{py + ph - 4}" width="{pw}" height="4" fill="{dark}" opacity=".3"/>' if dl else ""
+    css = ("@keyframes bnc{0%,100%{transform:translateY(-2px)}50%{transform:translateY(3px)}}.bnc{animation:bnc 1s ease-in-out infinite}"
+           "@keyframes nudge{0%,100%{transform:translate(0,0)}50%{transform:translate(3px,-3px)}}.nudge{animation:nudge 1.4s ease-in-out infinite}"
+           "@keyframes chv{0%,100%{opacity:.2}35%{opacity:1}}.chv{animation:chv 1.3s ease-in-out infinite}"
+           "@keyframes rip{0%{r:19;opacity:.8}100%{r:34;opacity:0}}.rip{animation:rip 1.8s ease-out infinite}"
+           "@keyframes shn{0%{transform:translateX(0)}45%,100%{transform:translateX(460px)}}.shn{animation:shn 3.2s ease-in-out infinite}"
+           "@keyframes prog{0%{transform:scaleX(0)}70%,100%{transform:scaleX(1)}}.prog{transform-box:fill-box;transform-origin:left;animation:prog 2.6s ease-in-out infinite}"
+           "@keyframes pl{0%{opacity:.75;transform:scale(1)}100%{opacity:0;transform:scale(1.05,1.25)}}.pl{transform-box:fill-box;transform-origin:center;animation:pl 2s ease-out infinite}"
+           "@keyframes run{to{stroke-dashoffset:-1000}}.run{stroke-dasharray:160 840;animation:run 6s linear infinite}"
+           "@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}.bob{animation:bob 2.4s ease-in-out infinite}" + _tw())
+    body = (f'<rect x="1" y="-40" width="{W - 2}" height="{H + 39}" rx="26" fill="{c["card"]}" stroke="{c["line"]}" stroke-width="1.5"/>'
+            f'<rect class="run" x="1" y="-40" width="{W - 2}" height="{H + 39}" rx="26" fill="none" stroke="url(#g1)" stroke-width="3" pathLength="1000" style="animation-delay:-{idx * 1.7 + 3:.1f}s"/>'
+            f'<line x1="26" y1="1" x2="{W - 26}" y2="1" stroke="{c["line"]}" stroke-dasharray="2 6" stroke-linecap="round"/>'
+            f'<clipPath id="bp"><rect x="{px}" y="{py}" width="{pw}" height="{ph}" rx="25"/></clipPath>'
+            f'<rect class="pl" x="{px}" y="{py}" width="{pw}" height="{ph}" rx="25" fill="none" stroke="url(#g1)" stroke-width="2.5"/>'
+            f'<g class="bob"><rect x="{px}" y="{py}" width="{pw}" height="{ph}" rx="25" {fill}/>'
+            f'<g clip-path="url(#bp)"><rect class="shn" x="{px - 90}" y="{py}" width="46" height="{ph}" fill="#fff" opacity="{.38 if dl else .14}" transform="skewX(-20)"/>{prog}</g>'
+            f'<circle class="rip" cx="{px + 30}" cy="{py + 25}" r="19" fill="none" stroke="{fg if dl else c["accent"]}" stroke-width="2"/>'
+            f'<circle cx="{px + 30}" cy="{py + 25}" r="19" {disc}/>'
+            f'<g transform="translate({px + 30} {py + 25})">{glyph}</g>'
+            f'<path d="{ld}" fill="{fg}"/><path d="{sd}" fill="{fg}" fill-opacity=".72"/>{chev}'
+            f'{star4(px + pw - 14, py + 9, 4.5, fg if dl else c["pink"], "tw")}</g>')
+    verb = "Download" if dl else "Open"
+    return doc(W, H, body, css, _grad(c, "g1"), f"{verb} {p['name']}: " + " ".join(p["band"]["sub"].split()))
 
 
 def build():
@@ -185,3 +235,4 @@ def build():
         write(OUT / "sections" / f"toolbox-{m}.svg", toolbox(m))
         for i, p in enumerate(PROJECTS):
             write(OUT / "projects" / f"{p['key']}-{m}.svg", project_card(p, m, i))
+            write(OUT / "projects" / f"{p['key']}-band-{m}.svg", action_band(p, m, i))

@@ -27,10 +27,14 @@ def title(slug: str, alt: str) -> str:
             f'<p align="center">{pic("assets/titles/" + slug + "-{m}.svg", alt)}</p>\n')
 
 
-def card(key: str, name: str, extra: str) -> str:
+def card(key: str, name: str, band_url: str) -> str:
+    """Project card (links to the repo) with an attached action band (download, or open the repo)."""
+    owner = REPO.split("/")[0]
+    top = pic("assets/projects/" + key + "-{m}.svg", name + " project card", "100%", 'align="top"')
+    band = pic("assets/projects/" + key + "-band-{m}.svg", "Action button for " + name, "100%", 'align="top"')
     return (f'<td width="50%" align="center" valign="top">\n'
-            f'<a href="https://github.com/{REPO.split("/")[0]}/{name}">{pic("assets/projects/" + key + "-{m}.svg", name + " project card", "100%")}</a>\n'
-            f'{extra}\n</td>')
+            f'<a href="https://github.com/{owner}/{name}">{top}</a><br>\n'
+            f'<a href="{band_url}">{band}</a>\n</td>')
 
 
 def main() -> None:
@@ -65,12 +69,12 @@ def main() -> None:
 {title("work", "Featured work")}
 <table>
 <tr>
-{card("ultimatecraft", "UltimateCraft", f'<sub><a href="https://github.com/{owner}/UltimateCraft/releases/latest">Download latest build</a></sub><!-- TODO_RAJDIP: write-up link, demo GIF -->')}
-{card("loci", "Loci", "<!-- TODO_RAJDIP: live link, write-up, demo GIF -->")}
+{card("ultimatecraft", "UltimateCraft", f"https://github.com/{owner}/UltimateCraft/releases/download/v5.1.0/UltimateCraft-5.1.0-windows.zip")}
+{card("loci", "Loci", f"https://github.com/{owner}/Loci")}
 </tr>
 <tr>
-{card("attendtrack", "AttendTrack", "<!-- TODO_RAJDIP: live link, write-up, demo GIF -->")}
-{card("meridian", "Meridian", "<!-- TODO_RAJDIP: live link, write-up, demo GIF -->")}
+{card("attendtrack", "AttendTrack", f"https://github.com/{owner}/AttendTrack/releases/latest/download/AttendTrack.apk")}
+{card("meridian", "Meridian", f"https://github.com/{owner}/Meridian")}
 </tr>
 </table>
 

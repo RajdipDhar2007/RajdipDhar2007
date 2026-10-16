@@ -35,22 +35,22 @@
 <table>
 <tr>
 <td width="50%" align="center" valign="top">
-<a href="https://github.com/RajdipDhar2007/UltimateCraft"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/projects/ultimatecraft-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/projects/ultimatecraft-light.svg"><img alt="UltimateCraft project card" src="assets/projects/ultimatecraft-light.svg" width="100%" ></picture></a>
-<sub><a href="https://github.com/RajdipDhar2007/UltimateCraft/releases/latest">Download latest build</a></sub><!-- TODO_RAJDIP: write-up link, demo GIF -->
+<a href="https://github.com/RajdipDhar2007/UltimateCraft"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/projects/ultimatecraft-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/projects/ultimatecraft-light.svg"><img alt="UltimateCraft project card" src="assets/projects/ultimatecraft-light.svg" width="100%" align="top"></picture></a><br>
+<a href="https://github.com/RajdipDhar2007/UltimateCraft/releases/download/v5.1.0/UltimateCraft-5.1.0-windows.zip"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/projects/ultimatecraft-band-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/projects/ultimatecraft-band-light.svg"><img alt="Action button for UltimateCraft" src="assets/projects/ultimatecraft-band-light.svg" width="100%" align="top"></picture></a>
 </td>
 <td width="50%" align="center" valign="top">
-<a href="https://github.com/RajdipDhar2007/Loci"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/projects/loci-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/projects/loci-light.svg"><img alt="Loci project card" src="assets/projects/loci-light.svg" width="100%" ></picture></a>
-<!-- TODO_RAJDIP: live link, write-up, demo GIF -->
+<a href="https://github.com/RajdipDhar2007/Loci"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/projects/loci-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/projects/loci-light.svg"><img alt="Loci project card" src="assets/projects/loci-light.svg" width="100%" align="top"></picture></a><br>
+<a href="https://github.com/RajdipDhar2007/Loci"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/projects/loci-band-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/projects/loci-band-light.svg"><img alt="Action button for Loci" src="assets/projects/loci-band-light.svg" width="100%" align="top"></picture></a>
 </td>
 </tr>
 <tr>
 <td width="50%" align="center" valign="top">
-<a href="https://github.com/RajdipDhar2007/AttendTrack"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/projects/attendtrack-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/projects/attendtrack-light.svg"><img alt="AttendTrack project card" src="assets/projects/attendtrack-light.svg" width="100%" ></picture></a>
-<!-- TODO_RAJDIP: live link, write-up, demo GIF -->
+<a href="https://github.com/RajdipDhar2007/AttendTrack"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/projects/attendtrack-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/projects/attendtrack-light.svg"><img alt="AttendTrack project card" src="assets/projects/attendtrack-light.svg" width="100%" align="top"></picture></a><br>
+<a href="https://github.com/RajdipDhar2007/AttendTrack/releases/latest/download/AttendTrack.apk"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/projects/attendtrack-band-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/projects/attendtrack-band-light.svg"><img alt="Action button for AttendTrack" src="assets/projects/attendtrack-band-light.svg" width="100%" align="top"></picture></a>
 </td>
 <td width="50%" align="center" valign="top">
-<a href="https://github.com/RajdipDhar2007/Meridian"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/projects/meridian-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/projects/meridian-light.svg"><img alt="Meridian project card" src="assets/projects/meridian-light.svg" width="100%" ></picture></a>
-<!-- TODO_RAJDIP: live link, write-up, demo GIF -->
+<a href="https://github.com/RajdipDhar2007/Meridian"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/projects/meridian-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/projects/meridian-light.svg"><img alt="Meridian project card" src="assets/projects/meridian-light.svg" width="100%" align="top"></picture></a><br>
+<a href="https://github.com/RajdipDhar2007/Meridian"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/projects/meridian-band-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/projects/meridian-band-light.svg"><img alt="Action button for Meridian" src="assets/projects/meridian-band-light.svg" width="100%" align="top"></picture></a>
 </td>
 </tr>
 </table>

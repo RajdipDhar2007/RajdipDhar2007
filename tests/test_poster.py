@@ -42,12 +42,12 @@ def test_generated_svgs_are_valid(mode):
     for i, p in enumerate(work.PROJECTS):
         _ok(work.project_card(p, mode, i))
     _ok(cards.dashboard_svg(mode, {"commits": 1, "prs": 2, "stars": 3, "followers": 4}, [("C", 10), ("Python", 5)], {"total": 9, "current": 2, "longest": 3}))
-    _ok(greeting_svg(mode, True))
-    _ok(greeting_svg(mode, False))
+    for scene in hero.SCENES:
+        _ok(greeting_svg(mode, scene))
 
 
-def greeting_svg(mode, night):
-    return hero.greeting_svg(mode, "Night in Kolkata", "Last auto-updated: now", night)
+def greeting_svg(mode, scene):
+    return hero.greeting_svg(mode, "Night in Kolkata", "Last auto-updated: now", scene)
 
 
 def test_text_is_outlined_not_font_dependent():
@@ -98,8 +98,15 @@ def test_streak_math():
 @pytest.mark.parametrize("utc_hour,word", [(0, "morning"), (6, "morning"), (12, "evening"), (18, "Night"), (23, "Night")])
 def test_greeting_uses_ist(utc_hour, word):
     # 00:00 UTC = 05:30 IST ; 06:00 UTC = 11:30 IST ; 12:00 UTC = 17:30 IST ; 18:00 UTC = 23:30 IST
-    text, night = greeting.greeting(dt.datetime(2026, 1, 1, utc_hour, tzinfo=dt.timezone.utc))
-    assert word in text and night == (word == "Night")
+    text, scene = greeting.greeting(dt.datetime(2026, 1, 1, utc_hour, tzinfo=dt.timezone.utc))
+    assert word in text and (scene == "night") == (word == "Night")
+
+
+@pytest.mark.parametrize("day,scene", [(3, "saturday"), (4, "sunday"), (5, "morning")])
+def test_greeting_weekend_scenes(day, scene):
+    # 2026-01-03 is a Saturday, 01-04 a Sunday, 01-05 a Monday; 06:00 UTC = 11:30 IST
+    assert greeting.greeting(dt.datetime(2026, 1, day, 6, tzinfo=dt.timezone.utc))[1] == scene
+    assert greeting.greeting(dt.datetime(2026, 1, day, 12, tzinfo=dt.timezone.utc))[1] == (scene if scene != "morning" else "evening")
 
 
 def test_stamp_is_ist():

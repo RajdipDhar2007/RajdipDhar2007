@@ -354,7 +354,18 @@ def arcade_card(mode: str) -> str:
     play, _ = hf.path("PLAY NOW", 17, bx + 66, by + 33, 1)
     tri = f"M{bx + 30} {by + 16} L{bx + 30} {by + 36} L{bx + 46} {by + 26}Z"
     dark = "#0D1117" if mode == "dark" else "#fff"
-    url, _ = mf.path("INSERT COIN", 12, bx + bw + 22, by + 31, 3)
+    # rotating motivational lines (one CSS cycle, each wipes in, glows, then fades up and out)
+    qx, qw, slot = bx + bw + 24, 224, 3.6
+    quotes = ["Debug today, ship tomorrow.", "Small steps still ship big things.", "Every bug is a lesson in disguise.", "Press start on your next idea.",
+              "Code it. Break it. Fix it. Level up.", "Be the boss you are trying to beat.", "Progress beats perfect, every run.", "Stay curious. Keep shipping."]
+    qparts = ""
+    for k, qt in enumerate(quotes):
+        ql = hf.wrap(qt, 14.5, qw)[:2]
+        qd = "".join(f'<path d="{hf.path(l, 14.5, qx, by + 27 + j * 21)[0]}" fill="{c["ink"]}"/>' for j, l in enumerate(ql))
+        qparts += f'<g class="q q{k}" style="animation-delay:{k * slot:.1f}s">{qd}</g>'
+    qlab, _ = mf.path("POWER-UP", 9.5, qx + 14, by + 8, 3)
+    quote = (f'<g class="qb"><path d="M{qx - 12} {by + 3} V{by + bh - 2}" stroke="url(#g1)" stroke-width="3" stroke-linecap="round"/></g>'
+             f'<path class="qlab" d="{qlab}" fill="{c["accent"]}"/>{star4(qx + 4, by + 4, 4.5, c["pink"], "tw")}{qparts}')
     chips, x = "", 332
     for k, lab in enumerate(["BOSS FIGHTS", "POWER-UPS", "COMBOS", "MOBILE READY"]):
         cw = mf.width(lab, 10, 1) + 22
@@ -366,7 +377,10 @@ def arcade_card(mode: str) -> str:
           f'<path class="pop" d="{mf.path("+100", 11, fx + 60, fy + 120, 1)[0]}" fill="{c["gold"] if "gold" in c else c["pink"]}"/>')
     css = ("@keyframes pwr{from{transform:translate(0,0)}to{transform:translate(-40px,300px)}}.pwr{animation:pwr 9s linear infinite;animation-delay:-3s}"
            "@keyframes pop{0%,100%{opacity:0;transform:translateY(0)}10%{opacity:1}40%{opacity:0;transform:translateY(-22px)}}.pop{animation:pop 3.4s ease-out infinite}"
-           "@keyframes coin{0%,49%{opacity:1}50%,100%{opacity:.15}}.coin{animation:coin 1s steps(1) infinite}"
+           "@keyframes qin{0%{opacity:0;transform:translateY(14px);clip-path:inset(0 100% 0 0)}2%{opacity:1}6%{opacity:1;transform:translateY(0);clip-path:inset(-4px 0 -4px 0)}11%{opacity:1;transform:translateY(0);clip-path:inset(-4px 0 -4px 0)}12.5%,100%{opacity:0;transform:translateY(-14px);clip-path:inset(-4px 0 -4px 0)}}"
+           ".q{opacity:0;animation:qin 28.8s ease-out infinite both}.q0{opacity:1}"
+           "@keyframes qlab{0%,100%{opacity:1}50%{opacity:.45}}.qlab{animation:qlab 1.4s ease-in-out infinite}"
+           "@keyframes qbar{0%,100%{opacity:.5}50%{opacity:1}}.qb{animation:qbar 1.8s ease-in-out infinite}"
            "@keyframes crt{from{transform:translateY(0)}to{transform:translateY(6px)}}.crt{animation:crt .5s linear infinite}"
            "@keyframes bf{from{transform:translateY(0)}to{transform:translateY(330px)}}.bf{animation:bf 7s linear infinite}"
            "@keyframes sw{0%,100%{transform:translateX(calc(var(--a) * -1))}50%{transform:translateX(var(--a))}}.sw{animation:sw 3s ease-in-out infinite}"
@@ -390,7 +404,7 @@ def arcade_card(mode: str) -> str:
             f'<g class="bob"><clipPath id="bcl"><rect x="{bx}" y="{by}" width="{bw}" height="{bh}" rx="26"/></clipPath><rect x="{bx}" y="{by}" width="{bw}" height="{bh}" rx="26" fill="url(#g1)"/>'
             f'<g clip-path="url(#bcl)"><rect class="shn" x="{bx - 90}" y="{by}" width="46" height="{bh}" fill="#fff" opacity=".4" transform="skewX(-20)"/></g>'
             f'<path class="tri" d="{tri}" fill="{dark}"/><path d="{play}" fill="{dark}"/></g>'
-            f'<path class="coin" d="{url}" fill="{c["accent"]}"/>{star4(790, 40, 9, c["accent"], "tw")}{star4(760, 70, 5, c["pink"], "tw", "style=" + chr(34) + "animation-delay:-1s" + chr(34))}')
+            f'{quote}{star4(790, 40, 9, c["accent"], "tw")}{star4(760, 70, 5, c["pink"], "tw", "style=" + chr(34) + "animation-delay:-1s" + chr(34))}')
     defs = _grad(c, "g1") + f'<linearGradient id="pbg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="{c["base"]}"/><stop offset="1" stop-color="{c["base2"]}"/></linearGradient>'
     return doc(W, H, body, css, defs, "Bug Hunter, a playable arcade shooter. Click to play.", pad_y=8)
 
@@ -475,35 +489,80 @@ def contact_pill(label: str, sub: str, icon_name: str, mode: str) -> str:
 
 
 # ------------------------------------------------------------------ live greeting
-def greeting_svg(mode: str, text: str, stamp: str, night: bool) -> str:
+SCENES = ("morning", "afternoon", "evening", "night", "saturday", "sunday")
+
+
+def greeting_svg(mode: str, text: str, stamp: str, scene="morning") -> str:
+    """scene: morning | afternoon | evening | night | saturday | sunday (a bool is accepted: True = night)."""
+    import random as _r
+    if isinstance(scene, bool):
+        scene = "night" if scene else "morning"
     c = PAL[mode]
+    warm = "#FB923C" if mode == "dark" else "#EA580C"
     W, H = 830, 84
     hf, bf = typo.font(typo.HEAD), typo.font(typo.MONO)
     d, w = hf.path(text, 19, 84, 38)
     sd, _ = bf.path(stamp, 12, 84, 62)
-    if night:   # crescent + twinkles
+    rr = _r.Random(3)
+    css = ("@keyframes spin{to{transform:rotate(360deg)}}.spin{transform-origin:42px 42px;animation:spin 14s linear infinite}"
+           "@keyframes run{to{stroke-dashoffset:-400}}.run{stroke-dasharray:80 320;animation:run 6s linear infinite}"
+           "@keyframes bobi{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}.bobi{animation:bobi 2.8s ease-in-out infinite}"
+           "@keyframes tws{0%,100%{opacity:.15}50%{opacity:.9}}.tws{animation:tws 3s ease-in-out infinite}"
+           "@keyframes gsl{0%{transform:translate(0,0);opacity:0}10%{opacity:1}35%,100%{transform:translate(220px,70px);opacity:0}}.gsl{animation:gsl 7s ease-in infinite}"
+           "@keyframes cld{from{transform:translateX(0)}to{transform:translateX(300px)}}.cld{animation:cld 20s linear infinite}"
+           "@keyframes hal{0%,100%{opacity:.25;transform:scale(1)}50%{opacity:.6;transform:scale(1.25)}}.hal{transform-box:fill-box;transform-origin:center;animation:hal 3.2s ease-in-out infinite}"
+           "@keyframes bird{from{transform:translate(0,0)}to{transform:translate(340px,-22px)}}.bird{animation:bird 16s linear infinite}"
+           "@keyframes flap{0%,100%{transform:scaleY(1)}50%{transform:scaleY(.35)}}.flap{transform-box:fill-box;transform-origin:center;animation:flap .7s ease-in-out infinite}"
+           "@keyframes fly{0%,100%{opacity:.1;transform:translate(0,0)}50%{opacity:1;transform:translate(8px,-10px)}}.fly{animation:fly 3.6s ease-in-out infinite}"
+           "@keyframes conf{0%{transform:translateY(-12px) rotate(0);opacity:0}10%{opacity:1}100%{transform:translateY(100px) rotate(360deg);opacity:0}}.conf{animation:conf 4.5s linear infinite}"
+           "@keyframes burst{0%{transform:scale(.1);opacity:1}70%{opacity:.9}100%{transform:scale(1);opacity:0}}.burst{transform-box:fill-box;transform-origin:center;animation:burst 3.4s ease-out infinite}"
+           "@keyframes steam{0%{transform:translateY(0);opacity:0}30%{opacity:.8}100%{transform:translateY(-8px);opacity:0}}.steam{animation:steam 2.4s ease-in infinite}"
+           "@keyframes leaf{0%{transform:translate(0,-10px) rotate(0);opacity:0}15%{opacity:.8}100%{transform:translate(-120px,100px) rotate(240deg);opacity:0}}.leaf{animation:leaf 9s linear infinite}"
+           "@keyframes pad{0%,100%{transform:rotate(-8deg)}50%{transform:rotate(8deg)}}.pad{transform-box:fill-box;transform-origin:center;animation:pad 1.6s ease-in-out infinite}" + _tw())
+    defs = _grad(c, "g1")
+    scn = ""
+    if scene == "night":      # crescent + twinkles
         icon_svg = (f'<path d="M52 22 a20 20 0 1 0 12 36 a16 16 0 1 1 -12 -36z" fill="{c["second"]}"/>'
-                    f'{star4(66, 26, 5, c["accent"], "tw")}{star4(30, 30, 4, c["pink"], "tw", "style=\"animation-delay:-1s\"")}')
-    else:       # sun with rotating rays
+                    f'{star4(66, 26, 5, c["accent"], "tw")}{star4(30, 30, 4, c["pink"], "tw", "style=" + chr(34) + "animation-delay:-1s" + chr(34))}')
+        scn = "".join(f'<circle class="tws" cx="{rr.randint(520, 800)}" cy="{rr.randint(10, 72)}" r="{rr.choice([1, 1.4, 2])}" fill="{c["ink"]}" style="animation-delay:-{rr.uniform(0, 3):.1f}s"/>' for _ in range(26))
+        scn += f'<line class="gsl" x1="560" y1="14" x2="500" y2="-6" stroke="{c["accent"]}" stroke-width="2" stroke-linecap="round"/>'
+    elif scene == "evening":  # sun sinking into a glowing horizon, birds, fireflies
+        defs += (f'<linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="{c["second"]}" stop-opacity="0"/>'
+                 f'<stop offset=".6" stop-color="{c["pink"]}" stop-opacity=".16"/><stop offset="1" stop-color="{warm}" stop-opacity=".34"/></linearGradient>'
+                 f'<clipPath id="hz"><rect x="14" y="14" width="56" height="42"/></clipPath>')
+        icon_svg = (f'<circle class="hal" cx="42" cy="56" r="26" fill="{warm}" opacity=".3"/>'
+                    f'<g clip-path="url(#hz)"><g class="bobi"><circle cx="42" cy="56" r="15" fill="{warm}"/><circle cx="42" cy="56" r="9" fill="{c["pink"]}" opacity=".55"/></g></g>'
+                    f'<path d="M12 56 H72" stroke="{warm}" stroke-width="3" stroke-linecap="round"/><path d="M20 63 H64" stroke="{c["pink"]}" stroke-width="2" stroke-linecap="round" opacity=".6"/>'
+                    f'{star4(66, 22, 4, c["accent"], "tw")}')
+        scn = (f'<rect x="440" y="0" width="390" height="84" fill="url(#sky)"/>'
+               + "".join(f'<g class="bird" style="animation-delay:-{k * 5.3:.1f}s;animation-duration:{14 + k * 3}s"><path class="flap" d="M470 {24 + k * 14} q6 -7 12 0 q6 -7 12 0" fill="none" stroke="{c["ink"]}" stroke-opacity=".45" stroke-width="1.8" stroke-linecap="round" style="animation-delay:-{k * .3:.1f}s"/></g>' for k in range(3))
+               + "".join(f'<circle class="fly" cx="{rr.randint(560, 810)}" cy="{rr.randint(44, 76)}" r="{rr.choice([1.4, 1.9, 2.4])}" fill="{warm}" style="animation-delay:-{rr.uniform(0, 3.6):.1f}s"/>' for _ in range(14)))
+    elif scene == "saturday":  # game pad + confetti and fireworks: weekend build mode
+        icon_svg = (f'<g class="pad"><rect x="18" y="30" width="48" height="26" rx="13" fill="{c["card"]}" stroke="url(#g1)" stroke-width="3"/>'
+                    f'<path d="M30 36 v14 M23 43 h14" stroke="{c["accent"]}" stroke-width="3" stroke-linecap="round"/>'
+                    f'<circle cx="51" cy="40" r="3" fill="{c["pink"]}"/><circle cx="58" cy="46" r="3" fill="{c["green"]}"/></g>'
+                    f'{star4(66, 22, 5, c["pink"], "tw")}{star4(20, 24, 4, c["accent"], "tw", "style=" + chr(34) + "animation-delay:-1.1s" + chr(34))}')
+        cols = [c["accent"], c["pink"], c["second"], c["green"], warm]
+        scn = "".join(f'<rect class="conf" x="{rr.randint(500, 810)}" y="{rr.randint(-4, 12)}" width="5" height="9" rx="1.5" fill="{cols[k % 5]}" style="animation-delay:-{rr.uniform(0, 4.5):.1f}s;animation-duration:{3.5 + rr.random() * 2:.1f}s"/>' for k in range(26))
+        for k, (bx_, by_) in enumerate([(600, 30), (730, 48), (670, 62)]):
+            ray = "".join(f'<line x1="{bx_}" y1="{by_ - 6}" x2="{bx_}" y2="{by_ - 17}" stroke="{cols[(k + a) % 5]}" stroke-width="2.2" stroke-linecap="round" transform="rotate({a * 45} {bx_} {by_})"/>' for a in range(8))
+            scn += f'<g class="burst" style="animation-delay:-{k * 1.15:.2f}s">{ray}</g>'
+    elif scene == "sunday":    # coffee with rising steam, drifting leaves: slow recharge day
+        icon_svg = (f'<path d="M20 38 h36 v12 a12 12 0 0 1 -12 12 h-12 a12 12 0 0 1 -12 -12z" fill="{c["card"]}" stroke="url(#g1)" stroke-width="3" stroke-linejoin="round"/>'
+                    f'<path d="M56 42 h4 a6 6 0 0 1 0 12 h-5" fill="none" stroke="url(#g1)" stroke-width="3" stroke-linecap="round"/>'
+                    f'<path d="M24 38 h28 v4 h-28z" fill="{warm}" opacity=".7"/>'
+                    + "".join(f'<path class="steam" d="M{x} 32 q-4 -5 0 -9 q4 -4 0 -9" fill="none" stroke="{c["muted"]}" stroke-width="2.2" stroke-linecap="round" style="animation-delay:-{k * .8:.1f}s"/>' for k, x in enumerate((28, 38, 48))))
+        scn = "".join(f'<g class="cld" style="animation-delay:-{k * 6}s;animation-duration:{26 + k * 6}s"><ellipse cx="520" cy="{22 + k * 22}" rx="34" ry="9" fill="{c["second"]}" opacity=".16"/><ellipse cx="545" cy="{16 + k * 22}" rx="22" ry="8" fill="{c["second"]}" opacity=".16"/></g>' for k in range(3))
+        scn += "".join(f'<g transform="translate({rr.randint(640, 830)} {rr.randint(0, 12)})"><path class="leaf" d="M0 0 q6 -8 12 0 q-6 8 -12 0z" fill="{[warm, c["green"], c["pink"]][k % 3]}" opacity=".7" style="animation-delay:-{rr.uniform(0, 9):.1f}s"/></g>' for k in range(9))
+    else:                      # morning / afternoon: spinning sun, drifting clouds
         rays = "".join(f'<line x1="42" y1="10" x2="42" y2="18" stroke="{c["accent"]}" stroke-width="3" stroke-linecap="round" transform="rotate({a} 42 42)"/>' for a in range(0, 360, 45))
         icon_svg = f'<g class="spin">{rays}</g><circle cx="42" cy="42" r="12" fill="{c["pink"]}"/>'
-    css = ("@keyframes spin{to{transform:rotate(360deg)}}.spin{transform-origin:42px 42px;animation:spin 14s linear infinite}"
-           "@keyframes run{to{stroke-dashoffset:-400}}.run{stroke-dasharray:80 320;animation:run 6s linear infinite}" + _tw())
-    import random as _r
-    rr = _r.Random(3)
-    if night:
-        scene = "".join(f'<circle class="tws" cx="{rr.randint(520, 800)}" cy="{rr.randint(10, 72)}" r="{rr.choice([1, 1.4, 2])}" fill="{c["ink"]}" style="animation-delay:-{rr.uniform(0, 3):.1f}s"/>' for _ in range(26))
-        scene += f'<line class="gsl" x1="560" y1="14" x2="500" y2="-6" stroke="{c["accent"]}" stroke-width="2" stroke-linecap="round"/>'
-    else:
-        scene = "".join(f'<g class="cld" style="animation-delay:-{k * 5}s;animation-duration:{18 + k * 4}s"><ellipse cx="540" cy="{20 + k * 20}" rx="30" ry="9" fill="{c["accent"]}" opacity=".18"/><ellipse cx="560" cy="{14 + k * 20}" rx="20" ry="8" fill="{c["accent"]}" opacity=".18"/></g>' for k in range(3))
-    css_scene = ("@keyframes tws{0%,100%{opacity:.15}50%{opacity:.9}}.tws{animation:tws 3s ease-in-out infinite}"
-                 "@keyframes gsl{0%{transform:translate(0,0);opacity:0}10%{opacity:1}35%,100%{transform:translate(220px,70px);opacity:0}}.gsl{animation:gsl 7s ease-in infinite}"
-                 "@keyframes cld{from{transform:translateX(0)}to{transform:translateX(300px)}}.cld{animation:cld 20s linear infinite}")
-    body = (f'<clipPath id="gc"><rect x="1" y="1" width="{W - 2}" height="{H - 2}" rx="26"/></clipPath><g clip-path="url(#gc)">{scene}</g>'
+        scn = "".join(f'<g class="cld" style="animation-delay:-{k * 5}s;animation-duration:{18 + k * 4}s"><ellipse cx="540" cy="{20 + k * 20}" rx="30" ry="9" fill="{c["accent"]}" opacity=".18"/><ellipse cx="560" cy="{14 + k * 20}" rx="20" ry="8" fill="{c["accent"]}" opacity=".18"/></g>' for k in range(3))
+    body = (f'<clipPath id="gc"><rect x="1" y="1" width="{W - 2}" height="{H - 2}" rx="26"/></clipPath><g clip-path="url(#gc)">{scn}</g>'
             f'<rect x=".5" y=".5" width="{W - 1}" height="{H - 1}" rx="26" fill="none" stroke="{c["line"]}"/>'
             f'<rect class="run" x=".5" y=".5" width="{W - 1}" height="{H - 1}" rx="26" fill="none" stroke="url(#g1)" stroke-width="2.4" pathLength="400"/>'
             f'{icon_svg}<path d="{d}" fill="{c["ink"]}"/><path d="{sd}" fill="{c["muted"]}"/>')
-    return doc(W, H, body, css + css_scene, _grad(c, "g1"), text)
+    return doc(W, H, body, css, defs, text)
 
 
 TITLES = [("01", "ABOUT ME", "about"), ("02", "TOOLBOX", "toolbox"), ("03", "FEATURED WORK", "work"), ("04", "BY THE NUMBERS", "stats"),
