@@ -388,7 +388,7 @@ def arcade_card(mode: str) -> str:
     # ---- right side copy
     title, tw = sf.path("Bug Hunter", 64, 330, 98)
     sub, _ = mf.path("A  PLAYABLE  ARCADE  SHOOTER", 12, 332, 126, 3)
-    pitch = bf.wrap("Squash bugs, dodge their fire and take on the SEGFAULT boss. Power-ups, combos and a rank for every score.", 15, 450)
+    pitch = bf.wrap("Squash bugs, dodge their fire and take on the SEGFAULT boss. Combos, bonus drops and a rank for every score.", 15, 450)
     pd = "".join(f'<path d="{bf.path(l, 15, 332, 160 + k * 23)[0]}" fill="{c["muted"]}"/>' for k, l in enumerate(pitch))
     bx, by, bw, bh = 332, 244, 214, 52
     play, _ = hf.path("PLAY NOW", 17, bx + 66, by + 33, 1)
@@ -407,9 +407,8 @@ def arcade_card(mode: str) -> str:
             if len(ql) <= 2 or size <= 11:
                 break
             size -= 1
-        qd = "".join(f'<path d="{sf.path(l, size, qx + 52, qy + 38 + j * 17 - (11 if len(ql) == 2 else 0))[0]}" fill="url(#g1)"/>' for j, l in enumerate(ql[:2]))
+        qd = "".join(f'<path d="{sf.path(l, size, qx + 52, qy + 36 + j * 18 - (9 if len(ql) == 2 else 0))[0]}" fill="url(#g1)"/>' for j, l in enumerate(ql[:2]))
         qparts += f'<g class="q q{k}" style="animation-delay:{k * slot:.1f}s">{qd}</g>'
-    qlab, _ = mf.path("POWER-UP", 8, qx + 52, qy + 15, 3)
     bolt = "M4 -13 L-6 2 H-1 L-4 13 L7 -3 H1Z"
     quote = (f'<rect x="{qx}" y="{qy}" width="{qw_}" height="{qh_}" rx="18" fill="{c["card"]}" fill-opacity=".6" stroke="{c["line"]}"/>'
              f'<rect class="qrun" x="{qx}" y="{qy}" width="{qw_}" height="{qh_}" rx="18" fill="none" stroke="url(#g1)" stroke-width="2" pathLength="400"/>'
@@ -417,12 +416,12 @@ def arcade_card(mode: str) -> str:
              f'<circle class="qrip" cx="{qx + 28}" cy="{qy + qh_ / 2}" r="14" fill="none" stroke="{c["pink"]}" stroke-width="2" style="animation-delay:-.9s"/>'
              f'<circle cx="{qx + 28}" cy="{qy + qh_ / 2}" r="17" fill="{c["card"]}" stroke="url(#g1)" stroke-width="2"/>'
              f'<g transform="translate({qx + 28} {qy + qh_ / 2})"><g class="qbolt"><path d="{bolt}" fill="url(#g1)" stroke="url(#g1)" stroke-width="1.4" stroke-linejoin="round"/></g></g>'
-             f'<path class="qlab" d="{qlab}" fill="{c["accent"]}"/>{qparts}'
+             f'{qparts}'
              f'<rect x="{qx + 52}" y="{qy + qh_ - 11}" width="170" height="3" rx="1.5" fill="{c["line"]}"/>'
              f'<rect class="qchg" x="{qx + 52}" y="{qy + qh_ - 11}" width="170" height="3" rx="1.5" fill="url(#g1)"/>'
              f'{star4(qx + qw_ - 14, qy + 12, 5, c["pink"], "tw")}')
     chips, x = "", 332
-    for k, lab in enumerate(["BOSS FIGHTS", "POWER-UPS", "COMBOS", "MOBILE READY"]):
+    for k, lab in enumerate(["BOSS FIGHTS", "HIGH SCORES", "COMBOS", "MOBILE READY"]):
         cw = mf.width(lab, 10, 1) + 22
         chips += f'<rect x="{x}" y="200" width="{cw:.0f}" height="24" rx="12" fill="none" stroke="{[c["accent"], c["second"], c["pink"], c["green"]][k]}" stroke-width="1.6"/><path d="{mf.path(lab, 10, x + 11, 216, 1)[0]}" fill="{c["ink"]}"/>'
         x += cw + 8

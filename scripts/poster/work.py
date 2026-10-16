@@ -366,8 +366,4 @@ def build():
     for m in MODES:
         write(OUT / "sections" / f"toolbox-{m}.svg", toolbox(m))
         write(OUT / "sections" / f"more-{m}.svg", more_header(m))
-        for k, (label, kind, _repo) in enumerate(MORE):
-            write(OUT / "sections" / f"more-{k}-{m}.svg", repo_pill(label, kind, k, m))
-        for i, p in enumerate(PROJECTS):
-            write(OUT / "projects" / f"{p['key']}-{m}.svg", project_card(p, m, i))
-            write(OUT / "projects" / f"{p['key']}-band-{m}.svg", action_band(p, m, i))
+    # pills and project cards come from scripts/featured.py (they follow the pinned repositories)

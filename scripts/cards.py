@@ -315,7 +315,7 @@ def dashboard_svg(mode: str, stats: dict, langs: list[tuple[str, int]], streak: 
              f'<clipPath id="mb"><rect x="{cx - 80}" y="418" width="{160 * frac:.0f}" height="6" rx="3"/></clipPath><rect x="{cx - 80}" y="418" width="{160 * frac:.0f}" height="6" rx="3" fill="url(#g1)"/>'
              f'<g clip-path="url(#mb)"><rect class="bshine" x="{cx - 100}" y="418" width="20" height="6" fill="#fff" opacity=".7" transform="skewX(-25)"/></g>')
     # side cards
-    for i, (val, label, col, kind) in enumerate([(streak["longest"], "LONGEST STREAK", c["second"], "trophy"), (streak["total"], "CONTRIBUTIONS", c["accent"], "grid")]):
+    for i, (val, label, col, kind) in enumerate([(streak["longest"], ("LONGEST", "STREAK"), c["second"], "trophy"), (streak["total"], ("TOTAL", "CONTRIBUTIONS"), c["accent"], "grid")]):
         y = 214 + i * 96
         px = 668
         sdig, scss = _roll(str(val), px + 18, y + 67, 28, big, f"sc{i}", 0.6 + i * .25)
@@ -325,7 +325,10 @@ def dashboard_svg(mode: str, stats: dict, langs: list[tuple[str, int]], streak: 
                      f'fill="none" stroke="{col}" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>')
         else:
             glyph = "".join(f'<rect class="tk" x="{px + 14 + gx * 11}" y="{y + 18 + gy * 11}" width="8" height="8" rx="2" fill="{col}" opacity="{.35 + .2 * ((gx + gy) % 3)}" style="animation-delay:{(gx + gy) * .25:.2f}s"/>' for gx in range(3) for gy in range(3))
-        ld, _ = mono.path(label, 8.5, px + 58, y + 34, 1.4)
+        ld = ""
+        for li, word in enumerate(label):                      # two stacked lines, each fitted inside the card (80 px)
+            sz = 8.5 * min(1.0, 80 / mono.width(word, 8.5, 1.2))
+            ld += mono.path(word, sz, px + 56, y + 27 + li * 12, 1.2)[0] + " "
         body += (f'<rect x="{px + .5}" y="{y + .5}" width="147" height="75" rx="18" fill="{col}" fill-opacity=".07" stroke="{col}" stroke-opacity=".55"/>'
                  f'<clipPath id="sk{i}"><rect x="{px}" y="{y}" width="148" height="76" rx="18"/></clipPath><g clip-path="url(#sk{i})"><rect class="sweep" x="{px - 70}" y="{y}" width="24" height="76" fill="{col}" opacity=".16" transform="skewX(-20)" style="animation-delay:{i * 1.3:.1f}s"/></g>'
                  f'<g transform="translate(0 -8)">{glyph}</g><path d="{ld}" fill="{col}" transform="translate(0 -8)"/>{sdig}')
