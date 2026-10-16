@@ -28,26 +28,13 @@ def title(slug: str, alt: str) -> str:
             f'<p align="center">{pic("assets/titles/" + slug + "-{m}.svg", alt)}</p>\n')
 
 
-def card(key: str, name: str, band_url: str) -> str:
-    """Project card (links to the repo) with an attached action band (download, or open the repo)."""
-    owner = REPO.split("/")[0]
+def card(key: str, name: str, band_url: str, repo_url: str) -> str:
+    """Project card (links to the repo) with an attached action band (download, live demo or the repo)."""
     top = pic("assets/projects/" + key + "-{m}.svg", name + " project card", "100%", 'align="top"')
     band = pic("assets/projects/" + key + "-band-{m}.svg", "Action button for " + name, "100%", 'align="top"')
     return (f'<td width="50%" align="center" valign="top">\n'
-            f'<a href="https://github.com/{owner}/{name}">{top}</a><br>\n'
+            f'<a href="{repo_url}">{top}</a><br>\n'
             f'<a href="{band_url}">{band}</a>\n</td>')
-
-
-def more_pills(owner: str) -> str:
-    """One linked pill per repository; the last one ("and more") opens the repositories page."""
-    pills = [("TaskFlow", "TaskFlow"), ("MathForge", "MathForge"), ("Rack Up, a Web3 game on Base Sepolia", "Rack_Up-Onchain_Hi-Lo"),
-             ("Periodic Table", "Periodic-Table"), ("and more repositories", None)]
-    out = []
-    for k, (alt, repo) in enumerate(pills):
-        url = f"https://github.com/{owner}/{repo}" if repo else f"https://github.com/{owner}?tab=repositories"
-        img = pic("assets/sections/more-" + str(k) + "-{m}.svg", alt, "", 'align="top"').replace(' width=""', "")
-        out.append(f'<a href="{url}">{img}</a>')
-    return "\n".join(out)
 
 
 def main() -> None:
@@ -80,20 +67,15 @@ def main() -> None:
 <p align="center">{pic("assets/sections/ticker2-{m}.svg", "Build, ship, learn, repeat")}</p>
 
 {title("work", "Featured work")}
-<table>
-<tr>
-{card("ultimatecraft", "UltimateCraft", f"https://github.com/{owner}/UltimateCraft/releases/download/v5.1.0/UltimateCraft-5.1.0-windows.zip")}
-{card("loci", "Loci", f"https://github.com/{owner}/Loci")}
-</tr>
-<tr>
-{card("attendtrack", "AttendTrack", f"https://github.com/{owner}/AttendTrack/releases/latest/download/AttendTrack.apk")}
-{card("meridian", "Meridian", f"https://github.com/{owner}/Meridian")}
-</tr>
-</table>
+<!-- FEATURED:START -->
+<!-- filled by scripts/featured.py from the pinned repositories -->
+<!-- FEATURED:END -->
 
 <p align="center"><a href="https://github.com/{owner}?tab=repositories">{pic("assets/sections/more-{m}.svg", "More from my repositories: open the repositories page")}</a></p>
 <p align="center">
-{more_pills(owner)}
+<!-- MORE:START -->
+<!-- filled by scripts/featured.py -->
+<!-- MORE:END -->
 </p>
 
 {title("stats", "By the numbers")}
@@ -122,9 +104,9 @@ def main() -> None:
 </div>
 '''
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-    from bust import carry
+    from bust import carry, carry_blocks
     old = README.read_text(encoding="utf-8") if README.exists() else ""
-    README.write_text(carry(old, out), encoding="utf-8")
+    README.write_text(carry_blocks(old, carry(old, out)), encoding="utf-8")
     print("README.md written")
 
 

@@ -1,0 +1,47 @@
+name: Featured work
+
+on:
+  schedule:
+    - cron: "40 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+jobs:
+  featured:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - run: pip install fonttools
+
+      # The default GITHUB_TOKEN reads public data. Optionally add a PAT secret named GH_STATS_PAT
+      # (read-only) to include private contributions.
+      - name: Rebuild featured work from the pinned repositories
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_STATS_PAT || secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY_OWNER: ${{ github.repository_owner }}
+        run: python scripts/featured.py
+
+      - name: Bust the README image cache
+        run: python scripts/bust.py featured
+      - name: Commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md assets/projects/ assets/sections/
+          if git diff --cached --quiet; then echo "nothing to commit"; exit 0; fi
+          git commit -m "chore: refresh featured work [skip ci]"
+          # other workflows may push at the same time: rebase and retry instead of failing
+          for attempt in 1 2 3 4 5; do
+            git pull --rebase --autostash && git push && exit 0
+            echo "push failed (attempt $attempt), retrying"; sleep $((attempt * 3))
+          done
+          exit 1

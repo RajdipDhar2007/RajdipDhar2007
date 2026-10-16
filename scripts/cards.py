@@ -243,7 +243,10 @@ def dashboard_svg(mode: str, stats: dict, langs: list[tuple[str, int]], streak: 
         body += (f'<clipPath id="tb{i}"><path d="{tube} Z"/></clipPath>'
                  f'<ellipse class="fsh" cx="{cxm}" cy="{BOT + 4}" rx="{r + 10}" ry="8" fill="{col}" style="animation-delay:-{i * .7:.1f}s"/>'
                  f'<ellipse cx="{cxm}" cy="{BOT + 3}" rx="{r + 3}" ry="5" fill="#000" opacity=".28"/>'
-                 f'<g class="nz" style="animation-delay:-{i * .5:.1f}s"><path d="M{cxm - 5} 218 h10 l-2 12 h-6z" fill="{c["line"]}"/><rect x="{cxm - 7}" y="215" width="14" height="4" rx="2" fill="{c["muted"]}" opacity=".7"/></g>'
+                 f'<g class="nz" style="animation-delay:-{i * .5:.1f}s"><ellipse cx="{cxm}" cy="203" rx="7" ry="8" fill="{col}"/><ellipse cx="{cxm}" cy="203" rx="7" ry="8" fill="url(#cyl)"/><ellipse cx="{cxm - 2.5}" cy="199.5" rx="1.8" ry="3" fill="#fff" opacity=".6"/>'
+                 f'<rect x="{cxm - 6.5}" y="208" width="13" height="4" rx="2" fill="{c["muted"]}"/><rect x="{cxm - 6.5}" y="208" width="13" height="4" rx="2" fill="url(#cyl)"/>'
+                 f'<path d="M{cxm - 4.5} 212 h9 v9 l-2.4 8 h-4.2 l-2.4 -8z" fill="{c["ink"]}" fill-opacity=".14" stroke="{c["ink"]}" stroke-opacity=".55" stroke-width="1.2" stroke-linejoin="round"/>'
+                 f'<path d="M{cxm - 4.5} 212 h9 v9 l-2.4 8 h-4.2 l-2.4 -8z" fill="url(#cyl)" opacity=".8"/><path d="M{cxm - 2.2} 214 v8" stroke="#fff" stroke-opacity=".6" stroke-width="1.6" stroke-linecap="round"/></g>'
                  f'<g class="sway" style="transform-origin:{cxm}px {BOT}px;animation-delay:-{i * .9:.1f}s">'
                  # back of the opening, glass body
                  f'<ellipse cx="{cxm}" cy="{TOP}" rx="{r}" ry="6" fill="{c["page"]}" opacity=".5"/>'
@@ -259,7 +262,8 @@ def dashboard_svg(mode: str, stats: dict, langs: list[tuple[str, int]], streak: 
                  f'<path d="{tube}" fill="none" stroke="{c["ink"]}" stroke-opacity=".5" stroke-width="2.2" stroke-linecap="round"/>'
                  f'<ellipse cx="{cxm}" cy="{TOP}" rx="{r + 2.5}" ry="6.5" fill="none" stroke="{c["ink"]}" stroke-opacity=".7" stroke-width="2.4"/>'
                  f'<path d="M{x + 6} {TOP + 14} V{BOT - 26}" stroke="#fff" stroke-opacity=".45" stroke-width="3" stroke-linecap="round"/></g>'
-                 f'<path class="dr" d="M{cxm} 224 q-4 6 -4 9 a4 4 0 0 0 8 0 q0 -3 -4 -9z" fill="{col}" style="--dy:{ys - 232:.0f}px;animation-delay:{i * .5:.1f}s"/>'
+                 f'<g class="dr" style="--dy:{ys - 238:.0f}px;animation-delay:{i * .5:.1f}s"><path d="M{cxm} 229 q-4.5 6.5 -4.5 10 a4.5 4.5 0 0 0 9 0 q0 -3.5 -4.5 -10z" fill="{col}"/>'
+                 f'<path d="M{cxm} 229 q-4.5 6.5 -4.5 10 a4.5 4.5 0 0 0 9 0 q0 -3.5 -4.5 -10z" fill="url(#dsh)"/><ellipse cx="{cxm - 1.7}" cy="238" rx="1.1" ry="1.9" fill="#fff" opacity=".85"/></g>'
                  f'<path d="{nd}" transform="translate({cxm - nw / 2:.1f} 416)" fill="{c["ink"]}"/>'
                  f'<path d="{pd}" transform="translate({cxm - pw / 2:.1f} 436)" fill="{col}"/>')
     body += "</g>"
@@ -326,7 +330,8 @@ def dashboard_svg(mode: str, stats: dict, langs: list[tuple[str, int]], streak: 
                  f'<clipPath id="sk{i}"><rect x="{px}" y="{y}" width="148" height="76" rx="18"/></clipPath><g clip-path="url(#sk{i})"><rect class="sweep" x="{px - 70}" y="{y}" width="24" height="76" fill="{col}" opacity=".16" transform="skewX(-20)" style="animation-delay:{i * 1.3:.1f}s"/></g>'
                  f'<g transform="translate(0 -8)">{glyph}</g><path d="{ld}" fill="{col}" transform="translate(0 -8)"/>{sdig}')
     body += star4(790, 190, 6, c["accent"], "tw") + "</g>"
-    defs_extra = (f'<linearGradient id="cyl" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#000" stop-opacity=".38"/><stop offset=".22" stop-color="#fff" stop-opacity=".22"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".45"/></linearGradient>'
+    defs_extra = (f'<radialGradient id="dsh" cx=".35" cy=".65" r=".75"><stop offset="0" stop-color="#fff" stop-opacity=".5"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".42"/></radialGradient>'
+                  + f'<linearGradient id="cyl" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#000" stop-opacity=".38"/><stop offset=".22" stop-color="#fff" stop-opacity=".22"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".45"/></linearGradient>'
                   f'<linearGradient id="glass" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="{c["ink"]}" stop-opacity=".16"/><stop offset=".3" stop-color="{c["ink"]}" stop-opacity=".03"/><stop offset="1" stop-color="{c["ink"]}" stop-opacity=".12"/></linearGradient>'
                   + f'<linearGradient id="shade" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity=".25"/><stop offset=".35" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".28"/></linearGradient>'
                   f'<radialGradient id="aura"><stop offset="0" stop-color="{c["pink"]}" stop-opacity=".5"/><stop offset="1" stop-color="{c["pink"]}" stop-opacity="0"/></radialGradient>')

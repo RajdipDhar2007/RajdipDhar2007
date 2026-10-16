@@ -30,6 +30,27 @@ ROWS = [
 PILLS = ["Machine Learning", "Data Science", "LLM apps", "Automation"]
 
 
+def _shade(hexcol: str, k: float) -> str:
+    r, g, b = (int(hexcol[i:i + 2], 16) for i in (1, 3, 5))
+    return "#%02X%02X%02X" % tuple(max(0, min(255, int(v * k))) for v in (r, g, b))
+
+
+def _icon_path(name: str) -> str:
+    import json
+    from pathlib import Path
+    return json.loads((Path(__file__).resolve().parents[1] / "icons.json").read_text(encoding="utf-8"))[name]["path"]
+
+
+def icon3d(key: str, x: float, y: float, size: float, col: str, k: int, dark: bool) -> str:
+    """Extruded (3D) brand glyph: a stack of darker copies that fans out as the glyph sways, plus a glossy front face."""
+    s = size / 24
+    layers = "".join(f'<g class="ex" style="--k:{n}"><use href="#ic-{key}" transform="translate({x:.1f} {y:.1f}) scale({s:.4f})" fill="{_shade(col, .62 - n * .035)}"/></g>' for n in range(7, 0, -1))
+    front = (f'<g class="fr"><use href="#ic-{key}" transform="translate({x:.1f} {y:.1f}) scale({s:.4f})" fill="{col}"/>'
+             f'<use href="#ic-{key}" transform="translate({x:.1f} {y:.1f}) scale({s:.4f})" fill="url(#gloss)"/></g>')
+    shadow = f'<ellipse class="fsd" cx="{x + size / 2 + 3:.1f}" cy="{y + size + 9:.1f}" rx="{size * .4:.1f}" ry="3.6" fill="#000" opacity="{.38 if dark else .22}" style="animation-delay:-{k * .5 % 3:.1f}s"/>'
+    return shadow + f'<g class="sw3" style="animation-delay:-{k * .6 % 4.2:.1f}s">{layers}{front}</g>'
+
+
 def toolbox(mode: str) -> str:
     c = PAL[mode]
     W, TW, TH, GAP = 830, 112, 124, 16
@@ -40,6 +61,9 @@ def toolbox(mode: str) -> str:
            "@keyframes flow{0%{stroke-dashoffset:100}100%{stroke-dashoffset:-100}}.flow{stroke-dasharray:22 78;animation:flow 1.6s linear infinite}"
            "@keyframes shn{0%{transform:translateX(0)}40%,100%{transform:translateX(220px)}}.shn{animation:shn 5s ease-in-out infinite}"
            "@keyframes orb{from{offset-distance:0%}to{offset-distance:100%}}.orb{animation:orb 4s linear infinite;filter:drop-shadow(0 0 3px currentColor)}"
+           "@keyframes ex{0%,100%{transform:translate(calc(var(--k) * -.9px),calc(var(--k) * .7px))}50%{transform:translate(calc(var(--k) * .9px),calc(var(--k) * .7px))}}.ex{animation:ex 4.2s ease-in-out infinite;animation-delay:inherit}"
+           "@keyframes sw3{0%,100%{transform:translateY(0) scaleX(.94) skewY(-2deg)}50%{transform:translateY(-3px) scaleX(1) skewY(2deg)}}.sw3{transform-box:fill-box;transform-origin:50% 100%;animation:sw3 4.2s ease-in-out infinite}"
+           "@keyframes fsd{0%,100%{transform:scale(1);opacity:.9}50%{transform:scale(.8);opacity:.6}}.fsd{transform-box:fill-box;transform-origin:center;animation:fsd 4.2s ease-in-out infinite}"
            "@keyframes gw{0%,100%{opacity:.12;transform:scale(1)}50%{opacity:.3;transform:scale(1.18)}}.gw{transform-box:fill-box;transform-origin:center;animation:gw 3s ease-in-out infinite}" + _tw())
     body, y, k = "", 0, 0
     for label, items, learning in ROWS:
@@ -63,7 +87,7 @@ def toolbox(mode: str) -> str:
                      f'<clipPath id="tc{k}"><rect x="{x:.1f}" y="{y}" width="{TW}" height="{TH}" rx="22"/></clipPath>'
                      f'<g clip-path="url(#tc{k})"><rect class="shn" x="{x - 70:.1f}" y="{y}" width="40" height="{TH}" fill="#fff" opacity=".09" transform="skewX(-20)" style="animation-delay:-{(k * .45) % 5:.2f}s"/></g>'
                      f'<circle class="gw" cx="{x + TW / 2:.1f}" cy="{y + 52}" r="30" fill="{col}" opacity=".14" style="animation-delay:-{(k * .5) % 3:.1f}s"/>'
-                     f'{icon(key, x + TW / 2 - 21, y + 31, 42, col)}'
+                     f'{icon3d(key, x + TW / 2 - 21, y + 27, 42, col, k, mode == "dark")}'
                      f'<path d="{nd}" transform="translate({x + (TW - nw) / 2:.1f} {y + 107})" fill="{c["ink"]}"/>'
                      + ((f'<circle class="pu" cx="{x + TW - 16}" cy="{y + 16}" r="4" fill="{c["pink"]}"/>'
                          f'<circle class="orb" r="3.2" fill="{c["pink"]}" style="offset-path:path({A}M{x + 22:.1f} {y:.1f} H{x + TW - 22:.1f} A22 22 0 0 1 {x + TW:.1f} {y + 22:.1f} V{y + TH - 22:.1f} A22 22 0 0 1 {x + TW - 22:.1f} {y + TH:.1f} H{x + 22:.1f} A22 22 0 0 1 {x:.1f} {y + TH - 22:.1f} V{y + 22:.1f} A22 22 0 0 1 {x + 22:.1f} {y:.1f}Z{A});animation-delay:-{k * .9:.1f}s"/>') if learning else "") + '</g>')
@@ -83,7 +107,9 @@ def toolbox(mode: str) -> str:
                  f'<path d="{pd}" fill="{c["ink"]}"/></g>')
         x += pw + 12
     H = y + 56
-    return doc(W, int(H), body, css, _grad(c, "g1"), "Toolbox: Python, TypeScript, JavaScript, Kotlin, C, HTML, React, Vite, Android Studio, OpenGL, Git, GitHub. Learning Django, Solidity, Jupyter, machine learning, data science, LLM apps, automation", pad_y=8)
+    defs = _grad(c, "g1") + '<linearGradient id="gloss" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset=".45" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".25"/></linearGradient>'
+    defs += "".join(f'<path id="ic-{key}" d="{_icon_path(key)}"/>' for _, items, _l in ROWS for key, _n in items)
+    return doc(W, int(H), body, css, defs, "Toolbox: Python, TypeScript, JavaScript, Kotlin, C, HTML, React, Vite, Android Studio, OpenGL, Git, GitHub. Learning Django, Solidity, Jupyter, machine learning, data science, LLM apps, automation", pad_y=8)
 
 
 # ------------------------------------------------------------------ projects
@@ -139,8 +165,26 @@ def art_sky(x, y, col, c):
             f'<g transform="translate({cx} {cy})"><g class="sun"><circle cx="0" cy="-50" r="9" fill="{c["pink"]}"/><circle class="sunr" cx="0" cy="-50" r="9" fill="none" stroke="{c["pink"]}" stroke-width="2"/></g></g>')
 
 
-ART = {"ultimatecraft": art_voxels, "loci": art_graph, "attendtrack": art_ring, "meridian": art_sky}
-ART_CSS = ("@keyframes vx{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}.vx1{animation:vx 2.4s ease-in-out infinite}.vx2{animation:vx 2.4s ease-in-out infinite;animation-delay:-.8s}.vx3{animation:vx 2.4s ease-in-out infinite;animation-delay:-1.6s}"
+def art_terminal(x, y, col, c):
+    """Code window: lines type themselves out, a caret blinks."""
+    lines = "".join(f'<rect class="tln" x="{x + 12}" y="{y + 20 + k * 11}" width="{w}" height="4.5" rx="2.2" fill="{[col, c["second"], c["pink"], col][k]}" style="animation-delay:{k * .5:.1f}s"/>' for k, w in enumerate((58, 40, 68, 30)))
+    return (f'<rect x="{x}" y="{y}" width="100" height="66" rx="10" fill="{c["card"]}" stroke="{col}" stroke-opacity=".6" stroke-width="2"/>'
+            f'<circle cx="{x + 10}" cy="{y + 9}" r="2.6" fill="{c["pink"]}"/><circle cx="{x + 19}" cy="{y + 9}" r="2.6" fill="{c["second"]}"/><circle cx="{x + 28}" cy="{y + 9}" r="2.6" fill="{col}"/>'
+            f'{lines}<rect class="car" x="{x + 44}" y="{y + 52}" width="6" height="9" fill="{col}"/>')
+
+
+def art_chain(x, y, col, c):
+    """Three linked blocks with a pulse travelling along the chain."""
+    cubes = "".join(f'<g class="vx{k + 1}">{_cube(x + 18 + k * 34, y + 44 - (k % 2) * 16, 12, [col, c["second"], c["pink"]][k])}</g>' for k in range(3))
+    return (f'<path d="M{x + 28} {y + 40} L{x + 52} {y + 28} L{x + 76} {y + 40}" fill="none" stroke="{col}" stroke-opacity=".4" stroke-width="2" stroke-dasharray="3 4"/>'
+            f'<path d="M{x + 28} {y + 40} L{x + 52} {y + 28} L{x + 76} {y + 40}" fill="none" stroke="{col}" stroke-width="3" stroke-linecap="round" pathLength="100" style="stroke-dasharray:18 82;animation:cmt2 2.4s linear infinite"/>{cubes}')
+
+
+ART = {"ultimatecraft": art_voxels, "loci": art_graph, "attendtrack": art_ring, "meridian": art_sky, "terminal": art_terminal, "chain": art_chain}
+ART_CSS = ("@keyframes tln{0%,8%{transform:scaleX(0)}35%,85%{transform:scaleX(1)}100%{transform:scaleX(0)}}.tln{transform-box:fill-box;transform-origin:left;animation:tln 5s ease-in-out infinite}"
+           "@keyframes car{0%,49%{opacity:1}50%,100%{opacity:0}}.car{animation:car 1s steps(1) infinite}"
+           "@keyframes cmt2{from{stroke-dashoffset:100}to{stroke-dashoffset:0}}"
+           "@keyframes vx{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}.vx1{animation:vx 2.4s ease-in-out infinite}.vx2{animation:vx 2.4s ease-in-out infinite;animation-delay:-.8s}.vx3{animation:vx 2.4s ease-in-out infinite;animation-delay:-1.6s}"
            "@keyframes gdraw{0%{stroke-dashoffset:100}50%,80%{stroke-dashoffset:0}100%{stroke-dashoffset:-100}}"
            "@keyframes rgp{0%{stroke-dashoffset:var(--c)}45%,85%{stroke-dashoffset:calc(var(--c) * .22)}100%{stroke-dashoffset:var(--c)}}.rgp{stroke-dasharray:var(--c);animation:rgp 5s ease-in-out infinite}"
            "@keyframes chk{0%,30%{stroke-dasharray:0 100}55%,85%{stroke-dasharray:100 0}100%{stroke-dasharray:0 100}}.chk{animation:chk 5s ease-in-out infinite}"
@@ -153,7 +197,8 @@ def project_card(p: dict, mode: str, idx: int) -> str:
     W, H = 400, 250
     tf, bf, mf, cf = typo.font(typo.DISPLAY), typo.font(typo.BODY), typo.font(typo.MONO_B), typo.font(typo.MEDIUM)
     col = _brand(p["icon"], c, mode)
-    td, _ = tf.path(p["name"], 30, 28, 92)
+    nsz = min(30.0, 30.0 * 195 / max(tf.width(p["name"], 30), 1))
+    td, _ = tf.path(p["name"], nsz, 28, 92)
     lines = bf.wrap(p["desc"], 13.5, 330)[:4]
     dd = "".join(f'<path d="{bf.path(l, 13.5, 28, 124 + k * 21)[0]}" fill="{c["muted"]}"/>' for k, l in enumerate(lines))
     chips, x = "", 28
@@ -175,7 +220,7 @@ def project_card(p: dict, mode: str, idx: int) -> str:
             f'<g><rect x="1" y="1" width="{W - 2}" height="{H + 38}" rx="26" fill="{c["card"]}" stroke="{c["line"]}" stroke-width="1.5"/>'
             f'<g clip-path="url(#cc)"><circle cx="{W - 30}" cy="40" r="120" fill="{col}" opacity=".10"/>'
             f'<g class="wm">{icon(p["icon"], W - 130, -10, 130, col, "opacity=\".07\"")}</g></g>'
-            f'{ART[p["key"]](W - 150, 26, col, c)}'
+            f'{ART[p.get("art", p["key"])](W - 150, 26, col, c)}'
             f'<rect class="run" x="1" y="1" width="{W - 2}" height="{H + 38}" rx="26" fill="none" stroke="url(#g1)" stroke-width="3" pathLength="1000" style="animation-delay:-{idx * 1.7:.1f}s"/>'
             f'<g clip-path="url(#cc)">{"".join(f"<circle class=" + chr(34) + "ptl" + chr(34) + f" cx=" + chr(34) + f"{40 + j * 58}" + chr(34) + f" cy=" + chr(34) + f"{H - 10}" + chr(34) + f" r=" + chr(34) + f"{1.6 + (j % 3) * .6}" + chr(34) + f" fill=" + chr(34) + f"{col}" + chr(34) + " style=" + chr(34) + f"animation-delay:-{(j * 1.1 + idx) % 6:.1f}s;animation-duration:{4 + j % 3}s" + chr(34) + "/>" for j in range(6))}</g>'
             f'<g clip-path="url(#cc)"><rect class="sheen" x="-120" y="0" width="70" height="{H}" fill="#fff" opacity=".10" transform="skewX(-20)" style="animation-delay:-{idx * 1.6:.1f}s"/></g>'
@@ -193,7 +238,7 @@ def action_band(p: dict, mode: str, idx: int) -> str:
     dark = "#0D1117" if mode == "dark" else "#fff"
     fg = dark if dl else c["ink"]
     px, py, pw, ph = 20, 10, W - 40, 50
-    label = "DOWNLOAD" if dl else "OPEN REPOSITORY"
+    label = "DOWNLOAD" if dl else ("OPEN LIVE DEMO" if p["band"]["kind"] == "live" else "OPEN REPOSITORY")
     ld, _ = hf.path(label, 17, 88, py + 25, 2)
     sd, _ = mf.path(p["band"]["sub"], 9.5, 88, py + 40, 2)
     if dl:   # arrow into a tray

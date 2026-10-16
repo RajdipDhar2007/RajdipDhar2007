@@ -528,17 +528,21 @@ def greeting_svg(mode: str, text: str, stamp: str, scene="morning", slot=None) -
                     f'{star4(66, 26, 5, c["accent"], "tw")}{star4(30, 30, 4, c["pink"], "tw", "style=" + chr(34) + "animation-delay:-1s" + chr(34))}')
         scn = "".join(f'<circle class="tws" cx="{rr.randint(520, 800)}" cy="{rr.randint(10, 72)}" r="{rr.choice([1, 1.4, 2])}" fill="{c["ink"]}" style="animation-delay:-{rr.uniform(0, 3):.1f}s"/>' for _ in range(26))
         scn += f'<line class="gsl" x1="560" y1="14" x2="500" y2="-6" stroke="{c["accent"]}" stroke-width="2" stroke-linecap="round"/>'
-    elif scene == "evening":  # sun sinking into a glowing horizon, birds, fireflies
-        defs += (f'<linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="{c["second"]}" stop-opacity="0"/>'
-                 f'<stop offset=".6" stop-color="{c["pink"]}" stop-opacity=".16"/><stop offset="1" stop-color="{warm}" stop-opacity=".34"/></linearGradient>'
-                 f'<clipPath id="hz"><rect x="14" y="14" width="56" height="42"/></clipPath>')
-        icon_svg = (f'<circle class="hal" cx="42" cy="56" r="26" fill="{warm}" opacity=".3"/>'
-                    f'<g clip-path="url(#hz)"><g class="bobi"><circle cx="42" cy="56" r="15" fill="{warm}"/><circle cx="42" cy="56" r="9" fill="{c["pink"]}" opacity=".55"/></g></g>'
-                    f'<path d="M12 56 H72" stroke="{warm}" stroke-width="3" stroke-linecap="round"/><path d="M20 63 H64" stroke="{c["pink"]}" stroke-width="2" stroke-linecap="round" opacity=".6"/>'
-                    f'{star4(66, 22, 4, c["accent"], "tw")}')
-        scn = (f'<rect x="440" y="0" width="390" height="84" fill="url(#sky)"/>'
+    elif scene == "evening":  # a dusk porthole (sun sinking into the sea, all clipped to the disc), soft sunset glow, birds, fireflies
+        defs += (f'<linearGradient id="dusk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="{c["second"]}"/><stop offset=".55" stop-color="{c["pink"]}"/><stop offset="1" stop-color="{warm}"/></linearGradient>'
+                 f'<radialGradient id="sunh"><stop offset="0" stop-color="{warm}" stop-opacity=".9"/><stop offset="1" stop-color="{warm}" stop-opacity="0"/></radialGradient>'
+                 f'<radialGradient id="skyg"><stop offset="0" stop-color="{warm}" stop-opacity=".34"/><stop offset=".55" stop-color="{c["pink"]}" stop-opacity=".12"/><stop offset="1" stop-color="{c["pink"]}" stop-opacity="0"/></radialGradient>'
+                 f'<clipPath id="orb"><circle cx="42" cy="42" r="31"/></clipPath>')
+        sea = "#1B1035" if mode == "dark" else "#5B2A86"
+        icon_svg = (f'<g clip-path="url(#orb)"><rect x="8" y="8" width="68" height="68" fill="url(#dusk)"/>'
+                    f'{star4(26, 22, 3.5, "#fff", "tw")}{star4(58, 18, 3, "#fff", "tw", "style=" + chr(34) + "animation-delay:-1.1s" + chr(34))}'
+                    f'<g class="bobi"><circle class="hal" cx="42" cy="50" r="24" fill="url(#sunh)"/><circle cx="42" cy="50" r="12" fill="#FFE9B8"/><circle cx="42" cy="50" r="12" fill="{warm}" opacity=".35"/></g>'
+                    f'<path d="M8 54 Q16 51 24 54 T40 54 T56 54 T76 54 V80 H8Z" fill="{sea}" opacity=".92"/>'
+                    f'<g class="bobi"><path d="M31 59 h22 M35 64 h14 M38 69 h8" stroke="{warm}" stroke-width="2.4" stroke-linecap="round" opacity=".8"/></g></g>'
+                    f'<circle cx="42" cy="42" r="31" fill="none" stroke="url(#g1)" stroke-width="2"/>')
+        scn = (f'<ellipse cx="770" cy="104" rx="360" ry="86" fill="url(#skyg)"/><ellipse cx="610" cy="108" rx="230" ry="60" fill="url(#skyg)" opacity=".8"/>'
                + "".join(f'<g class="bird" style="animation-delay:-{k * 5.3:.1f}s;animation-duration:{14 + k * 3}s"><path class="flap" d="M470 {24 + k * 14} q6 -7 12 0 q6 -7 12 0" fill="none" stroke="{c["ink"]}" stroke-opacity=".45" stroke-width="1.8" stroke-linecap="round" style="animation-delay:-{k * .3:.1f}s"/></g>' for k in range(3))
-               + "".join(f'<circle class="fly" cx="{rr.randint(560, 810)}" cy="{rr.randint(44, 76)}" r="{rr.choice([1.4, 1.9, 2.4])}" fill="{warm}" style="animation-delay:-{rr.uniform(0, 3.6):.1f}s"/>' for _ in range(14)))
+               + "".join(f'<circle class="fly" cx="{rr.randint(560, 810)}" cy="{rr.randint(40, 74)}" r="{rr.choice([1.4, 1.9, 2.4])}" fill="{warm}" style="animation-delay:-{rr.uniform(0, 3.6):.1f}s"/>' for _ in range(14)))
     elif scene == "saturday":  # game pad + confetti and fireworks: weekend build mode
         icon_svg = (f'<g class="pad"><rect x="18" y="30" width="48" height="26" rx="13" fill="{c["card"]}" stroke="url(#g1)" stroke-width="3"/>'
                     f'<path d="M30 36 v14 M23 43 h14" stroke="{c["accent"]}" stroke-width="3" stroke-linecap="round"/>'
