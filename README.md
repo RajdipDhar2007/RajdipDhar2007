@@ -101,7 +101,8 @@
 <p align="center">
 <a href="mailto:rajdipdharofficial@gmail.com"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/contact/email-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/contact/email-light.svg"><img alt="Email Rajdip" src="assets/contact/email-light.svg" width="250" ></picture></a>
 <a href="https://github.com/RajdipDhar2007"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/contact/github-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/contact/github-light.svg"><img alt="Rajdip on GitHub" src="assets/contact/github-light.svg" width="250" ></picture></a>
-<!-- TODO_RAJDIP: add LinkedIn, portfolio, LeetCode / Codeforces and X pills (see contact_pill() in scripts/poster/hero.py) -->
+<a href="https://www.linkedin.com/in/rajdip-dhar"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/contact/linkedin-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/contact/linkedin-light.svg"><img alt="Rajdip on LinkedIn" src="assets/contact/linkedin-light.svg" width="250" ></picture></a>
+<!-- TODO_RAJDIP: add portfolio, LeetCode / Codeforces and X pills (see contact_pill() in scripts/poster/hero.py) -->
 </p>
 
 <p align="center"><a href="https://github.com/RajdipDhar2007/RajdipDhar2007"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/sections/star-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/sections/star-light.svg"><img alt="Enjoyed the tour? Star this repo" src="assets/sections/star-light.svg" width="100%" ></picture></a></p>

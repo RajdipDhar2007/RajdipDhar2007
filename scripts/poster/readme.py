@@ -94,7 +94,8 @@ def main() -> None:
 <p align="center">
 <a href="mailto:rajdipdharofficial@gmail.com">{pic("assets/contact/email-{m}.svg", "Email Rajdip", "250")}</a>
 <a href="https://github.com/{owner}">{pic("assets/contact/github-{m}.svg", "Rajdip on GitHub", "250")}</a>
-<!-- TODO_RAJDIP: add LinkedIn, portfolio, LeetCode / Codeforces and X pills (see contact_pill() in scripts/poster/hero.py) -->
+<a href="https://www.linkedin.com/in/rajdip-dhar">{pic("assets/contact/linkedin-{m}.svg", "Rajdip on LinkedIn", "250")}</a>
+<!-- TODO_RAJDIP: add portfolio, LeetCode / Codeforces and X pills (see contact_pill() in scripts/poster/hero.py) -->
 </p>
 
 <p align="center"><a href="https://github.com/{REPO}">{pic("assets/sections/star-{m}.svg", "Enjoyed the tour? Star this repo")}</a></p>

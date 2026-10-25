@@ -781,3 +781,4 @@ def build():
         write(OUT / "sections" / f"about-{m}.svg", about(m))
         write(OUT / "contact" / f"email-{m}.svg", contact_pill("Email", "rajdipdharofficial@gmail.com", "gmail", m))
         write(OUT / "contact" / f"github-{m}.svg", contact_pill("GitHub", "@RajdipDhar2007", "github", m))
+        write(OUT / "contact" / f"linkedin-{m}.svg", contact_pill("LinkedIn", "in/rajdip-dhar", "linkedin", m))
