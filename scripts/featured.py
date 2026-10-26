@@ -132,17 +132,13 @@ def main() -> None:
     for f in (OUT / "projects").glob("*.svg"):
         if f.name not in keep:
             f.unlink()
-    more = [dict(name=pill_name(o["name"]), url=o["url"], kind=GLYPHS[i % len(GLYPHS)]) for i, o in enumerate(others)]
-    for k in range(8):                                             # drop stale pills
+    for k in range(8):                                             # no pills any more; drop stale ones
         for m in MODES:
             (OUT / "sections" / f"more-{k}-{m}.svg").unlink(missing_ok=True)
-    for k, o in enumerate(more):
-        for m in MODES:
-            write(OUT / "sections" / f"more-{k}-{m}.svg", work.repo_pill(o["name"], o["kind"], k % 5, m))
 
     text = README.read_text(encoding="utf-8")
     text = replace_block(text, "FEATURED", build_featured(projects))
-    text = replace_block(text, "MORE", build_more([dict(name=o["name"], url=o["url"]) for o in others]))
+    text = replace_block(text, "MORE", "")   # the heading stays; the repo pills are gone
     README.write_text(text, encoding="utf-8", newline="\n")
 
 
