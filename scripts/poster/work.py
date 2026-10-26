@@ -326,7 +326,7 @@ def _more_glyph(kind: str, col: str, c: dict) -> str:
 
 
 def more_header(mode: str) -> str:
-    """Headline strip of the 'more repositories' block (links to the repositories page)."""
+    """Headline strip of the 'more repositories' block (plain heading, not a link)."""
     c = PAL[mode]
     W, H = 830, 84
     sf = typo.font(typo.SCRIPT)
@@ -339,9 +339,8 @@ def more_header(mode: str) -> str:
             f'<clipPath id="mt"><path d="{head}" transform="translate({hx:.1f} 54)"/></clipPath><path d="{head}" transform="translate({hx:.1f} 54)" fill="url(#g1)"/>'
             f'<g clip-path="url(#mt)"><rect class="mshn" x="{hx:.1f}" y="14" width="60" height="50" fill="#fff" opacity=".75" transform="skewX(-22)"/></g>'
             f'<path class="mbr" d="M{hx:.1f} 64 q{hw * .25:.0f} -8 {hw * .5:.0f} -2 t{hw * .5:.0f} -4" fill="none" stroke="url(#g1)" stroke-width="3" stroke-linecap="round" pathLength="200"/>'
-            f'{star4(hx - 24, 38, 7, c["accent"], "tw")}{star4(hx + hw + 24, 34, 7, c["pink"], "tw", "style=" + chr(34) + "animation-delay:-1.2s" + chr(34))}'
-            f'<g class="arw"><path d="M{W - 58} 34 h22 m-9 -9 l9 9 l-9 9" fill="none" stroke="url(#g1)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>')
-    return doc(W, H, body, MORE_CSS + _tw(), _grad(c, "g1"), "More from my repositories: open the repositories page", pad_y=4)
+            f'{star4(hx - 24, 38, 7, c["accent"], "tw")}{star4(hx + hw + 24, 34, 7, c["pink"], "tw", "style=" + chr(34) + "animation-delay:-1.2s" + chr(34))}')
+    return doc(W, H, body, MORE_CSS + _tw(), _grad(c, "g1"), "More from my repositories", pad_y=4)
 
 
 def repo_pill(label: str, kind: str, idx: int, mode: str) -> str:

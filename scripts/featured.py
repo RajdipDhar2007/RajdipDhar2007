@@ -99,7 +99,7 @@ def build_featured(projects: list[dict]) -> str:
 
 def build_more(others: list[dict]) -> str:
     from poster.readme import pic
-    items = [(o["name"], o["url"]) for o in others] + [("and more repositories", f"https://github.com/{OWNER}?tab=repositories")]
+    items = [(o["name"], o["url"]) for o in others]
     out = []
     for k, (alt, url) in enumerate(items):
         img = pic("assets/sections/more-" + str(k) + "-{m}.svg", alt, "", 'align="top"').replace(' width=""', "")
@@ -133,7 +133,6 @@ def main() -> None:
         if f.name not in keep:
             f.unlink()
     more = [dict(name=pill_name(o["name"]), url=o["url"], kind=GLYPHS[i % len(GLYPHS)]) for i, o in enumerate(others)]
-    more.append(dict(name="and more", url=f"https://github.com/{login}?tab=repositories", kind="plus"))
     for k in range(8):                                             # drop stale pills
         for m in MODES:
             (OUT / "sections" / f"more-{k}-{m}.svg").unlink(missing_ok=True)
