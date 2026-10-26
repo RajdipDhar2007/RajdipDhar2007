@@ -326,7 +326,7 @@ def _more_glyph(kind: str, col: str, c: dict) -> str:
 
 
 def more_header(mode: str) -> str:
-    """Headline strip of the 'more repositories' block (plain heading, not a link)."""
+    """Headline strip of the 'more repositories' block (linked to the repositories page by the README)."""
     c = PAL[mode]
     W, H = 830, 84
     sf = typo.font(typo.SCRIPT)

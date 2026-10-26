@@ -71,7 +71,7 @@ def main() -> None:
 <!-- filled by scripts/featured.py from the pinned repositories -->
 <!-- FEATURED:END -->
 
-<p align="center">{pic("assets/sections/more-{m}.svg", "More from my repositories")}</p>
+<p align="center"><a href="https://github.com/{owner}?tab=repositories">{pic("assets/sections/more-{m}.svg", "More from my repositories")}</a></p>
 <p align="center">
 <!-- MORE:START -->
 <!-- filled by scripts/featured.py -->

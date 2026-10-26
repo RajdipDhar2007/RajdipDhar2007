@@ -64,7 +64,7 @@
 </table>
 <!-- FEATURED:END -->
 
-<p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/sections/more-dark.svg?v=1793013627"><source media="(prefers-color-scheme: light)" srcset="assets/sections/more-light.svg?v=1793013627"><img alt="More from my repositories" src="assets/sections/more-light.svg?v=1793013627" width="100%" ></picture></p>
+<p align="center"><a href="https://github.com/RajdipDhar2007?tab=repositories"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/sections/more-dark.svg?v=1793013627"><source media="(prefers-color-scheme: light)" srcset="assets/sections/more-light.svg?v=1793013627"><img alt="More from my repositories" src="assets/sections/more-light.svg?v=1793013627" width="100%" ></picture></a></p>
 <p align="center">
 <!-- MORE:START -->
 
