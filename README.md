@@ -36,35 +36,35 @@
 <table>
 <tr>
 <td width="50%" align="center" valign="top">
-<a href="https://github.com/RajdipDhar2007/Periodic-Table"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/projects/periodictable-dark.svg?v=1793204973"><source media="(prefers-color-scheme: light)" srcset="assets/projects/periodictable-light.svg?v=1793204973"><img alt="Periodic Table project card" src="assets/projects/periodictable-light.svg?v=1793204973" width="100%" align="top"></picture></a><br>
-<a href="https://github.com/RajdipDhar2007/Periodic-Table"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/projects/periodictable-band-dark.svg?v=1793204973"><source media="(prefers-color-scheme: light)" srcset="assets/projects/periodictable-band-light.svg?v=1793204973"><img alt="Action button for Periodic Table" src="assets/projects/periodictable-band-light.svg?v=1793204973" width="100%" align="top"></picture></a>
+<a href="https://github.com/RajdipDhar2007/Periodic-Table"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/projects/periodictable-dark.svg?v=1793208413"><source media="(prefers-color-scheme: light)" srcset="assets/projects/periodictable-light.svg?v=1793208413"><img alt="Periodic Table project card" src="assets/projects/periodictable-light.svg?v=1793208413" width="100%" align="top"></picture></a><br>
+<a href="https://github.com/RajdipDhar2007/Periodic-Table"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/projects/periodictable-band-dark.svg?v=1793208413"><source media="(prefers-color-scheme: light)" srcset="assets/projects/periodictable-band-light.svg?v=1793208413"><img alt="Action button for Periodic Table" src="assets/projects/periodictable-band-light.svg?v=1793208413" width="100%" align="top"></picture></a>
 </td>
 <td width="50%" align="center" valign="top">
-<a href="https://github.com/RajdipDhar2007/UltimateCraft"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/projects/ultimatecraft-dark.svg?v=1793204973"><source media="(prefers-color-scheme: light)" srcset="assets/projects/ultimatecraft-light.svg?v=1793204973"><img alt="UltimateCraft project card" src="assets/projects/ultimatecraft-light.svg?v=1793204973" width="100%" align="top"></picture></a><br>
-<a href="https://github.com/RajdipDhar2007/UltimateCraft/releases/download/v5.1.0/UltimateCraft-5.1.0-windows.zip"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/projects/ultimatecraft-band-dark.svg?v=1793204973"><source media="(prefers-color-scheme: light)" srcset="assets/projects/ultimatecraft-band-light.svg?v=1793204973"><img alt="Action button for UltimateCraft" src="assets/projects/ultimatecraft-band-light.svg?v=1793204973" width="100%" align="top"></picture></a>
-</td>
-</tr>
-<tr>
-<td width="50%" align="center" valign="top">
-<a href="https://github.com/RajdipDhar2007/Rack_Up-Onchain_Hi-Lo"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/projects/rackuponchainhilo-dark.svg?v=1793204973"><source media="(prefers-color-scheme: light)" srcset="assets/projects/rackuponchainhilo-light.svg?v=1793204973"><img alt="Rack Up project card" src="assets/projects/rackuponchainhilo-light.svg?v=1793204973" width="100%" align="top"></picture></a><br>
-<a href="https://github.com/RajdipDhar2007/Rack_Up-Onchain_Hi-Lo"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/projects/rackuponchainhilo-band-dark.svg?v=1793204973"><source media="(prefers-color-scheme: light)" srcset="assets/projects/rackuponchainhilo-band-light.svg?v=1793204973"><img alt="Action button for Rack Up" src="assets/projects/rackuponchainhilo-band-light.svg?v=1793204973" width="100%" align="top"></picture></a>
-</td>
-<td width="50%" align="center" valign="top">
-<a href="https://github.com/RajdipDhar2007/AttendTrack"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/projects/attendtrack-dark.svg?v=1793204973"><source media="(prefers-color-scheme: light)" srcset="assets/projects/attendtrack-light.svg?v=1793204973"><img alt="AttendTrack project card" src="assets/projects/attendtrack-light.svg?v=1793204973" width="100%" align="top"></picture></a><br>
-<a href="https://github.com/RajdipDhar2007/AttendTrack/releases/download/v1.0/AttendTrack.apk"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/projects/attendtrack-band-dark.svg?v=1793204973"><source media="(prefers-color-scheme: light)" srcset="assets/projects/attendtrack-band-light.svg?v=1793204973"><img alt="Action button for AttendTrack" src="assets/projects/attendtrack-band-light.svg?v=1793204973" width="100%" align="top"></picture></a>
+<a href="https://github.com/RajdipDhar2007/UltimateCraft"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/projects/ultimatecraft-dark.svg?v=1793208413"><source media="(prefers-color-scheme: light)" srcset="assets/projects/ultimatecraft-light.svg?v=1793208413"><img alt="UltimateCraft project card" src="assets/projects/ultimatecraft-light.svg?v=1793208413" width="100%" align="top"></picture></a><br>
+<a href="https://github.com/RajdipDhar2007/UltimateCraft/releases/download/v5.1.0/UltimateCraft-5.1.0-windows.zip"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/projects/ultimatecraft-band-dark.svg?v=1793208413"><source media="(prefers-color-scheme: light)" srcset="assets/projects/ultimatecraft-band-light.svg?v=1793208413"><img alt="Action button for UltimateCraft" src="assets/projects/ultimatecraft-band-light.svg?v=1793208413" width="100%" align="top"></picture></a>
 </td>
 </tr>
 <tr>
 <td width="50%" align="center" valign="top">
-<a href="https://github.com/RajdipDhar2007/TaskFlow"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/projects/taskflow-dark.svg?v=1793204973"><source media="(prefers-color-scheme: light)" srcset="assets/projects/taskflow-light.svg?v=1793204973"><img alt="TaskFlow project card" src="assets/projects/taskflow-light.svg?v=1793204973" width="100%" align="top"></picture></a><br>
-<a href="https://github.com/RajdipDhar2007/TaskFlow/releases/download/v1.0.0/TaskFlow-Setup-1.0.0.exe"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/projects/taskflow-band-dark.svg?v=1793204973"><source media="(prefers-color-scheme: light)" srcset="assets/projects/taskflow-band-light.svg?v=1793204973"><img alt="Action button for TaskFlow" src="assets/projects/taskflow-band-light.svg?v=1793204973" width="100%" align="top"></picture></a>
+<a href="https://github.com/RajdipDhar2007/Rack_Up-Onchain_Hi-Lo"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/projects/rackuponchainhilo-dark.svg?v=1793208413"><source media="(prefers-color-scheme: light)" srcset="assets/projects/rackuponchainhilo-light.svg?v=1793208413"><img alt="Rack Up project card" src="assets/projects/rackuponchainhilo-light.svg?v=1793208413" width="100%" align="top"></picture></a><br>
+<a href="https://github.com/RajdipDhar2007/Rack_Up-Onchain_Hi-Lo"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/projects/rackuponchainhilo-band-dark.svg?v=1793208413"><source media="(prefers-color-scheme: light)" srcset="assets/projects/rackuponchainhilo-band-light.svg?v=1793208413"><img alt="Action button for Rack Up" src="assets/projects/rackuponchainhilo-band-light.svg?v=1793208413" width="100%" align="top"></picture></a>
+</td>
+<td width="50%" align="center" valign="top">
+<a href="https://github.com/RajdipDhar2007/AttendTrack"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/projects/attendtrack-dark.svg?v=1793208413"><source media="(prefers-color-scheme: light)" srcset="assets/projects/attendtrack-light.svg?v=1793208413"><img alt="AttendTrack project card" src="assets/projects/attendtrack-light.svg?v=1793208413" width="100%" align="top"></picture></a><br>
+<a href="https://github.com/RajdipDhar2007/AttendTrack/releases/download/v1.0/AttendTrack.apk"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/projects/attendtrack-band-dark.svg?v=1793208413"><source media="(prefers-color-scheme: light)" srcset="assets/projects/attendtrack-band-light.svg?v=1793208413"><img alt="Action button for AttendTrack" src="assets/projects/attendtrack-band-light.svg?v=1793208413" width="100%" align="top"></picture></a>
+</td>
+</tr>
+<tr>
+<td width="50%" align="center" valign="top">
+<a href="https://github.com/RajdipDhar2007/TaskFlow"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/projects/taskflow-dark.svg?v=1793208413"><source media="(prefers-color-scheme: light)" srcset="assets/projects/taskflow-light.svg?v=1793208413"><img alt="TaskFlow project card" src="assets/projects/taskflow-light.svg?v=1793208413" width="100%" align="top"></picture></a><br>
+<a href="https://github.com/RajdipDhar2007/TaskFlow/releases/download/v1.0.0/TaskFlow-Setup-1.0.0.exe"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/projects/taskflow-band-dark.svg?v=1793208413"><source media="(prefers-color-scheme: light)" srcset="assets/projects/taskflow-band-light.svg?v=1793208413"><img alt="Action button for TaskFlow" src="assets/projects/taskflow-band-light.svg?v=1793208413" width="100%" align="top"></picture></a>
 </td>
 <td width="50%"></td>
 </tr>
 </table>
 <!-- FEATURED:END -->
 
-<p align="center"><a href="https://github.com/RajdipDhar2007?tab=repositories"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/sections/more-dark.svg?v=1793204973"><source media="(prefers-color-scheme: light)" srcset="assets/sections/more-light.svg?v=1793204973"><img alt="More from my repositories" src="assets/sections/more-light.svg?v=1793204973" width="100%" ></picture></a></p>
+<p align="center"><a href="https://github.com/RajdipDhar2007?tab=repositories"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/sections/more-dark.svg?v=1793208413"><source media="(prefers-color-scheme: light)" srcset="assets/sections/more-light.svg?v=1793208413"><img alt="More from my repositories" src="assets/sections/more-light.svg?v=1793208413" width="100%" ></picture></a></p>
 <p align="center">
 <!-- MORE:START -->
 
