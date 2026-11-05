@@ -155,8 +155,25 @@ def _cube(cx, cy, sz, col, op=1.0):
 
 
 def art_voxels(x, y, col, c):
-    return (f'<g class="vx1">{_cube(x + 30, y + 52, 18, col)}</g><g class="vx2">{_cube(x + 66, y + 52, 18, col)}</g>'
-            f'<g class="vx3">{_cube(x + 48, y + 28, 18, col)}</g>')
+    """Isometric grass-and-dirt voxel terrain: columns drop in one after another, a spare block hovers above."""
+    s, cx, cy = 11, x + 55, y + 22
+    heights = [[2, 1, 1], [1, 3, 1], [1, 1, 2]]
+    out = ""
+    for gx in range(3):
+        for gy in range(3):
+            h = heights[gx][gy]
+            H = h * s * .9
+            gxp, gyp = cx + (gx - gy) * s, cy + (gx + gy) * s / 2
+            ty = gyp - H
+            top = f"M{gxp} {ty - s / 2:.1f} L{gxp + s} {ty:.1f} L{gxp} {ty + s / 2:.1f} L{gxp - s} {ty:.1f}Z"
+            left = f"M{gxp - s} {ty:.1f} L{gxp} {ty + s / 2:.1f} V{gyp + s / 2:.1f} L{gxp - s} {gyp:.1f}Z"
+            right = f"M{gxp} {ty + s / 2:.1f} L{gxp + s} {ty:.1f} V{gyp:.1f} L{gxp} {gyp + s / 2:.1f}Z"
+            gl = f"M{gxp - s} {ty:.1f} L{gxp} {ty + s / 2:.1f} V{ty + s / 2 + 3.2:.1f} L{gxp - s} {ty + 3.2:.1f}Z"
+            gr = f"M{gxp} {ty + s / 2:.1f} L{gxp + s} {ty:.1f} V{ty + 3.2:.1f} L{gxp} {ty + s / 2 + 3.2:.1f}Z"
+            out += (f'<g class="vd" style="animation-delay:{(gx + gy) * .22:.2f}s"><path d="{left}" fill="#8B5A2B"/><path d="{right}" fill="#6E4520"/>'
+                    f'<path d="{gl}" fill="#4FA83D"/><path d="{gr}" fill="#3F8A30"/><path d="{top}" fill="#6FCF55"/></g>')
+    spare = f'<g class="vx2">{_cube(x + 100, y + 18, 9, col)}</g>'
+    return out + spare
 
 
 def art_graph(x, y, col, c):
@@ -168,11 +185,19 @@ def art_graph(x, y, col, c):
 
 
 def art_ring(x, y, col, c):
-    cx, cy, r = x + 55, y + 40, 30
+    """Attendance dial filling to ~75% beside a weekly present/absent bar chart with a 75% target line."""
+    cx, cy, r = x + 28, y + 38, 24
     circ = 2 * 3.14159 * r
-    return (f'<circle cx="{cx}" cy="{cy}" r="{r}" fill="none" stroke="{col}" stroke-opacity=".25" stroke-width="7"/>'
-            f'<circle class="rgp" cx="{cx}" cy="{cy}" r="{r}" fill="none" stroke="{col}" stroke-width="7" stroke-linecap="round" transform="rotate(-90 {cx} {cy})" style="--c:{circ:.0f}"/>'
-            f'<path class="chk" d="M{cx - 11} {cy + 1} L{cx - 3} {cy + 10} L{cx + 12} {cy - 9}" fill="none" stroke="{c["ink"]}" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" pathLength="100"/>')
+    ring = (f'<circle cx="{cx}" cy="{cy}" r="{r}" fill="none" stroke="{col}" stroke-opacity=".25" stroke-width="6"/>'
+            f'<circle class="rgp" cx="{cx}" cy="{cy}" r="{r}" fill="none" stroke="{col}" stroke-width="6" stroke-linecap="round" transform="rotate(-90 {cx} {cy})" style="--c:{circ:.0f}"/>'
+            f'<path class="chk" d="M{cx - 9} {cy + 1} L{cx - 2} {cy + 8} L{cx + 10} {cy - 7}" fill="none" stroke="{c["ink"]}" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" pathLength="100"/>')
+    bars, bx = "", x + 64
+    for k, (h, ok) in enumerate(((34, 1), (44, 1), (18, 0), (50, 1), (40, 1))):
+        fc = col if ok else c["pink"]
+        bars += f'<rect class="bar" x="{bx + k * 9:.0f}" y="{y + 66 - h}" width="6" height="{h}" rx="3" fill="{fc}" style="animation-delay:{k * .18:.2f}s"/>'
+    tgt = f'<path d="M{bx - 3} {y + 66 - 38} H{bx + 46}" stroke="{c["second"]}" stroke-width="1.5" stroke-dasharray="3 3" opacity=".8"/>'
+    base = f'<path d="M{bx - 3} {y + 67} H{bx + 46}" stroke="{col}" stroke-opacity=".35" stroke-width="1.5"/>'
+    return ring + base + tgt + bars
 
 
 def art_sky(x, y, col, c):
@@ -198,8 +223,84 @@ def art_chain(x, y, col, c):
             f'<path d="M{x + 28} {y + 40} L{x + 52} {y + 28} L{x + 76} {y + 40}" fill="none" stroke="{col}" stroke-width="3" stroke-linecap="round" pathLength="100" style="stroke-dasharray:18 82;animation:cmt2 2.4s linear infinite"/>{cubes}')
 
 
-ART = {"ultimatecraft": art_voxels, "loci": art_graph, "attendtrack": art_ring, "meridian": art_sky, "terminal": art_terminal, "chain": art_chain}
-ART_CSS = ("@keyframes tln{0%,8%{transform:scaleX(0)}35%,85%{transform:scaleX(1)}100%{transform:scaleX(0)}}.tln{transform-box:fill-box;transform-origin:left;animation:tln 5s ease-in-out infinite}"
+def art_periodic(x, y, col, c):
+    """The real periodic-table silhouette (18 columns, s/d/p blocks, f-block rows) with a heat-map wave rolling across it."""
+    rows = {0: [0, 17], 1: [0, 1, *range(12, 18)], 2: [0, 1, *range(12, 18)]}
+    for r in (3, 4, 5, 6):
+        rows[r] = list(range(18))
+    rows[7] = list(range(2, 16))
+    rows[8] = list(range(2, 16))
+    pal = [col, c["second"], c["pink"], c["accent"]]
+    out = []
+    for r, cols in rows.items():
+        for cc in cols:
+            cx, cy = x - 4 + cc * 6.1, y + 2 + r * 6.3 + (4 if r >= 7 else 0)
+            fc = pal[(cc // 3 + r) % 4]
+            out.append(f'<rect class="pt" x="{cx:.1f}" y="{cy:.1f}" width="5" height="5" rx="1.1" fill="{fc}" style="animation-delay:{(cc * .09 + r * .05):.2f}s"/>')
+    # Bohr-style atom over the faint table: three tilted orbits, electrons riding them, a pulsing nucleus
+    cx, cy, rx, ry = x + 55, y + 36, 50, 17,
+    orbits, els = "", ""
+    for k, ang in enumerate((0, 60, -60)):
+        d = f"M{cx - rx} {cy} A{rx} {ry} 0 1 1 {cx + rx} {cy} A{rx} {ry} 0 1 1 {cx - rx} {cy}Z"
+        orbits += f'<path d="{d}" fill="none" stroke="{pal[k]}" stroke-opacity=".6" stroke-width="1.4" transform="rotate({ang} {cx} {cy})"/>'
+        for j in range(2):
+            els += (f'<g transform="rotate({ang} {cx} {cy})"><circle class="el" r="3" fill="{pal[(k + j * 2) % 4]}" '
+                    f'style="offset-path:path(\'{d}\');animation-duration:{3.2 + k * .5}s;animation-delay:-{j * (1.6 + k * .25):.2f}s"/></g>')
+    nuc = (f'<circle class="npl" cx="{cx}" cy="{cy}" r="9" fill="{c["pink"]}" opacity=".35"/>'
+           f'<circle cx="{cx - 2.5}" cy="{cy - 2}" r="3.6" fill="{c["pink"]}"/><circle cx="{cx + 2.6}" cy="{cy - 1}" r="3.6" fill="{col}"/>'
+           f'<circle cx="{cx - .5}" cy="{cy + 3}" r="3.6" fill="{c["second"]}"/>')
+    return f'<g opacity=".2">{"".join(out)}</g>' + orbits + nuc + els
+
+
+def art_rack(x, y, col, c):
+    """Cascade juggling: three numbered pool balls arc between two hands, with Hi / Lo chevrons pulsing."""
+    nf, q = typo.font(typo.MONO_B), chr(39)
+    lx, rx_, hy = x + 26, x + 86, y + 58
+    d = (f"M{lx} {hy} C{lx - 6} {y - 14} {rx_ + 6} {y - 14} {rx_} {hy} "
+         f"C{rx_ + 6} {y + 20} {lx - 6} {y + 20} {lx} {hy}Z")
+    balls = ""
+    for k, (num, fc) in enumerate((("3", c["pink"]), ("8", col), ("12", c["second"]))):
+        nd, nw = nf.path(num, 8.5, 0, 0)
+        balls += (f'<g class="el" style="offset-path:path({q}{d}{q});animation-duration:3.3s;animation-delay:-{k * 1.1:.1f}s">'
+                  f'<circle r="8.5" fill="{fc}"/><circle r="5.2" fill="#fff"/><circle cx="-3.2" cy="-4" r="1.6" fill="#fff" opacity=".6"/>'
+                  f'<path d="{nd}" transform="translate({-nw / 2:.1f} 3)" fill="#101521"/></g>')
+    hands = "".join(f'<path class="hand" d="M{hx - 12} {hy - 2} Q{hx} {hy + 14} {hx + 12} {hy - 2}" fill="none" stroke="{col}" stroke-width="3.4" stroke-linecap="round" style="animation-delay:{i * -.55:.2f}s"/>'
+                    for i, hx in enumerate((lx, rx_)))
+    hilo = (f'<path class="hi" d="M{x + 2} {y + 8} l6 -6 l6 6" fill="none" stroke="{c["pink"]}" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>'
+            f'<path class="lo" d="M{x + 104} {y + 70} l6 6 l6 -6" fill="none" stroke="{col}" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" transform="translate(-12 -6)"/>')
+    return hands + balls + hilo
+
+
+def art_tasks(x, y, col, c):
+    """Productivity list: rows tick themselves off one by one, a progress bar fills underneath."""
+    pal = [col, c["second"], c["pink"]]
+    rows = ""
+    for k, w in enumerate((62, 46, 72)):
+        ry = y + 6 + k * 19
+        rows += (f'<rect x="{x}" y="{ry}" width="14" height="14" rx="4" fill="none" stroke="{pal[k]}" stroke-width="2"/>'
+                 f'<path class="tk" d="M{x + 3.5} {ry + 7.5} L{x + 6.5} {ry + 10.5} L{x + 11} {ry + 4}" fill="none" stroke="{pal[k]}" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" pathLength="100" style="animation-delay:{k * .9:.1f}s"/>'
+                 f'<rect x="{x + 22}" y="{ry + 4.5}" width="{w}" height="5" rx="2.5" fill="{c["muted"]}" opacity=".5"/>'
+                 f'<rect class="tkl" x="{x + 22}" y="{ry + 6}" width="{w}" height="2" rx="1" fill="{pal[k]}" style="animation-delay:{k * .9:.1f}s"/>')
+    bar = (f'<rect x="{x}" y="{y + 66}" width="100" height="5" rx="2.5" fill="{col}" opacity=".2"/>'
+           f'<rect class="tkb" x="{x}" y="{y + 66}" width="100" height="5" rx="2.5" fill="url(#g1)"/>')
+    return rows + bar
+
+
+ART = {"ultimatecraft": art_voxels, "loci": art_graph, "attendtrack": art_ring, "meridian": art_sky, "terminal": art_terminal, "chain": art_chain,
+       "periodic": art_periodic, "rack": art_rack, "tasks": art_tasks}
+ART_CSS = ("@keyframes hand{0%,100%{transform:translateY(0)}50%{transform:translateY(2.5px)}}.hand{animation:hand 1.65s ease-in-out infinite}"
+           "@keyframes eo{to{offset-distance:100%}}.el{offset-rotate:0deg;animation:eo 3.2s linear infinite}"
+           "@keyframes npl{0%,100%{transform:scale(.8);opacity:.2}50%{transform:scale(1.25);opacity:.5}}.npl{transform-box:fill-box;transform-origin:center;animation:npl 2s ease-in-out infinite}"
+           "@keyframes vd{0%{transform:translateY(-22px);opacity:0}14%,82%{transform:translateY(0);opacity:1}94%,100%{transform:translateY(0);opacity:0}}.vd{animation:vd 5.5s ease-out infinite backwards}"
+           "@keyframes bar{0%,10%{transform:scaleY(0)}35%,85%{transform:scaleY(1)}100%{transform:scaleY(0)}}.bar{transform-box:fill-box;transform-origin:bottom;animation:bar 5s ease-in-out infinite}"
+           "@keyframes pt{0%,100%{opacity:.35}50%{opacity:1}}.pt{animation:pt 3.2s ease-in-out infinite}"
+           "@keyframes rkb{0%,100%{transform:translate(0,0)}50%{transform:translate(2px,-2px)}}.rk0{animation:rkb 2.2s ease-in-out infinite}.rk1{animation:rkb 2.2s ease-in-out infinite;animation-delay:-.7s}.rk2{animation:rkb 2.2s ease-in-out infinite;animation-delay:-1.4s}"
+           "@keyframes cue{0%,10%{transform:translateX(-4px)}45%,100%{transform:translateX(34px)}}.cue{animation:cue 3s cubic-bezier(.3,0,.2,1) infinite alternate}"
+           "@keyframes hl{0%,100%{opacity:.25}50%{opacity:1}}.hi{animation:hl 1.6s ease-in-out infinite}.lo{animation:hl 1.6s ease-in-out infinite;animation-delay:-.8s}"
+           "@keyframes tk{0%,12%{stroke-dasharray:0 100}30%,88%{stroke-dasharray:100 0}100%{stroke-dasharray:0 100}}.tk{animation:tk 5s ease-in-out infinite}"
+           "@keyframes tkl{0%,15%{transform:scaleX(0)}35%,88%{transform:scaleX(1)}100%{transform:scaleX(0)}}.tkl{transform-box:fill-box;transform-origin:left;animation:tkl 5s ease-in-out infinite}"
+           "@keyframes tkb{0%{transform:scaleX(0)}70%,88%{transform:scaleX(1)}100%{transform:scaleX(0)}}.tkb{transform-box:fill-box;transform-origin:left;animation:tkb 5s ease-in-out infinite}"
+"@keyframes tln{0%,8%{transform:scaleX(0)}35%,85%{transform:scaleX(1)}100%{transform:scaleX(0)}}.tln{transform-box:fill-box;transform-origin:left;animation:tln 5s ease-in-out infinite}"
            "@keyframes car{0%,49%{opacity:1}50%,100%{opacity:0}}.car{animation:car 1s steps(1) infinite}"
            "@keyframes cmt2{from{stroke-dashoffset:100}to{stroke-dashoffset:0}}"
            "@keyframes vx{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}.vx1{animation:vx 2.4s ease-in-out infinite}.vx2{animation:vx 2.4s ease-in-out infinite;animation-delay:-.8s}.vx3{animation:vx 2.4s ease-in-out infinite;animation-delay:-1.6s}"

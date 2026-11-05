@@ -23,7 +23,8 @@ README = ROOT / "README.md"
 PROFILE_REPO = OWNER
 ICONS = {"python": "python", "typescript": "typescript", "javascript": "javascript", "kotlin": "kotlin", "c": "c", "html": "html",
          "jupyter notebook": "jupyter", "solidity": "solidity", "css": "html", "vue": "vite"}
-CURATED_ART = {"ultimatecraft": "ultimatecraft", "loci": "loci", "attendtrack": "attendtrack", "meridian": "meridian"}
+CURATED_ART = {"ultimatecraft": "ultimatecraft", "loci": "loci", "attendtrack": "attendtrack", "meridian": "meridian",
+               "periodictable": "periodic", "rackuponchainhilo": "rack", "taskflow": "tasks"}
 ART_BY_LANG = {"c": "ultimatecraft", "c++": "ultimatecraft", "kotlin": "attendtrack", "java": "attendtrack", "swift": "attendtrack",
                "typescript": "loci", "solidity": "chain", "python": "terminal", "javascript": "terminal", "html": "terminal", "css": "terminal"}
 GLYPHS = ["task", "sigma", "game", "atom"]
