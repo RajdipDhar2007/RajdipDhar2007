@@ -82,6 +82,16 @@
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/3d/contribution-dark.svg?v=1793889098"><source media="(prefers-color-scheme: light)" srcset="assets/3d/contribution-light.svg?v=1793889098"><img alt="3D contribution chart for the last 36 weeks" src="assets/3d/contribution-light.svg?v=1793889098" width="100%" ></picture></p>
 
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/sections/divider2-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/sections/divider2-light.svg"><img alt="" src="assets/sections/divider2-light.svg" width="100%" ></picture></p>
+<p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/titles/achievements-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/titles/achievements-light.svg"><img alt="Achievements" src="assets/titles/achievements-light.svg" width="100%" ></picture></p>
+
+<p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/sections/achievements-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/sections/achievements-light.svg"><img alt="GitHub achievements: Pull Shark, Quickdraw, YOLO, Pair Extraordinaire, Galaxy Brain" src="assets/sections/achievements-light.svg" width="100%" ></picture></p>
+
+<p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/sections/divider-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/sections/divider-light.svg"><img alt="" src="assets/sections/divider-light.svg" width="100%" ></picture></p>
+<p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/titles/highlights-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/titles/highlights-light.svg"><img alt="Highlights" src="assets/titles/highlights-light.svg" width="100%" ></picture></p>
+
+<p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/stats/highlights-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/stats/highlights-light.svg"><img alt="Highlights: all-time contributions, longest and current streak, active days, best day" src="assets/stats/highlights-light.svg" width="100%" ></picture></p>
+
+<p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/sections/divider2-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/sections/divider2-light.svg"><img alt="" src="assets/sections/divider2-light.svg" width="100%" ></picture></p>
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/titles/activity-dark.svg"><source media="(prefers-color-scheme: light)" srcset="assets/titles/activity-light.svg"><img alt="Live activity" src="assets/titles/activity-light.svg" width="100%" ></picture></p>
 
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/live/greeting-dark.svg?v=1793889090"><source media="(prefers-color-scheme: light)" srcset="assets/live/greeting-light.svg?v=1793889090"><img alt="Time-of-day greeting" src="assets/live/greeting-light.svg?v=1793889090" width="100%" ></picture></p>

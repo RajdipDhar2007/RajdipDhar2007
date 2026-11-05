@@ -28,7 +28,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GH_STATS_PAT || secrets.GITHUB_TOKEN }}
           GITHUB_REPOSITORY_OWNER: ${{ github.repository_owner }}
-        run: python scripts/cards.py
+        run: |
+          python scripts/cards.py
+          python scripts/highlights.py
 
       - name: Bust the README image cache
         run: python scripts/bust.py stats
