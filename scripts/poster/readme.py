@@ -84,12 +84,6 @@ def main() -> None:
 {title("city", "Contribution city")}
 <p align="center">{pic("assets/3d/contribution-{m}.svg", "3D contribution chart for the last 36 weeks", "100%")}</p>
 
-{title("achievements", "Achievements")}
-<p align="center">{pic("assets/sections/achievements-{m}.svg", "GitHub achievements: Pull Shark, Quickdraw, YOLO, Pair Extraordinaire, Galaxy Brain")}</p>
-
-{title("highlights", "Highlights")}
-<p align="center">{pic("assets/stats/highlights-{m}.svg", "Highlights: all-time contributions, longest and current streak, active days, best day")}</p>
-
 {title("activity", "Live activity")}
 <p align="center">{pic("assets/live/greeting-{m}.svg", "Time-of-day greeting")}</p>
 

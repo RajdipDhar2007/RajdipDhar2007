@@ -759,7 +759,7 @@ def greeting_svg(mode: str, text: str, stamp: str, scene="morning", slot=None) -
 
 
 TITLES = [("01", "ABOUT ME", "about"), ("02", "TOOLBOX", "toolbox"), ("03", "FEATURED WORK", "work"), ("04", "BY THE NUMBERS", "stats"),
-          ("05", "CONTRIBUTION CITY", "city"), ("09", "ACHIEVEMENTS", "achievements"), ("10", "HIGHLIGHTS", "highlights"), ("08", "PLAY A GAME", "play"), ("06", "RIGHT NOW", "activity"), ("07", "LET'S CONNECT", "connect")]
+          ("05", "CONTRIBUTION CITY", "city"), ("08", "PLAY A GAME", "play"), ("06", "RIGHT NOW", "activity"), ("07", "LET'S CONNECT", "connect")]
 
 
 def build():
